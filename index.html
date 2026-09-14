@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt | RFG – Realistic Funfair Games</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body {
+            background: #0b0b0f;
+            color: white;
+            min-height: 100vh;
+        }
+        header {
+            background: #111116;
+            border-bottom: 1px solid #25252d;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff3b3b;
+        }
+        nav a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 25px;
+            transition: 0.2s;
+        }
+        nav a:hover {
+            color: #ff3b3b;
+        }
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 70px auto;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .title h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+        .title h1 span {
+            color: #ff3b3b;
+        }
+        .title p {
+            color: #aaa;
+            font-size: 17px;
+        }
+        .contact-box {
+            background: #121218;
+            border: 1px solid #292932;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+        }
+        .form-group {
+            margin-bottom: 22px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ddd;
+        }
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #30303a;
+            background: #0c0c11;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus,
+        textarea:focus {
+            border-color: #ff3b3b;
+            box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.12);
+        }
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+        .send-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #ff3b3b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .send-button:hover {
+            background: #e52f2f;
+            transform: translateY(-1px);
+        }
+        .info {
+            text-align: center;
+            margin-top: 25px;
+            color: #888;
+            font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            border-top: 1px solid #222;
+            margin-top: 80px;
+        }
+        @media (max-width: 700px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav a {
+                margin: 0 7px;
+                font-size: 14px;
+            }
+            .container {
+                margin-top: 40px;
+            }
+            .title h1 {
+                font-size: 32px;
+            }
+            .contact-box {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">RFG</div>
+    <nav>
+        <a href="index.html">Startseite</a>
+        <a href="projects.html">Projekte</a>
+        <a href="team.html">Team</a>
+        <a href="devlog.html">Devlog</a>
+        <a href="contact.html">Kontakt</a>
+    </nav>
+</header>
+<main class="container">
+    <div class="title">
+        <h1>Kontakt <span>RFG</span></h1>
+        <p>
+            Du hast eine Frage, einen Vorschlag oder möchtest mit uns Kontakt aufnehmen?
+        </p>
+    </div>
+    <div class="contact-box">
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Dein Name"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="email">Deine E-Mail-Adresse</label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="deine@email.de"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="subject">Betreff</label>
+                <input
+                    type="text"
+                    id="subject"
+                    placeholder="Worum geht es?"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="message">Nachricht</label>
+                <textarea
+                    id="message"
+                    placeholder="Schreibe hier deine Nachricht..."
+                    required
+                ></textarea>
+            </div>
+            <button type="submit" class="send-button">
+                ✉ Nachricht senden
+            </button>
+        </form>
+        <div class="info">
+            Deine E-Mail-App wird geöffnet und die Nachricht an
+            <strong>crazyfunworld24@gmail.com</strong> vorbereitet.
+        </div>
+    </div>
+</main>
+<footer>
+    © 2026 RFG – Realistic Funfair Games
+</footer>
+<script>
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const subject = document.getElementById("subject").value;
+        const message = document.getElementById("message").value;
+        const recipient = "crazyfunworld24@gmail.com";
+        const mailSubject =
+            encodeURIComponent(subject);
+        const mailBody =
+            encodeURIComponent(
+                "Hallo RFG-Team,\n\n" +
+                message +
+                "\n\n--------------------\n" +
+                "Name: " + name + "\n" +
+                "E-Mail: " + email
+            );
+        window.location.href =
+            "mailto:" + recipient +
+            "?subject=" + mailSubject +
+            "&body=" + mailBody;
+    });
+</script>
+</body>
+</html>
