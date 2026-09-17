@@ -2,1101 +2,1636 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#111827">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Anwesenheit">
-
-<title>Anwesenheit</title>
-
+<meta name="apple-mobile-web-app-title" content="Klassenbuch">
+<title>Digitales Klassenbuch</title>
 <style>
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                     "SF Pro Text", Arial, sans-serif;
-        background: #f2f2f7;
-        color: #111827;
-        min-height: 100vh;
-        overflow-x: hidden;
-    }
-
-    .app {
-        max-width: 900px;
-        margin: auto;
-        padding: 24px;
-        padding-top: calc(24px + env(safe-area-inset-top));
-        padding-bottom: calc(30px + env(safe-area-inset-bottom));
-    }
-
-    header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    h1 {
-        margin: 0;
-        font-size: 32px;
-        font-weight: 750;
-        letter-spacing: -1px;
-    }
-
-    .subtitle {
-        margin-top: 5px;
-        color: #6b7280;
-        font-size: 15px;
-    }
-
-    button {
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        touch-action: manipulation;
-    }
-
-    .add-button {
-        width: 52px;
-        height: 52px;
-        border-radius: 17px;
-        background: #007aff;
-        color: white;
-        font-size: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 5px 15px rgba(0,122,255,.25);
-    }
-
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+:root {
+    --blue: #007aff;
+    --green: #16a34a;
+    --red: #dc2626;
+    --orange: #d97706;
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --text: #111827;
+    --secondary: #6b7280;
+    --border: #e5e7eb;
+}
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "SF Pro Text", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+button, input, textarea, select {
+    font: inherit;
+}
+button {
+    border: 0;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.app {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    padding-top: calc(20px + env(safe-area-inset-top));
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+/* HEADER */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: -1px;
+}
+.header p {
+    margin: 5px 0 0;
+    color: var(--secondary);
+    font-size: 14px;
+}
+/* BUTTONS */
+.primary-btn {
+    background: var(--blue);
+    color: white;
+    border-radius: 15px;
+    padding: 13px 17px;
+    font-weight: 700;
+}
+.icon-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: var(--blue);
+    color: white;
+    font-size: 28px;
+}
+/* NAV */
+.nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: var(--card);
+    padding: 7px;
+    border-radius: 18px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+.nav button {
+    background: transparent;
+    color: var(--secondary);
+    padding: 12px 5px;
+    border-radius: 13px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.nav button.active {
+    background: var(--blue);
+    color: white;
+}
+/* SECTIONS */
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+/* CARDS */
+.card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+.card-title {
+    font-size: 18px;
+    font-weight: 750;
+    margin-bottom: 15px;
+}
+/* STATS */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.stat {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 15px;
+}
+.stat-number {
+    font-size: 25px;
+    font-weight: 800;
+}
+.stat-label {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+}
+/* FORMS */
+.form-group {
+    margin-bottom: 14px;
+}
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+input, textarea, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #f9fafb;
+    color: var(--text);
+    border-radius: 14px;
+    padding: 13px 14px;
+    outline: none;
+}
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--blue);
+    background: var(--card);
+}
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+/* USERS */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.user-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 19px;
+    min-height: 80px;
+}
+.swipe-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: white;
+    font-weight: 750;
+}
+.swipe-missing {
+    background: var(--red);
+}
+.swipe-late {
+    background: #f59e0b;
+}
+.user-card {
+    position: relative;
+    z-index: 2;
+    min-height: 80px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px;
+    border-radius: 19px;
+    transform: translateX(0);
+    transition: transform .2s ease;
+    touch-action: pan-y;
+}
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+.user-name {
+    font-weight: 750;
+    font-size: 16px;
+}
+.status {
+    font-size: 13px;
+    font-weight: 650;
+    margin-top: 4px;
+}
+.present {
+    color: var(--green);
+}
+.missing {
+    color: var(--red);
+}
+.late {
+    color: var(--orange);
+}
+.more {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    color: #6b7280;
+    font-size: 20px;
+}
+/* ENTRIES */
+.entry {
+    border-left: 4px solid var(--blue);
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 9px;
+}
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.entry-user {
+    font-weight: 750;
+}
+.entry-date {
+    color: var(--secondary);
+    font-size: 12px;
+}
+.entry-text {
+    margin-top: 7px;
+    line-height: 1.4;
+}
+.entry-type {
+    display: inline-block;
+    margin-top: 8px;
+    background: #e5e7eb;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+/* LESSONS */
+.lesson {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+.lesson:last-child {
+    border-bottom: 0;
+}
+.lesson-time {
+    font-size: 17px;
+    font-weight: 800;
+    min-width: 70px;
+}
+.lesson-info {
+    flex: 1;
+}
+.lesson-name {
+    font-weight: 700;
+}
+.lesson-tolerance {
+    color: var(--secondary);
+    font-size: 12px;
+}
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 35px 15px;
+    color: var(--secondary);
+}
+.empty-icon {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+.modal-overlay.show {
+    display: flex;
+}
+.modal {
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 28px 28px 0 0;
+    padding: 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+.modal h2 {
+    margin: 0 0 20px;
+}
+.modal-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-top: 15px;
+}
+.cancel-btn {
+    background: #e5e7eb;
+    color: #374151;
+    border-radius: 14px;
+    height: 50px;
+    font-weight: 700;
+}
+.save-btn {
+    background: var(--blue);
+    color: white;
+    border-radius: 14px;
+    height: 50px;
+    font-weight: 700;
+}
+.delete-btn {
+    width: 100%;
+    margin-top: 10px;
+    height: 48px;
+    background: #fee2e2;
+    color: var(--red);
+    border-radius: 14px;
+    font-weight: 700;
+}
+/* TOGGLE */
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child {
+    border-bottom: 0;
+}
+.setting-title {
+    font-weight: 700;
+}
+.setting-description {
+    color: var(--secondary);
+    font-size: 12px;
+    margin-top: 3px;
+}
+/* EMPTY */
+.no-data {
+    padding: 30px;
+    text-align: center;
+    color: var(--secondary);
+}
+/* RESPONSIVE */
+@media (max-width: 650px) {
     .stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 25px;
+        grid-template-columns: repeat(2, 1fr);
     }
-
-    .stat {
-        background: white;
-        border-radius: 18px;
-        padding: 17px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    .nav button {
+        font-size: 11px;
     }
-
-    .stat-number {
-        font-size: 25px;
-        font-weight: 750;
+    .header h1 {
+        font-size: 27px;
     }
-
-    .stat-label {
-        margin-top: 3px;
-        font-size: 13px;
-        color: #6b7280;
-    }
-
-    .list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .empty {
-        background: white;
-        border-radius: 22px;
-        padding: 45px 20px;
-        text-align: center;
-        color: #6b7280;
-        box-shadow: 0 3px 12px rgba(0,0,0,.05);
-    }
-
-    .empty-icon {
-        font-size: 45px;
-        margin-bottom: 10px;
-    }
-
-    .user-wrapper {
-        position: relative;
-        overflow: hidden;
-        border-radius: 20px;
-        min-height: 82px;
-    }
-
-    .swipe-background {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 22px;
-        color: white;
-        font-weight: 700;
-        font-size: 15px;
-    }
-
-    .swipe-left {
-        background: #ef4444;
-    }
-
-    .swipe-right {
-        background: #f59e0b;
-    }
-
-    .user-card {
-        position: relative;
-        z-index: 2;
-        min-height: 82px;
-        background: white;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        padding: 14px 16px;
-        gap: 13px;
-        transform: translateX(0);
-        transition: transform .25s ease;
-        box-shadow: 0 3px 12px rgba(0,0,0,.05);
-        user-select: none;
-        touch-action: pan-y;
-    }
-
-    .avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 21px;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
-
-    .user-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .user-name {
-        font-size: 17px;
-        font-weight: 700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        margin-top: 5px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .status.present {
-        color: #16a34a;
-    }
-
-    .status.missing {
-        color: #dc2626;
-    }
-
-    .status.late {
-        color: #d97706;
-    }
-
-    .more-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 13px;
-        background: #f3f4f6;
-        color: #6b7280;
-        font-size: 21px;
-        flex-shrink: 0;
-    }
-
+}
+@media (min-width: 700px) {
     .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.42);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        display: none;
-        align-items: flex-end;
-        justify-content: center;
-        z-index: 100;
+        align-items: center;
     }
-
-    .modal-overlay.show {
-        display: flex;
-    }
-
     .modal {
-        width: 100%;
-        max-width: 600px;
-        background: white;
-        border-radius: 28px 28px 0 0;
-        padding: 25px;
-        padding-bottom: calc(25px + env(safe-area-inset-bottom));
-        animation: slideUp .25s ease;
+        border-radius: 28px;
     }
-
-    @keyframes slideUp {
-        from {
-            transform: translateY(100%);
-        }
-        to {
-            transform: translateY(0);
-        }
+}
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #000000;
+        --card: #1c1c1e;
+        --text: #ffffff;
+        --secondary: #98989d;
+        --border: #3a3a3c;
     }
-
-    .modal h2 {
-        margin: 0 0 20px;
-        font-size: 23px;
-    }
-
-    input {
-        width: 100%;
-        height: 54px;
-        border: 1px solid #d1d5db;
-        border-radius: 15px;
-        padding: 0 16px;
-        font-size: 17px;
-        outline: none;
-        font-family: inherit;
-        background: #f9fafb;
-    }
-
-    input:focus {
-        border-color: #007aff;
-        background: white;
-    }
-
-    .modal-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .modal-button {
-        height: 52px;
-        border-radius: 15px;
-        font-size: 16px;
-        font-weight: 700;
-    }
-
-    .cancel {
-        background: #e5e7eb;
-        color: #374151;
-    }
-
-    .primary {
-        background: #007aff;
+    input,
+    textarea,
+    select {
+        background: #2c2c2e;
         color: white;
     }
-
-    .danger {
-        background: #fee2e2;
-        color: #dc2626;
-        width: 100%;
-        height: 50px;
-        border-radius: 15px;
-        margin-top: 10px;
-        font-size: 16px;
-        font-weight: 700;
+    .avatar,
+    .more,
+    .cancel-btn {
+        background: #2c2c2e;
+        color: white;
     }
-
-    .status-buttons {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin-top: 10px;
+    .entry {
+        background: #2c2c2e;
     }
-
-    .status-button {
-        height: 48px;
-        border-radius: 14px;
-        background: #f3f4f6;
-        font-weight: 700;
-        font-size: 13px;
+    .delete-btn {
+        background: #3a1f20;
     }
-
-    @media (prefers-color-scheme: dark) {
-        body {
-            background: #000;
-            color: white;
-        }
-
-        .stat,
-        .user-card,
-        .empty,
-        .modal {
-            background: #1c1c1e;
-        }
-
-        .stat-label,
-        .subtitle,
-        .empty {
-            color: #98989d;
-        }
-
-        .avatar,
-        .more-button,
-        .status-button,
-        .cancel {
-            background: #2c2c2e;
-        }
-
-        input {
-            background: #2c2c2e;
-            border-color: #3a3a3c;
-            color: white;
-        }
-
-        .danger {
-            background: #3a1f20;
-        }
-    }
-
-    @media (min-width: 700px) {
-        .modal-overlay {
-            align-items: center;
-        }
-
-        .modal {
-            border-radius: 28px;
-            padding: 30px;
-        }
-    }
+}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
-    <header>
+    <div class="header">
         <div>
-            <h1>Anwesenheit</h1>
-            <div class="subtitle">Nutzer verwalten und Anwesenheit erfassen</div>
+            <h1>Klassenbuch</h1>
+            <p id="currentDate"></p>
         </div>
-
-        <button class="add-button" onclick="openAddModal()">+</button>
-    </header>
-
-    <div class="stats">
-        <div class="stat">
-            <div class="stat-number" id="totalCount">0</div>
-            <div class="stat-label">Nutzer</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-number" id="presentCount">0</div>
-            <div class="stat-label">Anwesend</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-number" id="missingCount">0</div>
-            <div class="stat-label">Fehlend</div>
-        </div>
+        <button class="icon-btn" onclick="openAddUser()">
+            +
+        </button>
     </div>
-
-    <div id="userList" class="list"></div>
-
+    <!-- NAVIGATION -->
+    <div class="nav">
+        <button class="active" onclick="showSection('overview', this)">
+            🏠<br>Übersicht
+        </button>
+        <button onclick="showSection('users', this)">
+            👥<br>Nutzer
+        </button>
+        <button onclick="showSection('book', this)">
+            📖<br>Klassenbuch
+        </button>
+        <button onclick="showSection('settings', this)">
+            ⚙️<br>Einstellungen
+        </button>
+    </div>
+    <!-- ÜBERSICHT -->
+    <section id="overview" class="section active">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="total">0</div>
+                <div class="stat-label">Nutzer</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="present">0</div>
+                <div class="stat-label">Anwesend</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="late">0</div>
+                <div class="stat-label">Zu spät</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="missing">0</div>
+                <div class="stat-label">Fehlend</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                📅 Aktuelle Unterrichtsstunde
+            </div>
+            <div id="currentLesson">
+                Keine aktuelle Unterrichtsstunde
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                👥 Anwesenheit
+            </div>
+            <div id="overviewUsers"></div>
+        </div>
+    </section>
+    <!-- NUTZER -->
+    <section id="users" class="section">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div class="card-title" style="margin:0;">
+                    Alle Nutzer
+                </div>
+                <button class="primary-btn" onclick="openAddUser()">
+                    + Nutzer
+                </button>
+            </div>
+        </div>
+        <div id="userList" class="user-list"></div>
+    </section>
+    <!-- KLASSENBUCH -->
+    <section id="book" class="section">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div class="card-title" style="margin:0;">
+                    📖 Klassenbuch
+                </div>
+                <button class="primary-btn" onclick="openAddEntry()">
+                    + Eintrag
+                </button>
+            </div>
+        </div>
+        <div id="entries"></div>
+    </section>
+    <!-- EINSTELLUNGEN -->
+    <section id="settings" class="section">
+        <div class="card">
+            <div class="card-title">
+                ⏰ Anwesenheit
+            </div>
+            <div class="form-group">
+                <label>
+                    Standard-Unterrichtsbeginn
+                </label>
+                <input
+                    type="time"
+                    id="defaultStart"
+                    onchange="saveSettings()"
+                >
+            </div>
+            <div class="form-group">
+                <label>
+                    Verspätungsgrenze
+                </label>
+                <input
+                    type="number"
+                    id="tolerance"
+                    min="0"
+                    max="120"
+                    onchange="saveSettings()"
+                >
+                <div style="color:var(--secondary);font-size:12px;margin-top:5px;">
+                    Beispiel: Bei 5 Minuten wird jemand ab 08:06 Uhr als zu spät geführt,
+                    wenn die Stunde um 08:00 Uhr beginnt.
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                📅 Unterrichtszeiten
+            </div>
+            <button
+                class="primary-btn"
+                style="width:100%;"
+                onclick="openAddLesson()"
+            >
+                + Unterrichtsstunde hinzufügen
+            </button>
+            <div id="lessonList"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                💾 Daten
+            </div>
+            <button
+                class="delete-btn"
+                onclick="resetAllData()"
+            >
+                Alle Daten löschen
+            </button>
+        </div>
+    </section>
 </div>
-
-
-<!-- Nutzer hinzufügen -->
-<div class="modal-overlay" id="addModal">
+<!-- NUTZER MODAL -->
+<div class="modal-overlay" id="userModal">
     <div class="modal">
-
-        <h2>👤 Nutzer hinzufügen</h2>
-
-        <input
-            id="nameInput"
-            type="text"
-            placeholder="Name eingeben"
-            autocomplete="off"
-        >
-
+        <h2 id="userModalTitle">
+            👤 Nutzer hinzufügen
+        </h2>
+        <div class="form-group">
+            <label>Name</label>
+            <input
+                id="userName"
+                placeholder="z. B. Max Mustermann"
+                autocomplete="off"
+            >
+        </div>
         <div class="modal-buttons">
-            <button class="modal-button cancel" onclick="closeModal('addModal')">
+            <button class="cancel-btn"
+                    onclick="closeModal('userModal')">
                 Abbrechen
             </button>
-
-            <button class="modal-button primary" onclick="addUser()">
-                Hinzufügen
-            </button>
-        </div>
-
-    </div>
-</div>
-
-
-<!-- Zu spät -->
-<div class="modal-overlay" id="lateModal">
-    <div class="modal">
-
-        <h2>⏰ Zu spät</h2>
-
-        <p id="lateUserText"></p>
-
-        <input
-            id="minutesInput"
-            type="number"
-            min="1"
-            max="999"
-            placeholder="Minuten"
-            inputmode="numeric"
-        >
-
-        <div class="modal-buttons">
-            <button class="modal-button cancel" onclick="closeModal('lateModal')">
-                Abbrechen
-            </button>
-
-            <button class="modal-button primary" onclick="saveLate()">
+            <button class="save-btn"
+                    onclick="saveUser()">
                 Speichern
             </button>
         </div>
-
-    </div>
-</div>
-
-
-<!-- Nutzer bearbeiten -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal">
-
-        <h2>⚙️ Nutzer bearbeiten</h2>
-
-        <input
-            id="editNameInput"
-            type="text"
-            placeholder="Name"
-            autocomplete="off"
+        <button
+            id="deleteUserButton"
+            class="delete-btn"
+            style="display:none;"
+            onclick="deleteUser()"
         >
-
-        <p style="margin-bottom:8px;font-weight:700;">
-            Status
-        </p>
-
-        <div class="status-buttons">
-
-            <button class="status-button"
-                    onclick="setEditStatus('present')">
-                🟢 Anwesend
-            </button>
-
-            <button class="status-button"
-                    onclick="setEditStatus('missing')">
-                🔴 Fehlend
-            </button>
-
-            <button class="status-button"
-                    onclick="openLateFromEdit()">
-                🟠 Zu spät
-            </button>
-
-        </div>
-
-        <div class="modal-buttons">
-
-            <button class="modal-button cancel"
-                    onclick="closeModal('editModal')">
-                Abbrechen
-            </button>
-
-            <button class="modal-button primary"
-                    onclick="saveEdit()">
-                Speichern
-            </button>
-
-        </div>
-
-        <button class="danger" onclick="deleteCurrentUser()">
             🗑️ Nutzer löschen
         </button>
-
     </div>
 </div>
-
-
+<!-- VERSPÄTUNG -->
+<div class="modal-overlay" id="lateModal">
+    <div class="modal">
+        <h2>⏰ Verspätung</h2>
+        <p id="lateText"></p>
+        <div class="form-group">
+            <label>Wie viele Minuten zu spät?</label>
+            <input
+                id="lateMinutes"
+                type="number"
+                min="1"
+                max="999"
+                inputmode="numeric"
+                placeholder="z. B. 10"
+            >
+        </div>
+        <div class="modal-buttons">
+            <button class="cancel-btn"
+                    onclick="closeModal('lateModal')">
+                Abbrechen
+            </button>
+            <button class="save-btn"
+                    onclick="saveLate()">
+                Speichern
+            </button>
+        </div>
+    </div>
+</div>
+<!-- KLASSENBUCH EINTRAG -->
+<div class="modal-overlay" id="entryModal">
+    <div class="modal">
+        <h2>📝 Klassenbuch-Eintrag</h2>
+        <div class="form-group">
+            <label>Nutzer</label>
+            <select id="entryUser"></select>
+        </div>
+        <div class="form-group">
+            <label>Art des Eintrags</label>
+            <select id="entryType">
+                <option value="Allgemein">
+                    Allgemein
+                </option>
+                <option value="Hausaufgaben">
+                    Hausaufgaben
+                </option>
+                <option value="Material">
+                    Material
+                </option>
+                <option value="Verhalten">
+                    Verhalten
+                </option>
+                <option value="Sonstiges">
+                    Sonstiges
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Eintrag</label>
+            <textarea
+                id="entryText"
+                placeholder="Eintrag schreiben..."
+            ></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="cancel-btn"
+                    onclick="closeModal('entryModal')">
+                Abbrechen
+            </button>
+            <button class="save-btn"
+                    onclick="saveEntry()">
+                Speichern
+            </button>
+        </div>
+    </div>
+</div>
+<!-- UNTERRICHTSSTUNDE -->
+<div class="modal-overlay" id="lessonModal">
+    <div class="modal">
+        <h2>📅 Unterrichtsstunde</h2>
+        <div class="form-group">
+            <label>Bezeichnung</label>
+            <input
+                id="lessonName"
+                placeholder="z. B. Mathematik"
+            >
+        </div>
+        <div class="form-group">
+            <label>Beginn</label>
+            <input
+                id="lessonStart"
+                type="time"
+            >
+        </div>
+        <div class="form-group">
+            <label>Ende</label>
+            <input
+                id="lessonEnd"
+                type="time"
+            >
+        </div>
+        <div class="modal-buttons">
+            <button class="cancel-btn"
+                    onclick="closeModal('lessonModal')">
+                Abbrechen
+            </button>
+            <button class="save-btn"
+                    onclick="saveLesson()">
+                Speichern
+            </button>
+        </div>
+    </div>
+</div>
+<!-- PROFIL -->
+<div class="modal-overlay" id="profileModal">
+    <div class="modal">
+        <h2 id="profileName"></h2>
+        <div id="profileContent"></div>
+        <button
+            class="cancel-btn"
+            style="width:100%;margin-top:15px;"
+            onclick="closeModal('profileModal')"
+        >
+            Schließen
+        </button>
+    </div>
+</div>
 <script>
-
-let users = JSON.parse(localStorage.getItem("attendanceUsers")) || [];
-
-let currentUserId = null;
+/* =====================================
+   DATEN
+===================================== */
+let users =
+    JSON.parse(localStorage.getItem("classbookUsers")) || [];
+let entries =
+    JSON.parse(localStorage.getItem("classbookEntries")) || [];
+let lessons =
+    JSON.parse(localStorage.getItem("classbookLessons")) || [];
+let settings =
+    JSON.parse(localStorage.getItem("classbookSettings")) || {
+        defaultStart: "08:00",
+        tolerance: 5
+    };
+let editingUserId = null;
 let lateUserId = null;
-let editStatus = null;
-
-
-/* =========================
+/* =====================================
    SPEICHERN
-========================= */
-
-function saveUsers() {
+===================================== */
+function saveAll() {
     localStorage.setItem(
-        "attendanceUsers",
+        "classbookUsers",
         JSON.stringify(users)
     );
+    localStorage.setItem(
+        "classbookEntries",
+        JSON.stringify(entries)
+    );
+    localStorage.setItem(
+        "classbookLessons",
+        JSON.stringify(lessons)
+    );
+    localStorage.setItem(
+        "classbookSettings",
+        JSON.stringify(settings)
+    );
 }
-
-
-/* =========================
+/* =====================================
+   NAVIGATION
+===================================== */
+function showSection(id, button) {
+    document.querySelectorAll(".section")
+        .forEach(section =>
+            section.classList.remove("active")
+        );
+    document.getElementById(id)
+        .classList.add("active");
+    document.querySelectorAll(".nav button")
+        .forEach(btn =>
+            btn.classList.remove("active")
+        );
+    button.classList.add("active");
+    renderAll();
+}
+/* =====================================
+   DATUM
+===================================== */
+function updateDate() {
+    const date = new Date();
+    document.getElementById("currentDate")
+        .textContent =
+        date.toLocaleDateString(
+            "de-DE",
+            {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            }
+        );
+}
+/* =====================================
    ID
-========================= */
-
-function createId() {
+===================================== */
+function id() {
     return Date.now().toString() +
-           Math.random().toString(36).substring(2);
+        Math.random().toString(36)
+        .substring(2);
 }
-
-
-/* =========================
-   NUTZER HINZUFÜGEN
-========================= */
-
-function openAddModal() {
-
-    document.getElementById("nameInput").value = "";
-
-    document
-        .getElementById("addModal")
+/* =====================================
+   NUTZER
+===================================== */
+function openAddUser() {
+    editingUserId = null;
+    document.getElementById("userModalTitle")
+        .textContent = "👤 Nutzer hinzufügen";
+    document.getElementById("userName")
+        .value = "";
+    document.getElementById("deleteUserButton")
+        .style.display = "none";
+    document.getElementById("userModal")
         .classList.add("show");
-
     setTimeout(() => {
-        document.getElementById("nameInput").focus();
+        document.getElementById("userName")
+            .focus();
     }, 200);
 }
-
-
-function addUser() {
-
-    const input =
-        document.getElementById("nameInput");
-
-    const name = input.value.trim();
-
+function openEditUser(userId) {
+    const user =
+        users.find(u => u.id === userId);
+    if (!user) return;
+    editingUserId = userId;
+    document.getElementById("userModalTitle")
+        .textContent = "✏️ Nutzer bearbeiten";
+    document.getElementById("userName")
+        .value = user.name;
+    document.getElementById("deleteUserButton")
+        .style.display = "block";
+    document.getElementById("userModal")
+        .classList.add("show");
+}
+function saveUser() {
+    const name =
+        document.getElementById("userName")
+        .value.trim();
     if (!name) {
         alert("Bitte einen Namen eingeben.");
         return;
     }
-
-    users.push({
-        id: createId(),
-        name: name,
-        status: "present",
-        lateMinutes: 0
-    });
-
-    saveUsers();
-
-    closeModal("addModal");
-
-    renderUsers();
+    if (editingUserId) {
+        const user =
+            users.find(u => u.id === editingUserId);
+        if (user) user.name = name;
+    } else {
+        users.push({
+            id: id(),
+            name: name,
+            status: "present",
+            lateMinutes: 0,
+            attendance: {}
+        });
+    }
+    saveAll();
+    closeModal("userModal");
+    renderAll();
 }
-
-
-/* =========================
-   NUTZERLISTE
-========================= */
-
-function renderUsers() {
-
-    const list =
-        document.getElementById("userList");
-
-    list.innerHTML = "";
-
-    if (users.length === 0) {
-
-        list.innerHTML = `
-            <div class="empty">
-                <div class="empty-icon">👥</div>
-                <strong>Noch keine Nutzer</strong>
-                <div style="margin-top:6px;">
-                    Tippe oben auf +, um einen Nutzer hinzuzufügen.
-                </div>
-            </div>
-        `;
-
-        updateStats();
+function deleteUser() {
+    const user =
+        users.find(u => u.id === editingUserId);
+    if (!user) return;
+    if (!confirm(
+        `"${user.name}" wirklich löschen?`
+    )) return;
+    users =
+        users.filter(
+            u => u.id !== editingUserId
+        );
+    entries =
+        entries.filter(
+            e => e.userId !== editingUserId
+        );
+    saveAll();
+    closeModal("userModal");
+    renderAll();
+}
+/* =====================================
+   STATUS
+===================================== */
+function markMissing(userId) {
+    const user =
+        users.find(u => u.id === userId);
+    if (!user) return;
+    const today =
+        new Date().toISOString().slice(0,10);
+    user.status = "missing";
+    user.lateMinutes = 0;
+    if (!user.attendance)
+        user.attendance = {};
+    user.attendance[today] = "missing";
+    saveAll();
+    renderAll();
+}
+function markPresent(userId) {
+    const user =
+        users.find(u => u.id === userId);
+    if (!user) return;
+    const today =
+        new Date().toISOString().slice(0,10);
+    user.status = "present";
+    user.lateMinutes = 0;
+    if (!user.attendance)
+        user.attendance = {};
+    user.attendance[today] = "present";
+    saveAll();
+    renderAll();
+}
+/* =====================================
+   VERSPÄTUNG
+===================================== */
+function openLate(userId) {
+    const user =
+        users.find(u => u.id === userId);
+    if (!user) return;
+    lateUserId = userId;
+    document.getElementById("lateText")
+        .textContent =
+        user.name + " ist zu spät.";
+    document.getElementById("lateMinutes")
+        .value = "";
+    document.getElementById("lateModal")
+        .classList.add("show");
+}
+function saveLate() {
+    const minutes =
+        parseInt(
+            document.getElementById("lateMinutes")
+            .value
+        );
+    if (!minutes || minutes < 1) {
+        alert("Bitte eine gültige Minutenzahl eingeben.");
         return;
     }
-
+    const user =
+        users.find(u => u.id === lateUserId);
+    if (!user) return;
+    const today =
+        new Date().toISOString().slice(0,10);
+    user.status = "late";
+    user.lateMinutes = minutes;
+    if (!user.attendance)
+        user.attendance = {};
+    user.attendance[today] =
+        "late";
+    saveAll();
+    closeModal("lateModal");
+    renderAll();
+}
+/* =====================================
+   USER LISTE
+===================================== */
+function renderUsers() {
+    const list =
+        document.getElementById("userList");
+    if (!list) return;
+    list.innerHTML = "";
+    if (users.length === 0) {
+        list.innerHTML = emptyHTML(
+            "👥",
+            "Noch keine Nutzer"
+        );
+        return;
+    }
     users.forEach(user => {
-
         const wrapper =
             document.createElement("div");
-
         wrapper.className = "user-wrapper";
-
         wrapper.innerHTML = `
-
-            <div class="swipe-background swipe-left">
+            <div class="swipe-bg swipe-missing">
                 <span>🔴 Fehlend</span>
                 <span>←</span>
             </div>
-
-            <div class="swipe-background swipe-right">
+            <div class="swipe-bg swipe-late">
                 <span>→</span>
                 <span>🟠 Zu spät</span>
             </div>
-
             <div class="user-card">
-
                 <div class="avatar">
-                    ${getInitial(user.name)}
+                    ${initial(user.name)}
                 </div>
-
                 <div class="user-info">
-
                     <div class="user-name">
                         ${escapeHTML(user.name)}
                     </div>
-
-                    ${getStatusHTML(user)}
-
+                    ${statusHTML(user)}
                 </div>
-
-                <button class="more-button">
+                <button class="more">
                     ⋯
                 </button>
-
             </div>
         `;
-
         list.appendChild(wrapper);
-
         const card =
             wrapper.querySelector(".user-card");
-
-        const moreButton =
-            wrapper.querySelector(".more-button");
-
-        moreButton.addEventListener(
-            "click",
-            (event) => {
-
-                event.stopPropagation();
-
-                openEditModal(user.id);
-            }
-        );
-
+        wrapper.querySelector(".more")
+            .onclick = () =>
+                openEditUser(user.id);
         setupSwipe(card, user);
     });
-
-    updateStats();
 }
-
-
-/* =========================
-   STATUS
-========================= */
-
-function getStatusHTML(user) {
-
+function statusHTML(user) {
     if (user.status === "missing") {
-
         return `
             <div class="status missing">
                 🔴 Fehlend
             </div>
         `;
     }
-
     if (user.status === "late") {
-
         return `
             <div class="status late">
                 🟠 ${user.lateMinutes} Min. zu spät
             </div>
         `;
     }
-
     return `
         <div class="status present">
             🟢 Anwesend
         </div>
     `;
 }
-
-
-/* =========================
+/* =====================================
    SWIPE
-========================= */
-
+===================================== */
 function setupSwipe(card, user) {
-
     let startX = 0;
     let currentX = 0;
-    let dragging = false;
-
-    card.addEventListener("touchstart", e => {
-
-        startX = e.touches[0].clientX;
-        currentX = startX;
-        dragging = true;
-
-        card.style.transition = "none";
-
-    }, { passive: true });
-
-
-    card.addEventListener("touchmove", e => {
-
-        if (!dragging) return;
-
-        currentX = e.touches[0].clientX;
-
-        let diff = currentX - startX;
-
-        if (Math.abs(diff) > 5) {
-
+    let moving = false;
+    card.addEventListener(
+        "touchstart",
+        event => {
+            startX =
+                event.touches[0].clientX;
+            currentX = startX;
+            moving = true;
+            card.style.transition = "none";
+        },
+        { passive: true }
+    );
+    card.addEventListener(
+        "touchmove",
+        event => {
+            if (!moving) return;
+            currentX =
+                event.touches[0].clientX;
+            const diff =
+                currentX - startX;
             card.style.transform =
                 `translateX(${diff}px)`;
+        },
+        { passive: true }
+    );
+    card.addEventListener(
+        "touchend",
+        () => {
+            moving = false;
+            const diff =
+                currentX - startX;
+            card.style.transition =
+                "transform .2s ease";
+            if (diff < -100) {
+                card.style.transform =
+                    "translateX(-100%)";
+                setTimeout(() => {
+                    markMissing(user.id);
+                }, 180);
+            } else if (diff > 100) {
+                card.style.transform =
+                    "translateX(100%)";
+                setTimeout(() => {
+                    openLate(user.id);
+                }, 180);
+            } else {
+                card.style.transform =
+                    "translateX(0)";
+            }
         }
-
-    }, { passive: true });
-
-
-    card.addEventListener("touchend", () => {
-
-        dragging = false;
-
-        const diff = currentX - startX;
-
-        card.style.transition =
-            "transform .25s ease";
-
-        if (diff < -100) {
-
-            card.style.transform =
-                "translateX(-100%)";
-
-            setTimeout(() => {
-
-                markMissing(user.id);
-
-            }, 180);
-
-        } else if (diff > 100) {
-
-            card.style.transform =
-                "translateX(100%)";
-
-            setTimeout(() => {
-
-                openLateModal(user.id);
-
-            }, 180);
-
-        } else {
-
-            card.style.transform =
-                "translateX(0)";
-        }
-
-    });
+    );
 }
-
-
-/* =========================
-   FEHLEND
-========================= */
-
-function markMissing(id) {
-
-    const user =
-        users.find(u => u.id === id);
-
-    if (!user) return;
-
-    user.status = "missing";
-    user.lateMinutes = 0;
-
-    saveUsers();
-    renderUsers();
-}
-
-
-/* =========================
-   ZU SPÄT
-========================= */
-
-function openLateModal(id) {
-
-    lateUserId = id;
-
-    const user =
-        users.find(u => u.id === id);
-
-    if (!user) return;
-
-    document.getElementById("lateUserText").textContent =
-        user.name + " ist zu spät.";
-
-    document.getElementById("minutesInput").value = "";
-
-    document
-        .getElementById("lateModal")
-        .classList.add("show");
-
-    setTimeout(() => {
-
-        document
-            .getElementById("minutesInput")
-            .focus();
-
-    }, 200);
-}
-
-
-function saveLate() {
-
-    const input =
-        document.getElementById("minutesInput");
-
-    const minutes =
-        parseInt(input.value);
-
-    if (!minutes || minutes < 1) {
-
-        alert("Bitte eine gültige Minutenzahl eingeben.");
-
-        return;
-    }
-
-    const user =
-        users.find(u => u.id === lateUserId);
-
-    if (!user) return;
-
-    user.status = "late";
-    user.lateMinutes = minutes;
-
-    saveUsers();
-
-    closeModal("lateModal");
-
-    renderUsers();
-}
-
-
-/* =========================
-   BEARBEITEN
-========================= */
-
-function openEditModal(id) {
-
-    currentUserId = id;
-
-    const user =
-        users.find(u => u.id === id);
-
-    if (!user) return;
-
-    document.getElementById("editNameInput").value =
-        user.name;
-
-    editStatus = user.status;
-
-    document
-        .getElementById("editModal")
-        .classList.add("show");
-}
-
-
-function setEditStatus(status) {
-
-    editStatus = status;
-}
-
-
-function openLateFromEdit() {
-
-    const id = currentUserId;
-
-    closeModal("editModal");
-
-    setTimeout(() => {
-
-        openLateModal(id);
-
-    }, 250);
-}
-
-
-function saveEdit() {
-
-    const user =
-        users.find(u => u.id === currentUserId);
-
-    if (!user) return;
-
-    const name =
-        document
-            .getElementById("editNameInput")
-            .value.trim();
-
-    if (!name) {
-
-        alert("Bitte einen Namen eingeben.");
-
-        return;
-    }
-
-    user.name = name;
-
-    if (editStatus === "present") {
-
-        user.status = "present";
-        user.lateMinutes = 0;
-
-    } else if (editStatus === "missing") {
-
-        user.status = "missing";
-        user.lateMinutes = 0;
-    }
-
-    saveUsers();
-
-    closeModal("editModal");
-
-    renderUsers();
-}
-
-
-/* =========================
-   LÖSCHEN
-========================= */
-
-function deleteCurrentUser() {
-
-    const user =
-        users.find(u => u.id === currentUserId);
-
-    if (!user) return;
-
-    const confirmed =
-        confirm(
-            `"${user.name}" wirklich löschen?`
-        );
-
-    if (!confirmed) return;
-
-    users =
-        users.filter(
-            u => u.id !== currentUserId
-        );
-
-    saveUsers();
-
-    closeModal("editModal");
-
-    renderUsers();
-}
-
-
-/* =========================
-   STATISTIK
-========================= */
-
-function updateStats() {
-
-    const total = users.length;
-
-    const present =
+/* =====================================
+   ÜBERSICHT
+===================================== */
+function renderOverview() {
+    document.getElementById("total")
+        .textContent = users.length;
+    document.getElementById("present")
+        .textContent =
         users.filter(
             u => u.status === "present"
         ).length;
-
-    const missing =
+    document.getElementById("late")
+        .textContent =
+        users.filter(
+            u => u.status === "late"
+        ).length;
+    document.getElementById("missing")
+        .textContent =
         users.filter(
             u => u.status === "missing"
         ).length;
-
-    document.getElementById("totalCount")
-        .textContent = total;
-
-    document.getElementById("presentCount")
-        .textContent = present;
-
-    document.getElementById("missingCount")
-        .textContent = missing;
+    const container =
+        document.getElementById("overviewUsers");
+    if (!container) return;
+    if (users.length === 0) {
+        container.innerHTML =
+            emptyHTML(
+                "👥",
+                "Keine Nutzer vorhanden"
+            );
+        return;
+    }
+    container.innerHTML =
+        users.map(user => `
+            <div
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:12px;
+                    padding:11px 0;
+                    border-bottom:1px solid var(--border);
+                "
+                onclick="openProfile('${user.id}')"
+            >
+                <div class="avatar">
+                    ${initial(user.name)}
+                </div>
+                <div style="flex:1;">
+                    <div class="user-name">
+                        ${escapeHTML(user.name)}
+                    </div>
+                    ${statusHTML(user)}
+                </div>
+                <span style="color:var(--secondary);">
+                    ›
+                </span>
+            </div>
+        `)
+        .join("");
+    renderCurrentLesson();
 }
-
-
-/* =========================
-   MODAL
-========================= */
-
+/* =====================================
+   AUTOMATISCHE ZEIT
+===================================== */
+function renderCurrentLesson() {
+    const container =
+        document.getElementById("currentLesson");
+    if (!container) return;
+    const now = new Date();
+    const minutes =
+        now.getHours() * 60 +
+        now.getMinutes();
+    const current =
+        lessons.find(lesson => {
+            const start =
+                toMinutes(lesson.start);
+            const end =
+                toMinutes(lesson.end);
+            return minutes >= start &&
+                   minutes <= end;
+        });
+    if (!current) {
+        container.innerHTML =
+            `<span style="color:var(--secondary)">
+                Momentan keine Unterrichtsstunde.
+             </span>`;
+        return;
+    }
+    const start =
+        toMinutes(current.start);
+    const difference =
+        minutes - start;
+    container.innerHTML = `
+        <strong>
+            ${escapeHTML(current.name)}
+        </strong>
+        <div style="margin-top:5px;color:var(--secondary);">
+            ${current.start} – ${current.end}
+        </div>
+        <div style="margin-top:8px;">
+            Verspätungsgrenze:
+            <strong>${settings.tolerance} Min.</strong>
+        </div>
+        ${
+            difference > settings.tolerance
+            ? `
+                <div class="status late"
+                     style="margin-top:8px;">
+                    ⏰ Die Verspätungsgrenze wurde überschritten.
+                </div>
+              `
+            : `
+                <div class="status present"
+                     style="margin-top:8px;">
+                    🟢 Innerhalb der Toleranzzeit
+                </div>
+              `
+        }
+    `;
+}
+/* =====================================
+   KLASSENBUCH
+===================================== */
+function openAddEntry() {
+    const select =
+        document.getElementById("entryUser");
+    select.innerHTML = "";
+    users.forEach(user => {
+        select.innerHTML += `
+            <option value="${user.id}">
+                ${escapeHTML(user.name)}
+            </option>
+        `;
+    });
+    if (users.length === 0) {
+        alert(
+            "Bitte zuerst einen Nutzer hinzufügen."
+        );
+        return;
+    }
+    document.getElementById("entryText")
+        .value = "";
+    document.getElementById("entryModal")
+        .classList.add("show");
+}
+function saveEntry() {
+    const userId =
+        document.getElementById("entryUser")
+        .value;
+    const type =
+        document.getElementById("entryType")
+        .value;
+    const text =
+        document.getElementById("entryText")
+        .value.trim();
+    if (!text) {
+        alert("Bitte einen Eintrag schreiben.");
+        return;
+    }
+    entries.unshift({
+        id: id(),
+        userId: userId,
+        type: type,
+        text: text,
+        date: new Date().toISOString()
+    });
+    saveAll();
+    closeModal("entryModal");
+    renderEntries();
+}
+function renderEntries() {
+    const container =
+        document.getElementById("entries");
+    if (!container) return;
+    if (entries.length === 0) {
+        container.innerHTML =
+            emptyHTML(
+                "📖",
+                "Noch keine Klassenbuch-Einträge"
+            );
+        return;
+    }
+    container.innerHTML =
+        entries.map(entry => {
+            const user =
+                users.find(
+                    u => u.id === entry.userId
+                );
+            const name =
+                user ? user.name : "Unbekannt";
+            const date =
+                new Date(entry.date)
+                .toLocaleString(
+                    "de-DE",
+                    {
+                        dateStyle: "short",
+                        timeStyle: "short"
+                    }
+                );
+            return `
+                <div class="card">
+                    <div class="entry">
+                        <div class="entry-header">
+                            <div class="entry-user">
+                                ${escapeHTML(name)}
+                            </div>
+                            <div class="entry-date">
+                                ${date}
+                            </div>
+                        </div>
+                        <div class="entry-text">
+                            ${escapeHTML(entry.text)}
+                        </div>
+                        <span class="entry-type">
+                            ${escapeHTML(entry.type)}
+                        </span>
+                    </div>
+                    <button
+                        class="delete-btn"
+                        onclick="deleteEntry('${entry.id}')"
+                    >
+                        Eintrag löschen
+                    </button>
+                </div>
+            `;
+        }).join("");
+}
+function deleteEntry(entryId) {
+    if (!confirm("Eintrag löschen?"))
+        return;
+    entries =
+        entries.filter(
+            e => e.id !== entryId
+        );
+    saveAll();
+    renderEntries();
+}
+/* =====================================
+   PROFIL
+===================================== */
+function openProfile(userId) {
+    const user =
+        users.find(u => u.id === userId);
+    if (!user) return;
+    document.getElementById("profileName")
+        .textContent =
+        "👤 " + user.name;
+    const userEntries =
+        entries.filter(
+            e => e.userId === userId
+        );
+    let html = `
+        ${statusHTML(user)}
+        <div class="card"
+             style="padding:14px;margin-top:15px;">
+            <strong>📊 Statistik</strong>
+            <div style="margin-top:10px;line-height:1.8;">
+                🟢 Anwesend:
+                ${countAttendance(user, "present")}
+                <br>
+                🟠 Zu spät:
+                ${countAttendance(user, "late")}
+                <br>
+                🔴 Fehlend:
+                ${countAttendance(user, "missing")}
+            </div>
+        </div>
+        <h3>
+            📖 Klassenbuch
+        </h3>
+    `;
+    if (userEntries.length === 0) {
+        html += `
+            <div class="no-data">
+                Keine Einträge vorhanden.
+            </div>
+        `;
+    } else {
+        userEntries.forEach(entry => {
+            html += `
+                <div class="entry">
+                    <strong>
+                        ${escapeHTML(entry.type)}
+                    </strong>
+                    <div class="entry-date">
+                        ${new Date(entry.date)
+                            .toLocaleString("de-DE")}
+                    </div>
+                    <div class="entry-text">
+                        ${escapeHTML(entry.text)}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    document.getElementById("profileContent")
+        .innerHTML = html;
+    document.getElementById("profileModal")
+        .classList.add("show");
+}
+function countAttendance(user, status) {
+    if (!user.attendance)
+        return 0;
+    return Object.values(user.attendance)
+        .filter(x => x === status)
+        .length;
+}
+/* =====================================
+   UNTERRICHT
+===================================== */
+function openAddLesson() {
+    document.getElementById("lessonName")
+        .value = "";
+    document.getElementById("lessonStart")
+        .value = settings.defaultStart;
+    document.getElementById("lessonEnd")
+        .value = "";
+    document.getElementById("lessonModal")
+        .classList.add("show");
+}
+function saveLesson() {
+    const name =
+        document.getElementById("lessonName")
+        .value.trim();
+    const start =
+        document.getElementById("lessonStart")
+        .value;
+    const end =
+        document.getElementById("lessonEnd")
+        .value;
+    if (!name || !start || !end) {
+        alert(
+            "Bitte Bezeichnung, Beginn und Ende eingeben."
+        );
+        return;
+    }
+    lessons.push({
+        id: id(),
+        name: name,
+        start: start,
+        end: end
+    });
+    lessons.sort(
+        (a,b) =>
+            toMinutes(a.start) -
+            toMinutes(b.start)
+    );
+    saveAll();
+    closeModal("lessonModal");
+    renderLessons();
+}
+function renderLessons() {
+    const container =
+        document.getElementById("lessonList");
+    if (!container) return;
+    if (lessons.length === 0) {
+        container.innerHTML =
+            `<div class="no-data">
+                Noch keine Unterrichtszeiten.
+             </div>`;
+        return;
+    }
+    container.innerHTML =
+        lessons.map(lesson => `
+            <div class="lesson">
+                <div class="lesson-time">
+                    ${lesson.start}
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-name">
+                        ${escapeHTML(lesson.name)}
+                    </div>
+                    <div class="lesson-tolerance">
+                        bis ${lesson.end}
+                    </div>
+                </div>
+                <button
+                    class="more"
+                    onclick="deleteLesson('${lesson.id}')"
+                >
+                    🗑️
+                </button>
+            </div>
+        `).join("");
+}
+function deleteLesson(lessonId) {
+    if (!confirm(
+        "Unterrichtsstunde löschen?"
+    )) return;
+    lessons =
+        lessons.filter(
+            l => l.id !== lessonId
+        );
+    saveAll();
+    renderLessons();
+}
+/* =====================================
+   EINSTELLUNGEN
+===================================== */
+function loadSettings() {
+    document.getElementById("defaultStart")
+        .value =
+        settings.defaultStart;
+    document.getElementById("tolerance")
+        .value =
+        settings.tolerance;
+}
+function saveSettings() {
+    settings.defaultStart =
+        document.getElementById("defaultStart")
+        .value || "08:00";
+    settings.tolerance =
+        parseInt(
+            document.getElementById("tolerance")
+            .value
+        ) || 0;
+    saveAll();
+    renderCurrentLesson();
+}
+/* =====================================
+   RESET
+===================================== */
+function resetAllData() {
+    if (!confirm(
+        "Wirklich ALLE Daten löschen?"
+    )) return;
+    if (!confirm(
+        "Dieser Vorgang kann nicht rückgängig gemacht werden."
+    )) return;
+    localStorage.removeItem("classbookUsers");
+    localStorage.removeItem("classbookEntries");
+    localStorage.removeItem("classbookLessons");
+    localStorage.removeItem("classbookSettings");
+    location.reload();
+}
+/* =====================================
+   HILFSFUNKTIONEN
+===================================== */
 function closeModal(id) {
-
-    document
-        .getElementById(id)
+    document.getElementById(id)
         .classList.remove("show");
 }
-
-
 document.querySelectorAll(".modal-overlay")
-.forEach(overlay => {
-
-    overlay.addEventListener("click", e => {
-
-        if (e.target === overlay) {
-
-            overlay.classList.remove("show");
-
+.forEach(modal => {
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            modal.classList.remove("show");
         }
-
     });
-
 });
-
-
-/* =========================
-   HILFSFUNKTIONEN
-========================= */
-
-function getInitial(name) {
-
+function initial(name) {
     return name
         .trim()
         .charAt(0)
         .toUpperCase();
 }
-
-
 function escapeHTML(text) {
-
     const div =
         document.createElement("div");
-
     div.textContent = text;
-
     return div.innerHTML;
 }
-
-
-/* =========================
+function emptyHTML(icon, text) {
+    return `
+        <div class="card empty">
+            <div class="empty-icon">
+                ${icon}
+            </div>
+            <strong>
+                ${text}
+            </strong>
+        </div>
+    `;
+}
+function toMinutes(time) {
+    const parts =
+        time.split(":");
+    return (
+        parseInt(parts[0]) * 60 +
+        parseInt(parts[1])
+    );
+}
+/* =====================================
+   ALLES AKTUALISIEREN
+===================================== */
+function renderAll() {
+    renderOverview();
+    renderUsers();
+    renderEntries();
+    renderLessons();
+    loadSettings();
+}
+/* =====================================
    START
-========================= */
-
-renderUsers();
-
+===================================== */
+updateDate();
+renderAll();
+setInterval(() => {
+    updateDate();
+    renderCurrentLesson();
+}, 30000);
 </script>
-
 </body>
 </html>
