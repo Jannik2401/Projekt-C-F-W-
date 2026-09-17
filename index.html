@@ -2,1636 +2,1100 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#111827">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Klassenbuch">
-<title>Digitales Klassenbuch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#007aff">
+<title>Klassenbuch</title>
+
 <style>
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
-:root {
-    --blue: #007aff;
-    --green: #16a34a;
-    --red: #dc2626;
-    --orange: #d97706;
-    --bg: #f2f2f7;
-    --card: #ffffff;
-    --text: #111827;
-    --secondary: #6b7280;
-    --border: #e5e7eb;
-}
+
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                 "SF Pro Text", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f2f2f7;
+    color: #1c1c1e;
 }
-button, input, textarea, select {
-    font: inherit;
+
+header {
+    background: #007aff;
+    color: white;
+    padding: 22px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
-button {
-    border: 0;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-.app {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
-    padding-top: calc(20px + env(safe-area-inset-top));
-    padding-bottom: calc(90px + env(safe-area-inset-bottom));
-}
-/* HEADER */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 22px;
-}
-.header h1 {
+
+header h1 {
     margin: 0;
-    font-size: 32px;
-    letter-spacing: -1px;
-}
-.header p {
-    margin: 5px 0 0;
-    color: var(--secondary);
-    font-size: 14px;
-}
-/* BUTTONS */
-.primary-btn {
-    background: var(--blue);
-    color: white;
-    border-radius: 15px;
-    padding: 13px 17px;
-    font-weight: 700;
-}
-.icon-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 15px;
-    background: var(--blue);
-    color: white;
     font-size: 28px;
 }
-/* NAV */
-.nav {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    background: var(--card);
-    padding: 7px;
-    border-radius: 18px;
-    margin-bottom: 22px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+
+header p {
+    margin: 5px 0 0;
+    opacity: .9;
 }
-.nav button {
-    background: transparent;
-    color: var(--secondary);
-    padding: 12px 5px;
-    border-radius: 13px;
-    font-size: 13px;
-    font-weight: 700;
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
 }
-.nav button.active {
-    background: var(--blue);
-    color: white;
-}
-/* SECTIONS */
-.section {
-    display: none;
-}
-.section.active {
-    display: block;
-}
-/* CARDS */
+
 .card {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 14px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.05);
-}
-.card-title {
-    font-size: 18px;
-    font-weight: 750;
-    margin-bottom: 15px;
-}
-/* STATS */
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
-}
-.stat {
-    background: var(--card);
+    background: white;
     border-radius: 18px;
-    padding: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
 }
-.stat-number {
-    font-size: 25px;
-    font-weight: 800;
+
+h2 {
+    margin-top: 0;
 }
-.stat-label {
-    color: var(--secondary);
-    font-size: 12px;
-    margin-top: 3px;
-}
-/* FORMS */
-.form-group {
-    margin-bottom: 14px;
-}
-.form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 7px;
-}
-input, textarea, select {
-    width: 100%;
-    border: 1px solid var(--border);
-    background: #f9fafb;
-    color: var(--text);
-    border-radius: 14px;
-    padding: 13px 14px;
-    outline: none;
-}
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: var(--blue);
-    background: var(--card);
-}
+
+input,
+select,
 textarea {
-    min-height: 110px;
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d1d6;
+    border-radius: 12px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+textarea {
+    min-height: 100px;
     resize: vertical;
 }
-/* USERS */
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 17px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 4px;
+    background: #007aff;
+    color: white;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+button.danger {
+    background: #ff3b30;
+}
+
+button.warning {
+    background: #ff9500;
+}
+
+button.secondary {
+    background: #8e8e93;
+}
+
+button.success {
+    background: #34c759;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
 .user-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
-.user-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 19px;
-    min-height: 80px;
-}
-.swipe-bg {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    color: white;
-    font-weight: 750;
-}
-.swipe-missing {
-    background: var(--red);
-}
-.swipe-late {
-    background: #f59e0b;
-}
-.user-card {
-    position: relative;
-    z-index: 2;
-    min-height: 80px;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 13px;
-    border-radius: 19px;
-    transform: translateX(0);
-    transition: transform .2s ease;
-    touch-action: pan-y;
-}
-.avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-.user-info {
-    flex: 1;
-    min-width: 0;
-}
-.user-name {
-    font-weight: 750;
-    font-size: 16px;
-}
-.status {
-    font-size: 13px;
-    font-weight: 650;
-    margin-top: 4px;
-}
-.present {
-    color: var(--green);
-}
-.missing {
-    color: var(--red);
-}
-.late {
-    color: var(--orange);
-}
-.more {
-    width: 40px;
-    height: 40px;
-    background: #f3f4f6;
-    border-radius: 12px;
-    color: #6b7280;
-    font-size: 20px;
-}
-/* ENTRIES */
-.entry {
-    border-left: 4px solid var(--blue);
-    background: #f9fafb;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 9px;
-}
-.entry-header {
+
+.user {
+    border: 1px solid #e5e5ea;
+    border-radius: 15px;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
-    gap: 10px;
-}
-.entry-user {
-    font-weight: 750;
-}
-.entry-date {
-    color: var(--secondary);
-    font-size: 12px;
-}
-.entry-text {
-    margin-top: 7px;
-    line-height: 1.4;
-}
-.entry-type {
-    display: inline-block;
-    margin-top: 8px;
-    background: #e5e7eb;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-}
-/* LESSONS */
-.lesson {
-    display: flex;
     align-items: center;
-    gap: 13px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    gap: 15px;
 }
-.lesson:last-child {
-    border-bottom: 0;
-}
-.lesson-time {
+
+.user-info strong {
+    display: block;
     font-size: 17px;
-    font-weight: 800;
-    min-width: 70px;
 }
-.lesson-info {
-    flex: 1;
+
+.user-info span {
+    color: #666;
+    font-size: 14px;
 }
-.lesson-name {
-    font-weight: 700;
+
+.user-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
-.lesson-tolerance {
-    color: var(--secondary);
+
+.badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 8px;
     font-size: 12px;
+    font-weight: 600;
+    margin-top: 5px;
 }
-/* EMPTY */
+
+.badge.ok {
+    background: #dff7e5;
+    color: #16833a;
+}
+
+.badge.late {
+    background: #fff0d6;
+    color: #b35c00;
+}
+
+.badge.absent {
+    background: #ffe0df;
+    color: #b42318;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.stat {
+    background: #f2f2f7;
+    border-radius: 15px;
+    padding: 18px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 28px;
+}
+
+.entry {
+    border-left: 4px solid #007aff;
+    padding: 12px;
+    background: #f7f7f8;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.entry small {
+    color: #666;
+}
+
 .empty {
     text-align: center;
-    padding: 35px 15px;
-    color: var(--secondary);
-}
-.empty-icon {
-    font-size: 42px;
-    margin-bottom: 8px;
-}
-/* MODAL */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(0,0,0,.45);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
-}
-.modal-overlay.show {
-    display: flex;
-}
-.modal {
-    width: 100%;
-    max-width: 650px;
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--card);
-    border-radius: 28px 28px 0 0;
-    padding: 24px;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    animation: slideUp .25s ease;
-}
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
-.modal h2 {
-    margin: 0 0 20px;
-}
-.modal-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 9px;
-    margin-top: 15px;
-}
-.cancel-btn {
-    background: #e5e7eb;
-    color: #374151;
-    border-radius: 14px;
-    height: 50px;
-    font-weight: 700;
-}
-.save-btn {
-    background: var(--blue);
-    color: white;
-    border-radius: 14px;
-    height: 50px;
-    font-weight: 700;
-}
-.delete-btn {
-    width: 100%;
-    margin-top: 10px;
-    height: 48px;
-    background: #fee2e2;
-    color: var(--red);
-    border-radius: 14px;
-    font-weight: 700;
-}
-/* TOGGLE */
-.setting-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-}
-.setting-row:last-child {
-    border-bottom: 0;
-}
-.setting-title {
-    font-weight: 700;
-}
-.setting-description {
-    color: var(--secondary);
-    font-size: 12px;
-    margin-top: 3px;
-}
-/* EMPTY */
-.no-data {
     padding: 30px;
-    text-align: center;
-    color: var(--secondary);
+    color: #777;
 }
-/* RESPONSIVE */
+
+.hidden {
+    display: none;
+}
+
 @media (max-width: 650px) {
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
+    .user {
+        flex-direction: column;
+        align-items: flex-start;
     }
-    .nav button {
-        font-size: 11px;
+
+    .user-actions {
+        justify-content: flex-start;
     }
-    .header h1 {
-        font-size: 27px;
-    }
-}
-@media (min-width: 700px) {
-    .modal-overlay {
-        align-items: center;
-    }
-    .modal {
-        border-radius: 28px;
-    }
-}
-/* DARK MODE */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #000000;
-        --card: #1c1c1e;
-        --text: #ffffff;
-        --secondary: #98989d;
-        --border: #3a3a3c;
-    }
-    input,
-    textarea,
-    select {
-        background: #2c2c2e;
-        color: white;
-    }
-    .avatar,
-    .more,
-    .cancel-btn {
-        background: #2c2c2e;
-        color: white;
-    }
-    .entry {
-        background: #2c2c2e;
-    }
-    .delete-btn {
-        background: #3a1f20;
+
+    button {
+        margin-left: 0;
     }
 }
 </style>
 </head>
+
 <body>
-<div class="app">
-    <div class="header">
-        <div>
-            <h1>Klassenbuch</h1>
-            <p id="currentDate"></p>
+
+<header>
+    <h1>📚 Klassenbuch</h1>
+    <p>Nutzer, Anwesenheit und Einträge verwalten</p>
+</header>
+
+<div class="container">
+
+    <!-- EINSTELLUNGEN -->
+    <section class="card">
+        <h2>⚙️ Einstellungen</h2>
+
+        <div class="settings-grid">
+            <div>
+                <label>
+                    <strong>Ab wann gilt man als zu spät?</strong>
+                </label>
+                <input type="time" id="lateTime" value="08:00">
+            </div>
+
+            <div>
+                <label>
+                    <strong>Klassenname</strong>
+                </label>
+                <input type="text" id="className" placeholder="z. B. 10A">
+            </div>
         </div>
-        <button class="icon-btn" onclick="openAddUser()">
-            +
+
+        <button onclick="saveSettings()" class="success">
+            Einstellungen speichern
         </button>
-    </div>
-    <!-- NAVIGATION -->
-    <div class="nav">
-        <button class="active" onclick="showSection('overview', this)">
-            🏠<br>Übersicht
+    </section>
+
+
+    <!-- NUTZER HINZUFÜGEN -->
+    <section class="card">
+        <h2>👤 Nutzer hinzufügen</h2>
+
+        <input
+            type="text"
+            id="userName"
+            placeholder="Vor- und Nachname"
+        >
+
+        <input
+            type="text"
+            id="userNumber"
+            placeholder="Schülernummer (optional)"
+        >
+
+        <button onclick="addUser()">
+            Nutzer hinzufügen
         </button>
-        <button onclick="showSection('users', this)">
-            👥<br>Nutzer
+
+        <button onclick="generateRandomUsers()" class="warning">
+            🎲 10 zufällige Nutzer erstellen
         </button>
-        <button onclick="showSection('book', this)">
-            📖<br>Klassenbuch
+
+        <button onclick="deleteAllUsers()" class="danger">
+            🗑️ Alle Nutzer löschen
         </button>
-        <button onclick="showSection('settings', this)">
-            ⚙️<br>Einstellungen
-        </button>
-    </div>
-    <!-- ÜBERSICHT -->
-    <section id="overview" class="section active">
+    </section>
+
+
+    <!-- STATISTIK -->
+    <section class="card">
+        <h2>📊 Übersicht</h2>
+
         <div class="stats">
             <div class="stat">
-                <div class="stat-number" id="total">0</div>
-                <div class="stat-label">Nutzer</div>
+                <strong id="userCount">0</strong>
+                Nutzer
             </div>
+
             <div class="stat">
-                <div class="stat-number" id="present">0</div>
-                <div class="stat-label">Anwesend</div>
+                <strong id="entryCount">0</strong>
+                Klassenbuch-Einträge
             </div>
+
             <div class="stat">
-                <div class="stat-number" id="late">0</div>
-                <div class="stat-label">Zu spät</div>
+                <strong id="lateCount">0</strong>
+                Verspätungen
             </div>
+
             <div class="stat">
-                <div class="stat-number" id="missing">0</div>
-                <div class="stat-label">Fehlend</div>
+                <strong id="absentCount">0</strong>
+                Fehlzeiten
             </div>
-        </div>
-        <div class="card">
-            <div class="card-title">
-                📅 Aktuelle Unterrichtsstunde
-            </div>
-            <div id="currentLesson">
-                Keine aktuelle Unterrichtsstunde
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-title">
-                👥 Anwesenheit
-            </div>
-            <div id="overviewUsers"></div>
         </div>
     </section>
-    <!-- NUTZER -->
-    <section id="users" class="section">
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <div class="card-title" style="margin:0;">
-                    Alle Nutzer
-                </div>
-                <button class="primary-btn" onclick="openAddUser()">
-                    + Nutzer
-                </button>
-            </div>
-        </div>
+
+
+    <!-- NUTZERLISTE -->
+    <section class="card">
+        <h2>👥 Nutzerliste</h2>
+
+        <input
+            type="search"
+            id="searchUser"
+            placeholder="🔎 Nutzer suchen..."
+            oninput="renderUsers()"
+        >
+
         <div id="userList" class="user-list"></div>
     </section>
+
+
     <!-- KLASSENBUCH -->
-    <section id="book" class="section">
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <div class="card-title" style="margin:0;">
-                    📖 Klassenbuch
-                </div>
-                <button class="primary-btn" onclick="openAddEntry()">
-                    + Eintrag
-                </button>
-            </div>
-        </div>
+    <section class="card">
+        <h2>📝 Klassenbuch-Eintrag</h2>
+
+        <select id="entryUser">
+            <option value="">Nutzer auswählen</option>
+        </select>
+
+        <select id="entryType">
+            <option value="Anwesend">Anwesend</option>
+            <option value="Zu spät">Zu spät</option>
+            <option value="Abwesend">Abwesend</option>
+            <option value="Entschuldigt">Entschuldigt</option>
+        </select>
+
+        <input type="date" id="entryDate">
+
+        <textarea
+            id="entryNote"
+            placeholder="Notiz / Bemerkung..."
+        ></textarea>
+
+        <button onclick="addEntry()">
+            Eintrag hinzufügen
+        </button>
+    </section>
+
+
+    <!-- EINTRÄGE -->
+    <section class="card">
+        <h2>📖 Klassenbuch</h2>
+
         <div id="entries"></div>
     </section>
-    <!-- EINSTELLUNGEN -->
-    <section id="settings" class="section">
-        <div class="card">
-            <div class="card-title">
-                ⏰ Anwesenheit
-            </div>
-            <div class="form-group">
-                <label>
-                    Standard-Unterrichtsbeginn
-                </label>
-                <input
-                    type="time"
-                    id="defaultStart"
-                    onchange="saveSettings()"
-                >
-            </div>
-            <div class="form-group">
-                <label>
-                    Verspätungsgrenze
-                </label>
-                <input
-                    type="number"
-                    id="tolerance"
-                    min="0"
-                    max="120"
-                    onchange="saveSettings()"
-                >
-                <div style="color:var(--secondary);font-size:12px;margin-top:5px;">
-                    Beispiel: Bei 5 Minuten wird jemand ab 08:06 Uhr als zu spät geführt,
-                    wenn die Stunde um 08:00 Uhr beginnt.
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-title">
-                📅 Unterrichtszeiten
-            </div>
-            <button
-                class="primary-btn"
-                style="width:100%;"
-                onclick="openAddLesson()"
-            >
-                + Unterrichtsstunde hinzufügen
-            </button>
-            <div id="lessonList"></div>
-        </div>
-        <div class="card">
-            <div class="card-title">
-                💾 Daten
-            </div>
-            <button
-                class="delete-btn"
-                onclick="resetAllData()"
-            >
-                Alle Daten löschen
-            </button>
-        </div>
-    </section>
+
 </div>
-<!-- NUTZER MODAL -->
-<div class="modal-overlay" id="userModal">
-    <div class="modal">
-        <h2 id="userModalTitle">
-            👤 Nutzer hinzufügen
-        </h2>
-        <div class="form-group">
-            <label>Name</label>
-            <input
-                id="userName"
-                placeholder="z. B. Max Mustermann"
-                autocomplete="off"
-            >
-        </div>
-        <div class="modal-buttons">
-            <button class="cancel-btn"
-                    onclick="closeModal('userModal')">
-                Abbrechen
-            </button>
-            <button class="save-btn"
-                    onclick="saveUser()">
-                Speichern
-            </button>
-        </div>
-        <button
-            id="deleteUserButton"
-            class="delete-btn"
-            style="display:none;"
-            onclick="deleteUser()"
-        >
-            🗑️ Nutzer löschen
-        </button>
-    </div>
-</div>
-<!-- VERSPÄTUNG -->
-<div class="modal-overlay" id="lateModal">
-    <div class="modal">
-        <h2>⏰ Verspätung</h2>
-        <p id="lateText"></p>
-        <div class="form-group">
-            <label>Wie viele Minuten zu spät?</label>
-            <input
-                id="lateMinutes"
-                type="number"
-                min="1"
-                max="999"
-                inputmode="numeric"
-                placeholder="z. B. 10"
-            >
-        </div>
-        <div class="modal-buttons">
-            <button class="cancel-btn"
-                    onclick="closeModal('lateModal')">
-                Abbrechen
-            </button>
-            <button class="save-btn"
-                    onclick="saveLate()">
-                Speichern
-            </button>
-        </div>
-    </div>
-</div>
-<!-- KLASSENBUCH EINTRAG -->
-<div class="modal-overlay" id="entryModal">
-    <div class="modal">
-        <h2>📝 Klassenbuch-Eintrag</h2>
-        <div class="form-group">
-            <label>Nutzer</label>
-            <select id="entryUser"></select>
-        </div>
-        <div class="form-group">
-            <label>Art des Eintrags</label>
-            <select id="entryType">
-                <option value="Allgemein">
-                    Allgemein
-                </option>
-                <option value="Hausaufgaben">
-                    Hausaufgaben
-                </option>
-                <option value="Material">
-                    Material
-                </option>
-                <option value="Verhalten">
-                    Verhalten
-                </option>
-                <option value="Sonstiges">
-                    Sonstiges
-                </option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Eintrag</label>
-            <textarea
-                id="entryText"
-                placeholder="Eintrag schreiben..."
-            ></textarea>
-        </div>
-        <div class="modal-buttons">
-            <button class="cancel-btn"
-                    onclick="closeModal('entryModal')">
-                Abbrechen
-            </button>
-            <button class="save-btn"
-                    onclick="saveEntry()">
-                Speichern
-            </button>
-        </div>
-    </div>
-</div>
-<!-- UNTERRICHTSSTUNDE -->
-<div class="modal-overlay" id="lessonModal">
-    <div class="modal">
-        <h2>📅 Unterrichtsstunde</h2>
-        <div class="form-group">
-            <label>Bezeichnung</label>
-            <input
-                id="lessonName"
-                placeholder="z. B. Mathematik"
-            >
-        </div>
-        <div class="form-group">
-            <label>Beginn</label>
-            <input
-                id="lessonStart"
-                type="time"
-            >
-        </div>
-        <div class="form-group">
-            <label>Ende</label>
-            <input
-                id="lessonEnd"
-                type="time"
-            >
-        </div>
-        <div class="modal-buttons">
-            <button class="cancel-btn"
-                    onclick="closeModal('lessonModal')">
-                Abbrechen
-            </button>
-            <button class="save-btn"
-                    onclick="saveLesson()">
-                Speichern
-            </button>
-        </div>
-    </div>
-</div>
-<!-- PROFIL -->
-<div class="modal-overlay" id="profileModal">
-    <div class="modal">
-        <h2 id="profileName"></h2>
-        <div id="profileContent"></div>
-        <button
-            class="cancel-btn"
-            style="width:100%;margin-top:15px;"
-            onclick="closeModal('profileModal')"
-        >
-            Schließen
-        </button>
-    </div>
-</div>
+
+
 <script>
-/* =====================================
-   DATEN
-===================================== */
-let users =
-    JSON.parse(localStorage.getItem("classbookUsers")) || [];
-let entries =
-    JSON.parse(localStorage.getItem("classbookEntries")) || [];
-let lessons =
-    JSON.parse(localStorage.getItem("classbookLessons")) || [];
-let settings =
-    JSON.parse(localStorage.getItem("classbookSettings")) || {
-        defaultStart: "08:00",
-        tolerance: 5
-    };
-let editingUserId = null;
-let lateUserId = null;
-/* =====================================
-   SPEICHERN
-===================================== */
-function saveAll() {
+
+let users = JSON.parse(localStorage.getItem("klassenbuch_users")) || [];
+let entries = JSON.parse(localStorage.getItem("klassenbuch_entries")) || [];
+
+let settings = JSON.parse(
+    localStorage.getItem("klassenbuch_settings")
+) || {
+    lateTime: "08:00",
+    className: ""
+};
+
+
+// ------------------------------------
+// SPEICHERN
+// ------------------------------------
+
+function saveData() {
     localStorage.setItem(
-        "classbookUsers",
+        "klassenbuch_users",
         JSON.stringify(users)
     );
+
     localStorage.setItem(
-        "classbookEntries",
+        "klassenbuch_entries",
         JSON.stringify(entries)
     );
+
     localStorage.setItem(
-        "classbookLessons",
-        JSON.stringify(lessons)
-    );
-    localStorage.setItem(
-        "classbookSettings",
+        "klassenbuch_settings",
         JSON.stringify(settings)
     );
 }
-/* =====================================
-   NAVIGATION
-===================================== */
-function showSection(id, button) {
-    document.querySelectorAll(".section")
-        .forEach(section =>
-            section.classList.remove("active")
-        );
-    document.getElementById(id)
-        .classList.add("active");
-    document.querySelectorAll(".nav button")
-        .forEach(btn =>
-            btn.classList.remove("active")
-        );
-    button.classList.add("active");
-    renderAll();
+
+
+// ------------------------------------
+// EINSTELLUNGEN
+// ------------------------------------
+
+function loadSettings() {
+    document.getElementById("lateTime").value =
+        settings.lateTime || "08:00";
+
+    document.getElementById("className").value =
+        settings.className || "";
+
+    updateHeader();
 }
-/* =====================================
-   DATUM
-===================================== */
-function updateDate() {
-    const date = new Date();
-    document.getElementById("currentDate")
-        .textContent =
-        date.toLocaleDateString(
-            "de-DE",
-            {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            }
-        );
+
+function saveSettings() {
+
+    settings.lateTime =
+        document.getElementById("lateTime").value;
+
+    settings.className =
+        document.getElementById("className").value.trim();
+
+    saveData();
+    updateHeader();
+
+    alert("Einstellungen gespeichert.");
 }
-/* =====================================
-   ID
-===================================== */
-function id() {
-    return Date.now().toString() +
-        Math.random().toString(36)
-        .substring(2);
+
+function updateHeader() {
+
+    const subtitle = document.querySelector("header p");
+
+    if (settings.className) {
+        subtitle.textContent =
+            "Klasse " + settings.className +
+            " · Nutzer, Anwesenheit und Einträge verwalten";
+    } else {
+        subtitle.textContent =
+            "Nutzer, Anwesenheit und Einträge verwalten";
+    }
 }
-/* =====================================
-   NUTZER
-===================================== */
-function openAddUser() {
-    editingUserId = null;
-    document.getElementById("userModalTitle")
-        .textContent = "👤 Nutzer hinzufügen";
-    document.getElementById("userName")
-        .value = "";
-    document.getElementById("deleteUserButton")
-        .style.display = "none";
-    document.getElementById("userModal")
-        .classList.add("show");
-    setTimeout(() => {
-        document.getElementById("userName")
-            .focus();
-    }, 200);
-}
-function openEditUser(userId) {
-    const user =
-        users.find(u => u.id === userId);
-    if (!user) return;
-    editingUserId = userId;
-    document.getElementById("userModalTitle")
-        .textContent = "✏️ Nutzer bearbeiten";
-    document.getElementById("userName")
-        .value = user.name;
-    document.getElementById("deleteUserButton")
-        .style.display = "block";
-    document.getElementById("userModal")
-        .classList.add("show");
-}
-function saveUser() {
+
+
+// ------------------------------------
+// NUTZER HINZUFÜGEN
+// ------------------------------------
+
+function addUser() {
+
     const name =
-        document.getElementById("userName")
-        .value.trim();
+        document.getElementById("userName").value.trim();
+
+    const number =
+        document.getElementById("userNumber").value.trim();
+
     if (!name) {
         alert("Bitte einen Namen eingeben.");
         return;
     }
-    if (editingUserId) {
-        const user =
-            users.find(u => u.id === editingUserId);
-        if (user) user.name = name;
+
+    users.push({
+        id: Date.now() + Math.random(),
+        name: name,
+        number: number,
+        created: new Date().toISOString()
+    });
+
+    document.getElementById("userName").value = "";
+    document.getElementById("userNumber").value = "";
+
+    saveData();
+    renderAll();
+}
+
+
+// ------------------------------------
+// 10 ZUFÄLLIGE NUTZER
+// ------------------------------------
+
+function generateRandomUsers() {
+
+    const names = [
+        "Max Mustermann",
+        "Anna Müller",
+        "Leon Schneider",
+        "Sophie Fischer",
+        "Paul Weber",
+        "Emma Wagner",
+        "Ben Becker",
+        "Mia Schulz",
+        "Finn Hoffmann",
+        "Lina Schäfer",
+        "Noah Koch",
+        "Lena Bauer",
+        "Elias Richter",
+        "Laura Klein",
+        "Jonas Wolf",
+        "Marie Schröder",
+        "Felix Neumann",
+        "Clara Schwarz",
+        "Tim Zimmermann",
+        "Nele Braun",
+        "Lukas Krüger",
+        "Emily Hartmann",
+        "Jan Lange",
+        "Sarah Werner",
+        "David Schmitz"
+    ];
+
+    const availableNames = names.filter(name =>
+        !users.some(user => user.name === name)
+    );
+
+    if (availableNames.length < 10) {
+
+        // Falls bereits viele Testnutzer existieren,
+        // werden eindeutige Testnamen erzeugt.
+        for (let i = 0; i < 10; i++) {
+
+            users.push({
+                id: Date.now() + Math.random(),
+                name: "Testnutzer " + (users.length + 1),
+                number: "",
+                created: new Date().toISOString()
+            });
+        }
+
     } else {
-        users.push({
-            id: id(),
-            name: name,
-            status: "present",
-            lateMinutes: 0,
-            attendance: {}
-        });
+
+        availableNames
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 10)
+            .forEach((name, index) => {
+
+                users.push({
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    number: String(users.length + index + 1),
+                    created: new Date().toISOString()
+                });
+
+            });
     }
-    saveAll();
-    closeModal("userModal");
+
+    saveData();
     renderAll();
+
+    alert("10 zufällige Nutzer wurden erstellt.");
 }
-function deleteUser() {
-    const user =
-        users.find(u => u.id === editingUserId);
-    if (!user) return;
-    if (!confirm(
-        `"${user.name}" wirklich löschen?`
-    )) return;
-    users =
-        users.filter(
-            u => u.id !== editingUserId
-        );
-    entries =
-        entries.filter(
-            e => e.userId !== editingUserId
-        );
-    saveAll();
-    closeModal("userModal");
-    renderAll();
-}
-/* =====================================
-   STATUS
-===================================== */
-function markMissing(userId) {
-    const user =
-        users.find(u => u.id === userId);
-    if (!user) return;
-    const today =
-        new Date().toISOString().slice(0,10);
-    user.status = "missing";
-    user.lateMinutes = 0;
-    if (!user.attendance)
-        user.attendance = {};
-    user.attendance[today] = "missing";
-    saveAll();
-    renderAll();
-}
-function markPresent(userId) {
-    const user =
-        users.find(u => u.id === userId);
-    if (!user) return;
-    const today =
-        new Date().toISOString().slice(0,10);
-    user.status = "present";
-    user.lateMinutes = 0;
-    if (!user.attendance)
-        user.attendance = {};
-    user.attendance[today] = "present";
-    saveAll();
-    renderAll();
-}
-/* =====================================
-   VERSPÄTUNG
-===================================== */
-function openLate(userId) {
-    const user =
-        users.find(u => u.id === userId);
-    if (!user) return;
-    lateUserId = userId;
-    document.getElementById("lateText")
-        .textContent =
-        user.name + " ist zu spät.";
-    document.getElementById("lateMinutes")
-        .value = "";
-    document.getElementById("lateModal")
-        .classList.add("show");
-}
-function saveLate() {
-    const minutes =
-        parseInt(
-            document.getElementById("lateMinutes")
-            .value
-        );
-    if (!minutes || minutes < 1) {
-        alert("Bitte eine gültige Minutenzahl eingeben.");
+
+
+// ------------------------------------
+// ALLE NUTZER LÖSCHEN
+// ------------------------------------
+
+function deleteAllUsers() {
+
+    if (users.length === 0) {
+        alert("Es sind keine Nutzer vorhanden.");
         return;
     }
-    const user =
-        users.find(u => u.id === lateUserId);
+
+    const confirmation = confirm(
+        "⚠️ Wirklich ALLE Nutzer löschen?\n\n" +
+        "Diese Aktion kann nicht rückgängig gemacht werden."
+    );
+
+    if (!confirmation) return;
+
+    const deleteEntries = confirm(
+        "Sollen auch alle Klassenbuch-Einträge gelöscht werden?"
+    );
+
+    users = [];
+
+    if (deleteEntries) {
+        entries = [];
+    }
+
+    saveData();
+    renderAll();
+
+    alert("Alle Nutzer wurden gelöscht.");
+}
+
+
+// ------------------------------------
+// NUTZER LÖSCHEN
+// ------------------------------------
+
+function deleteUser(id) {
+
+    const user = users.find(u => u.id === id);
+
     if (!user) return;
-    const today =
-        new Date().toISOString().slice(0,10);
-    user.status = "late";
-    user.lateMinutes = minutes;
-    if (!user.attendance)
-        user.attendance = {};
-    user.attendance[today] =
-        "late";
-    saveAll();
-    closeModal("lateModal");
+
+    if (!confirm(
+        'Soll "' + user.name + '" wirklich gelöscht werden?'
+    )) {
+        return;
+    }
+
+    users = users.filter(u => u.id !== id);
+
+    saveData();
     renderAll();
 }
-/* =====================================
-   USER LISTE
-===================================== */
+
+
+// ------------------------------------
+// NUTZER BEARBEITEN
+// ------------------------------------
+
+function editUser(id) {
+
+    const user = users.find(u => u.id === id);
+
+    if (!user) return;
+
+    const newName = prompt(
+        "Neuer Name:",
+        user.name
+    );
+
+    if (newName === null) return;
+
+    const name = newName.trim();
+
+    if (!name) {
+        alert("Der Name darf nicht leer sein.");
+        return;
+    }
+
+    const newNumber = prompt(
+        "Schülernummer:",
+        user.number || ""
+    );
+
+    if (newNumber === null) return;
+
+    user.name = name;
+    user.number = newNumber.trim();
+
+    saveData();
+    renderAll();
+}
+
+
+// ------------------------------------
+// NUTZERLISTE
+// ------------------------------------
+
 function renderUsers() {
+
     const list =
         document.getElementById("userList");
-    if (!list) return;
+
+    const search =
+        document.getElementById("searchUser")
+            .value
+            .toLowerCase()
+            .trim();
+
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(search) ||
+        (user.number || "").toLowerCase().includes(search)
+    );
+
     list.innerHTML = "";
-    if (users.length === 0) {
-        list.innerHTML = emptyHTML(
-            "👥",
-            "Noch keine Nutzer"
-        );
+
+    if (filteredUsers.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">Keine Nutzer gefunden.</div>';
+
+        updateEntryUserSelect();
         return;
     }
-    users.forEach(user => {
-        const wrapper =
-            document.createElement("div");
-        wrapper.className = "user-wrapper";
-        wrapper.innerHTML = `
-            <div class="swipe-bg swipe-missing">
-                <span>🔴 Fehlend</span>
-                <span>←</span>
+
+    filteredUsers.forEach(user => {
+
+        const userEntries =
+            entries.filter(entry =>
+                entry.userId === user.id
+            );
+
+        const late =
+            userEntries.filter(e =>
+                e.type === "Zu spät"
+            ).length;
+
+        const absent =
+            userEntries.filter(e =>
+                e.type === "Abwesend"
+            ).length;
+
+        const div = document.createElement("div");
+
+        div.className = "user";
+
+        div.innerHTML = `
+            <div class="user-info">
+                <strong>${escapeHtml(user.name)}</strong>
+                <span>
+                    ${
+                        user.number
+                        ? "Schülernummer: " +
+                          escapeHtml(user.number)
+                        : "Keine Schülernummer"
+                    }
+                </span>
+                <br>
+
+                ${
+                    late > 0
+                    ? `<span class="badge late">
+                        ${late}× zu spät
+                       </span>`
+                    : ""
+                }
+
+                ${
+                    absent > 0
+                    ? `<span class="badge absent">
+                        ${absent}× abwesend
+                       </span>`
+                    : ""
+                }
+
+                ${
+                    late === 0 && absent === 0
+                    ? `<span class="badge ok">
+                        Keine Auffälligkeiten
+                       </span>`
+                    : ""
+                }
             </div>
-            <div class="swipe-bg swipe-late">
-                <span>→</span>
-                <span>🟠 Zu spät</span>
-            </div>
-            <div class="user-card">
-                <div class="avatar">
-                    ${initial(user.name)}
-                </div>
-                <div class="user-info">
-                    <div class="user-name">
-                        ${escapeHTML(user.name)}
-                    </div>
-                    ${statusHTML(user)}
-                </div>
-                <button class="more">
-                    ⋯
+
+            <div class="user-actions">
+                <button
+                    onclick="showUserEntries(${user.id})"
+                    class="secondary">
+                    📖 Einträge
+                </button>
+
+                <button
+                    onclick="editUser(${user.id})">
+                    ✏️ Bearbeiten
+                </button>
+
+                <button
+                    onclick="deleteUser(${user.id})"
+                    class="danger">
+                    🗑️ Löschen
                 </button>
             </div>
         `;
-        list.appendChild(wrapper);
-        const card =
-            wrapper.querySelector(".user-card");
-        wrapper.querySelector(".more")
-            .onclick = () =>
-                openEditUser(user.id);
-        setupSwipe(card, user);
+
+        list.appendChild(div);
     });
+
+    updateEntryUserSelect();
 }
-function statusHTML(user) {
-    if (user.status === "missing") {
-        return `
-            <div class="status missing">
-                🔴 Fehlend
-            </div>
-        `;
-    }
-    if (user.status === "late") {
-        return `
-            <div class="status late">
-                🟠 ${user.lateMinutes} Min. zu spät
-            </div>
-        `;
-    }
-    return `
-        <div class="status present">
-            🟢 Anwesend
-        </div>
-    `;
-}
-/* =====================================
-   SWIPE
-===================================== */
-function setupSwipe(card, user) {
-    let startX = 0;
-    let currentX = 0;
-    let moving = false;
-    card.addEventListener(
-        "touchstart",
-        event => {
-            startX =
-                event.touches[0].clientX;
-            currentX = startX;
-            moving = true;
-            card.style.transition = "none";
-        },
-        { passive: true }
-    );
-    card.addEventListener(
-        "touchmove",
-        event => {
-            if (!moving) return;
-            currentX =
-                event.touches[0].clientX;
-            const diff =
-                currentX - startX;
-            card.style.transform =
-                `translateX(${diff}px)`;
-        },
-        { passive: true }
-    );
-    card.addEventListener(
-        "touchend",
-        () => {
-            moving = false;
-            const diff =
-                currentX - startX;
-            card.style.transition =
-                "transform .2s ease";
-            if (diff < -100) {
-                card.style.transform =
-                    "translateX(-100%)";
-                setTimeout(() => {
-                    markMissing(user.id);
-                }, 180);
-            } else if (diff > 100) {
-                card.style.transform =
-                    "translateX(100%)";
-                setTimeout(() => {
-                    openLate(user.id);
-                }, 180);
-            } else {
-                card.style.transform =
-                    "translateX(0)";
-            }
-        }
-    );
-}
-/* =====================================
-   ÜBERSICHT
-===================================== */
-function renderOverview() {
-    document.getElementById("total")
-        .textContent = users.length;
-    document.getElementById("present")
-        .textContent =
-        users.filter(
-            u => u.status === "present"
-        ).length;
-    document.getElementById("late")
-        .textContent =
-        users.filter(
-            u => u.status === "late"
-        ).length;
-    document.getElementById("missing")
-        .textContent =
-        users.filter(
-            u => u.status === "missing"
-        ).length;
-    const container =
-        document.getElementById("overviewUsers");
-    if (!container) return;
-    if (users.length === 0) {
-        container.innerHTML =
-            emptyHTML(
-                "👥",
-                "Keine Nutzer vorhanden"
-            );
-        return;
-    }
-    container.innerHTML =
-        users.map(user => `
-            <div
-                style="
-                    display:flex;
-                    align-items:center;
-                    gap:12px;
-                    padding:11px 0;
-                    border-bottom:1px solid var(--border);
-                "
-                onclick="openProfile('${user.id}')"
-            >
-                <div class="avatar">
-                    ${initial(user.name)}
-                </div>
-                <div style="flex:1;">
-                    <div class="user-name">
-                        ${escapeHTML(user.name)}
-                    </div>
-                    ${statusHTML(user)}
-                </div>
-                <span style="color:var(--secondary);">
-                    ›
-                </span>
-            </div>
-        `)
-        .join("");
-    renderCurrentLesson();
-}
-/* =====================================
-   AUTOMATISCHE ZEIT
-===================================== */
-function renderCurrentLesson() {
-    const container =
-        document.getElementById("currentLesson");
-    if (!container) return;
-    const now = new Date();
-    const minutes =
-        now.getHours() * 60 +
-        now.getMinutes();
-    const current =
-        lessons.find(lesson => {
-            const start =
-                toMinutes(lesson.start);
-            const end =
-                toMinutes(lesson.end);
-            return minutes >= start &&
-                   minutes <= end;
-        });
-    if (!current) {
-        container.innerHTML =
-            `<span style="color:var(--secondary)">
-                Momentan keine Unterrichtsstunde.
-             </span>`;
-        return;
-    }
-    const start =
-        toMinutes(current.start);
-    const difference =
-        minutes - start;
-    container.innerHTML = `
-        <strong>
-            ${escapeHTML(current.name)}
-        </strong>
-        <div style="margin-top:5px;color:var(--secondary);">
-            ${current.start} – ${current.end}
-        </div>
-        <div style="margin-top:8px;">
-            Verspätungsgrenze:
-            <strong>${settings.tolerance} Min.</strong>
-        </div>
-        ${
-            difference > settings.tolerance
-            ? `
-                <div class="status late"
-                     style="margin-top:8px;">
-                    ⏰ Die Verspätungsgrenze wurde überschritten.
-                </div>
-              `
-            : `
-                <div class="status present"
-                     style="margin-top:8px;">
-                    🟢 Innerhalb der Toleranzzeit
-                </div>
-              `
-        }
-    `;
-}
-/* =====================================
-   KLASSENBUCH
-===================================== */
-function openAddEntry() {
+
+
+// ------------------------------------
+// DROPDOWN
+// ------------------------------------
+
+function updateEntryUserSelect() {
+
     const select =
         document.getElementById("entryUser");
-    select.innerHTML = "";
+
+    const oldValue = select.value;
+
+    select.innerHTML =
+        '<option value="">Nutzer auswählen</option>';
+
     users.forEach(user => {
-        select.innerHTML += `
-            <option value="${user.id}">
-                ${escapeHTML(user.name)}
-            </option>
-        `;
+
+        const option =
+            document.createElement("option");
+
+        option.value = user.id;
+
+        option.textContent =
+            user.name +
+            (user.number
+                ? " (" + user.number + ")"
+                : "");
+
+        select.appendChild(option);
     });
-    if (users.length === 0) {
-        alert(
-            "Bitte zuerst einen Nutzer hinzufügen."
-        );
-        return;
+
+    if (users.some(u =>
+        String(u.id) === oldValue
+    )) {
+        select.value = oldValue;
     }
-    document.getElementById("entryText")
-        .value = "";
-    document.getElementById("entryModal")
-        .classList.add("show");
 }
-function saveEntry() {
+
+
+// ------------------------------------
+// KLASSENBUCH-EINTRAG
+// ------------------------------------
+
+function addEntry() {
+
     const userId =
-        document.getElementById("entryUser")
-        .value;
+        document.getElementById("entryUser").value;
+
     const type =
-        document.getElementById("entryType")
-        .value;
-    const text =
-        document.getElementById("entryText")
-        .value.trim();
-    if (!text) {
-        alert("Bitte einen Eintrag schreiben.");
+        document.getElementById("entryType").value;
+
+    const date =
+        document.getElementById("entryDate").value;
+
+    const note =
+        document.getElementById("entryNote").value.trim();
+
+    if (!userId) {
+        alert("Bitte einen Nutzer auswählen.");
         return;
     }
+
+    if (!date) {
+        alert("Bitte ein Datum auswählen.");
+        return;
+    }
+
     entries.unshift({
-        id: id(),
-        userId: userId,
+        id: Date.now() + Math.random(),
+        userId: Number(userId),
         type: type,
-        text: text,
-        date: new Date().toISOString()
+        date: date,
+        note: note,
+        created: new Date().toISOString()
     });
-    saveAll();
-    closeModal("entryModal");
-    renderEntries();
+
+    document.getElementById("entryNote").value = "";
+
+    saveData();
+    renderAll();
 }
+
+
+// ------------------------------------
+// EINTRÄGE ANZEIGEN
+// ------------------------------------
+
 function renderEntries() {
+
     const container =
         document.getElementById("entries");
-    if (!container) return;
+
+    container.innerHTML = "";
+
     if (entries.length === 0) {
+
         container.innerHTML =
-            emptyHTML(
-                "📖",
-                "Noch keine Klassenbuch-Einträge"
+            '<div class="empty">' +
+            'Noch keine Klassenbuch-Einträge vorhanden.' +
+            '</div>';
+
+        return;
+    }
+
+    entries.forEach(entry => {
+
+        const user =
+            users.find(u =>
+                u.id === entry.userId
             );
-        return;
-    }
-    container.innerHTML =
-        entries.map(entry => {
-            const user =
-                users.find(
-                    u => u.id === entry.userId
-                );
-            const name =
-                user ? user.name : "Unbekannt";
-            const date =
-                new Date(entry.date)
-                .toLocaleString(
-                    "de-DE",
-                    {
-                        dateStyle: "short",
-                        timeStyle: "short"
-                    }
-                );
-            return `
-                <div class="card">
-                    <div class="entry">
-                        <div class="entry-header">
-                            <div class="entry-user">
-                                ${escapeHTML(name)}
-                            </div>
-                            <div class="entry-date">
-                                ${date}
-                            </div>
-                        </div>
-                        <div class="entry-text">
-                            ${escapeHTML(entry.text)}
-                        </div>
-                        <span class="entry-type">
-                            ${escapeHTML(entry.type)}
-                        </span>
-                    </div>
-                    <button
-                        class="delete-btn"
-                        onclick="deleteEntry('${entry.id}')"
-                    >
-                        Eintrag löschen
-                    </button>
-                </div>
-            `;
-        }).join("");
-}
-function deleteEntry(entryId) {
-    if (!confirm("Eintrag löschen?"))
-        return;
-    entries =
-        entries.filter(
-            e => e.id !== entryId
-        );
-    saveAll();
-    renderEntries();
-}
-/* =====================================
-   PROFIL
-===================================== */
-function openProfile(userId) {
-    const user =
-        users.find(u => u.id === userId);
-    if (!user) return;
-    document.getElementById("profileName")
-        .textContent =
-        "👤 " + user.name;
-    const userEntries =
-        entries.filter(
-            e => e.userId === userId
-        );
-    let html = `
-        ${statusHTML(user)}
-        <div class="card"
-             style="padding:14px;margin-top:15px;">
-            <strong>📊 Statistik</strong>
-            <div style="margin-top:10px;line-height:1.8;">
-                🟢 Anwesend:
-                ${countAttendance(user, "present")}
-                <br>
-                🟠 Zu spät:
-                ${countAttendance(user, "late")}
-                <br>
-                🔴 Fehlend:
-                ${countAttendance(user, "missing")}
-            </div>
-        </div>
-        <h3>
-            📖 Klassenbuch
-        </h3>
-    `;
-    if (userEntries.length === 0) {
-        html += `
-            <div class="no-data">
-                Keine Einträge vorhanden.
-            </div>
-        `;
-    } else {
-        userEntries.forEach(entry => {
-            html += `
-                <div class="entry">
-                    <strong>
-                        ${escapeHTML(entry.type)}
-                    </strong>
-                    <div class="entry-date">
-                        ${new Date(entry.date)
-                            .toLocaleString("de-DE")}
-                    </div>
-                    <div class="entry-text">
-                        ${escapeHTML(entry.text)}
-                    </div>
-                </div>
-            `;
-        });
-    }
-    document.getElementById("profileContent")
-        .innerHTML = html;
-    document.getElementById("profileModal")
-        .classList.add("show");
-}
-function countAttendance(user, status) {
-    if (!user.attendance)
-        return 0;
-    return Object.values(user.attendance)
-        .filter(x => x === status)
-        .length;
-}
-/* =====================================
-   UNTERRICHT
-===================================== */
-function openAddLesson() {
-    document.getElementById("lessonName")
-        .value = "";
-    document.getElementById("lessonStart")
-        .value = settings.defaultStart;
-    document.getElementById("lessonEnd")
-        .value = "";
-    document.getElementById("lessonModal")
-        .classList.add("show");
-}
-function saveLesson() {
-    const name =
-        document.getElementById("lessonName")
-        .value.trim();
-    const start =
-        document.getElementById("lessonStart")
-        .value;
-    const end =
-        document.getElementById("lessonEnd")
-        .value;
-    if (!name || !start || !end) {
-        alert(
-            "Bitte Bezeichnung, Beginn und Ende eingeben."
-        );
-        return;
-    }
-    lessons.push({
-        id: id(),
-        name: name,
-        start: start,
-        end: end
-    });
-    lessons.sort(
-        (a,b) =>
-            toMinutes(a.start) -
-            toMinutes(b.start)
-    );
-    saveAll();
-    closeModal("lessonModal");
-    renderLessons();
-}
-function renderLessons() {
-    const container =
-        document.getElementById("lessonList");
-    if (!container) return;
-    if (lessons.length === 0) {
-        container.innerHTML =
-            `<div class="no-data">
-                Noch keine Unterrichtszeiten.
-             </div>`;
-        return;
-    }
-    container.innerHTML =
-        lessons.map(lesson => `
-            <div class="lesson">
-                <div class="lesson-time">
-                    ${lesson.start}
-                </div>
-                <div class="lesson-info">
-                    <div class="lesson-name">
-                        ${escapeHTML(lesson.name)}
-                    </div>
-                    <div class="lesson-tolerance">
-                        bis ${lesson.end}
-                    </div>
-                </div>
-                <button
-                    class="more"
-                    onclick="deleteLesson('${lesson.id}')"
-                >
-                    🗑️
-                </button>
-            </div>
-        `).join("");
-}
-function deleteLesson(lessonId) {
-    if (!confirm(
-        "Unterrichtsstunde löschen?"
-    )) return;
-    lessons =
-        lessons.filter(
-            l => l.id !== lessonId
-        );
-    saveAll();
-    renderLessons();
-}
-/* =====================================
-   EINSTELLUNGEN
-===================================== */
-function loadSettings() {
-    document.getElementById("defaultStart")
-        .value =
-        settings.defaultStart;
-    document.getElementById("tolerance")
-        .value =
-        settings.tolerance;
-}
-function saveSettings() {
-    settings.defaultStart =
-        document.getElementById("defaultStart")
-        .value || "08:00";
-    settings.tolerance =
-        parseInt(
-            document.getElementById("tolerance")
-            .value
-        ) || 0;
-    saveAll();
-    renderCurrentLesson();
-}
-/* =====================================
-   RESET
-===================================== */
-function resetAllData() {
-    if (!confirm(
-        "Wirklich ALLE Daten löschen?"
-    )) return;
-    if (!confirm(
-        "Dieser Vorgang kann nicht rückgängig gemacht werden."
-    )) return;
-    localStorage.removeItem("classbookUsers");
-    localStorage.removeItem("classbookEntries");
-    localStorage.removeItem("classbookLessons");
-    localStorage.removeItem("classbookSettings");
-    location.reload();
-}
-/* =====================================
-   HILFSFUNKTIONEN
-===================================== */
-function closeModal(id) {
-    document.getElementById(id)
-        .classList.remove("show");
-}
-document.querySelectorAll(".modal-overlay")
-.forEach(modal => {
-    modal.addEventListener("click", event => {
-        if (event.target === modal) {
-            modal.classList.remove("show");
-        }
-    });
-});
-function initial(name) {
-    return name
-        .trim()
-        .charAt(0)
-        .toUpperCase();
-}
-function escapeHTML(text) {
-    const div =
-        document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-}
-function emptyHTML(icon, text) {
-    return `
-        <div class="card empty">
-            <div class="empty-icon">
-                ${icon}
-            </div>
+
+        const div =
+            document.createElement("div");
+
+        div.className = "entry";
+
+        div.innerHTML = `
             <strong>
-                ${text}
+                ${escapeHtml(
+                    user ? user.name : "Gelöschter Nutzer"
+                )}
             </strong>
-        </div>
-    `;
+
+            <br>
+
+            <span>
+                ${escapeHtml(entry.type)}
+            </span>
+
+            <br>
+
+            <small>
+                ${formatDate(entry.date)}
+            </small>
+
+            ${
+                entry.note
+                ? `<p>${escapeHtml(entry.note)}</p>`
+                : ""
+            }
+
+            <button
+                class="danger"
+                onclick="deleteEntry(${entry.id})">
+                Eintrag löschen
+            </button>
+        `;
+
+        container.appendChild(div);
+    });
 }
-function toMinutes(time) {
+
+
+// ------------------------------------
+// EINTRAG LÖSCHEN
+// ------------------------------------
+
+function deleteEntry(id) {
+
+    if (!confirm(
+        "Diesen Klassenbuch-Eintrag löschen?"
+    )) {
+        return;
+    }
+
+    entries =
+        entries.filter(entry =>
+            entry.id !== id
+        );
+
+    saveData();
+    renderAll();
+}
+
+
+// ------------------------------------
+// EINTRÄGE EINES NUTZERS
+// ------------------------------------
+
+function showUserEntries(id) {
+
+    const user =
+        users.find(u => u.id === id);
+
+    if (!user) return;
+
+    const userEntries =
+        entries.filter(e =>
+            e.userId === id
+        );
+
+    if (userEntries.length === 0) {
+
+        alert(
+            "Für " +
+            user.name +
+            " gibt es noch keine Einträge."
+        );
+
+        return;
+    }
+
+    let text =
+        "📖 Einträge von " +
+        user.name +
+        "\n\n";
+
+    userEntries.forEach(entry => {
+
+        text +=
+            formatDate(entry.date) +
+            " – " +
+            entry.type;
+
+        if (entry.note) {
+            text +=
+                " – " +
+                entry.note;
+        }
+
+        text += "\n";
+    });
+
+    alert(text);
+}
+
+
+// ------------------------------------
+// STATISTIK
+// ------------------------------------
+
+function updateStats() {
+
+    document.getElementById("userCount")
+        .textContent = users.length;
+
+    document.getElementById("entryCount")
+        .textContent = entries.length;
+
+    document.getElementById("lateCount")
+        .textContent =
+            entries.filter(e =>
+                e.type === "Zu spät"
+            ).length;
+
+    document.getElementById("absentCount")
+        .textContent =
+            entries.filter(e =>
+                e.type === "Abwesend"
+            ).length;
+}
+
+
+// ------------------------------------
+// DATUM
+// ------------------------------------
+
+function formatDate(date) {
+
+    if (!date) return "";
+
     const parts =
-        time.split(":");
+        date.split("-");
+
+    if (parts.length !== 3) {
+        return date;
+    }
+
     return (
-        parseInt(parts[0]) * 60 +
-        parseInt(parts[1])
+        parts[2] +
+        "." +
+        parts[1] +
+        "." +
+        parts[0]
     );
 }
-/* =====================================
-   ALLES AKTUALISIEREN
-===================================== */
+
+
+// ------------------------------------
+// HTML SICHER MACHEN
+// ------------------------------------
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ------------------------------------
+// ALLES AKTUALISIEREN
+// ------------------------------------
+
 function renderAll() {
-    renderOverview();
+
     renderUsers();
     renderEntries();
-    renderLessons();
-    loadSettings();
+    updateStats();
+    updateEntryUserSelect();
 }
-/* =====================================
-   START
-===================================== */
-updateDate();
-renderAll();
-setInterval(() => {
-    updateDate();
-    renderCurrentLesson();
-}, 30000);
+
+
+// ------------------------------------
+// START
+// ------------------------------------
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadSettings();
+
+        const today =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+        document.getElementById("entryDate")
+            .value = today;
+
+        renderAll();
+    }
+);
+
 </script>
+
 </body>
 </html>
