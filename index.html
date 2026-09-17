@@ -1,241 +1,1102 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt | RFG – Realistic Funfair Games</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Anwesenheit">
+
+<title>Anwesenheit</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                     "SF Pro Text", Arial, sans-serif;
+        background: #f2f2f7;
+        color: #111827;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .app {
+        max-width: 900px;
+        margin: auto;
+        padding: 24px;
+        padding-top: calc(24px + env(safe-area-inset-top));
+        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        letter-spacing: -1px;
+    }
+
+    .subtitle {
+        margin-top: 5px;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+    button {
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        touch-action: manipulation;
+    }
+
+    .add-button {
+        width: 52px;
+        height: 52px;
+        border-radius: 17px;
+        background: #007aff;
+        color: white;
+        font-size: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(0,122,255,.25);
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .stat {
+        background: white;
+        border-radius: 18px;
+        padding: 17px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    }
+
+    .stat-number {
+        font-size: 25px;
+        font-weight: 750;
+    }
+
+    .stat-label {
+        margin-top: 3px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .empty {
+        background: white;
+        border-radius: 22px;
+        padding: 45px 20px;
+        text-align: center;
+        color: #6b7280;
+        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    }
+
+    .empty-icon {
+        font-size: 45px;
+        margin-bottom: 10px;
+    }
+
+    .user-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        min-height: 82px;
+    }
+
+    .swipe-background {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        color: white;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .swipe-left {
+        background: #ef4444;
+    }
+
+    .swipe-right {
+        background: #f59e0b;
+    }
+
+    .user-card {
+        position: relative;
+        z-index: 2;
+        min-height: 82px;
+        background: white;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        gap: 13px;
+        transform: translateX(0);
+        transition: transform .25s ease;
+        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+        user-select: none;
+        touch-action: pan-y;
+    }
+
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 17px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status.present {
+        color: #16a34a;
+    }
+
+    .status.missing {
+        color: #dc2626;
+    }
+
+    .status.late {
+        color: #d97706;
+    }
+
+    .more-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        background: #f3f4f6;
+        color: #6b7280;
+        font-size: 21px;
+        flex-shrink: 0;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.42);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal {
+        width: 100%;
+        max-width: 600px;
+        background: white;
+        border-radius: 28px 28px 0 0;
+        padding: 25px;
+        padding-bottom: calc(25px + env(safe-area-inset-bottom));
+        animation: slideUp .25s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
         }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    .modal h2 {
+        margin: 0 0 20px;
+        font-size: 23px;
+    }
+
+    input {
+        width: 100%;
+        height: 54px;
+        border: 1px solid #d1d5db;
+        border-radius: 15px;
+        padding: 0 16px;
+        font-size: 17px;
+        outline: none;
+        font-family: inherit;
+        background: #f9fafb;
+    }
+
+    input:focus {
+        border-color: #007aff;
+        background: white;
+    }
+
+    .modal-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .modal-button {
+        height: 52px;
+        border-radius: 15px;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .cancel {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .primary {
+        background: #007aff;
+        color: white;
+    }
+
+    .danger {
+        background: #fee2e2;
+        color: #dc2626;
+        width: 100%;
+        height: 50px;
+        border-radius: 15px;
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .status-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .status-button {
+        height: 48px;
+        border-radius: 14px;
+        background: #f3f4f6;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    @media (prefers-color-scheme: dark) {
         body {
-            background: #0b0b0f;
+            background: #000;
             color: white;
-            min-height: 100vh;
         }
-        header {
-            background: #111116;
-            border-bottom: 1px solid #25252d;
-            padding: 20px 8%;
-            display: flex;
-            justify-content: space-between;
+
+        .stat,
+        .user-card,
+        .empty,
+        .modal {
+            background: #1c1c1e;
+        }
+
+        .stat-label,
+        .subtitle,
+        .empty {
+            color: #98989d;
+        }
+
+        .avatar,
+        .more-button,
+        .status-button,
+        .cancel {
+            background: #2c2c2e;
+        }
+
+        input {
+            background: #2c2c2e;
+            border-color: #3a3a3c;
+            color: white;
+        }
+
+        .danger {
+            background: #3a1f20;
+        }
+    }
+
+    @media (min-width: 700px) {
+        .modal-overlay {
             align-items: center;
         }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff3b3b;
-        }
-        nav a {
-            color: #ddd;
-            text-decoration: none;
-            margin-left: 25px;
-            transition: 0.2s;
-        }
-        nav a:hover {
-            color: #ff3b3b;
-        }
-        .container {
-            width: 90%;
-            max-width: 850px;
-            margin: 70px auto;
-        }
-        .title {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .title h1 {
-            font-size: 42px;
-            margin-bottom: 10px;
-        }
-        .title h1 span {
-            color: #ff3b3b;
-        }
-        .title p {
-            color: #aaa;
-            font-size: 17px;
-        }
-        .contact-box {
-            background: #121218;
-            border: 1px solid #292932;
-            border-radius: 18px;
-            padding: 35px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
-        }
-        .form-group {
-            margin-bottom: 22px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #ddd;
-        }
-        input,
-        textarea {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid #30303a;
-            background: #0c0c11;
-            color: white;
-            font-size: 15px;
-            outline: none;
-            transition: 0.2s;
-        }
-        input:focus,
-        textarea:focus {
-            border-color: #ff3b3b;
-            box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.12);
-        }
-        textarea {
-            min-height: 180px;
-            resize: vertical;
-        }
-        .send-button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: #ff3b3b;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .send-button:hover {
-            background: #e52f2f;
-            transform: translateY(-1px);
-        }
-        .info {
-            text-align: center;
-            margin-top: 25px;
-            color: #888;
-            font-size: 14px;
-        }
-        footer {
-            text-align: center;
+
+        .modal {
+            border-radius: 28px;
             padding: 30px;
-            color: #666;
-            border-top: 1px solid #222;
-            margin-top: 80px;
         }
-        @media (max-width: 700px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            nav a {
-                margin: 0 7px;
-                font-size: 14px;
-            }
-            .container {
-                margin-top: 40px;
-            }
-            .title h1 {
-                font-size: 32px;
-            }
-            .contact-box {
-                padding: 22px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
+
 <body>
-<header>
-    <div class="logo">RFG</div>
-    <nav>
-        <a href="index.html">Startseite</a>
-        <a href="projects.html">Projekte</a>
-        <a href="team.html">Team</a>
-        <a href="devlog.html">Devlog</a>
-        <a href="contact.html">Kontakt</a>
-    </nav>
-</header>
-<main class="container">
-    <div class="title">
-        <h1>Kontakt <span>RFG</span></h1>
-        <p>
-            Du hast eine Frage, einen Vorschlag oder möchtest mit uns Kontakt aufnehmen?
-        </p>
-    </div>
-    <div class="contact-box">
-        <form id="contactForm">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input
-                    type="text"
-                    id="name"
-                    placeholder="Dein Name"
-                    required
-                >
-            </div>
-            <div class="form-group">
-                <label for="email">Deine E-Mail-Adresse</label>
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="deine@email.de"
-                    required
-                >
-            </div>
-            <div class="form-group">
-                <label for="subject">Betreff</label>
-                <input
-                    type="text"
-                    id="subject"
-                    placeholder="Worum geht es?"
-                    required
-                >
-            </div>
-            <div class="form-group">
-                <label for="message">Nachricht</label>
-                <textarea
-                    id="message"
-                    placeholder="Schreibe hier deine Nachricht..."
-                    required
-                ></textarea>
-            </div>
-            <button type="submit" class="send-button">
-                ✉ Nachricht senden
-            </button>
-        </form>
-        <div class="info">
-            Deine E-Mail-App wird geöffnet und die Nachricht an
-            <strong>crazyfunworld24@gmail.com</strong> vorbereitet.
+
+<div class="app">
+
+    <header>
+        <div>
+            <h1>Anwesenheit</h1>
+            <div class="subtitle">Nutzer verwalten und Anwesenheit erfassen</div>
+        </div>
+
+        <button class="add-button" onclick="openAddModal()">+</button>
+    </header>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">Nutzer</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-number" id="presentCount">0</div>
+            <div class="stat-label">Anwesend</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-number" id="missingCount">0</div>
+            <div class="stat-label">Fehlend</div>
         </div>
     </div>
-</main>
-<footer>
-    © 2026 RFG – Realistic Funfair Games
-</footer>
+
+    <div id="userList" class="list"></div>
+
+</div>
+
+
+<!-- Nutzer hinzufügen -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+
+        <h2>👤 Nutzer hinzufügen</h2>
+
+        <input
+            id="nameInput"
+            type="text"
+            placeholder="Name eingeben"
+            autocomplete="off"
+        >
+
+        <div class="modal-buttons">
+            <button class="modal-button cancel" onclick="closeModal('addModal')">
+                Abbrechen
+            </button>
+
+            <button class="modal-button primary" onclick="addUser()">
+                Hinzufügen
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Zu spät -->
+<div class="modal-overlay" id="lateModal">
+    <div class="modal">
+
+        <h2>⏰ Zu spät</h2>
+
+        <p id="lateUserText"></p>
+
+        <input
+            id="minutesInput"
+            type="number"
+            min="1"
+            max="999"
+            placeholder="Minuten"
+            inputmode="numeric"
+        >
+
+        <div class="modal-buttons">
+            <button class="modal-button cancel" onclick="closeModal('lateModal')">
+                Abbrechen
+            </button>
+
+            <button class="modal-button primary" onclick="saveLate()">
+                Speichern
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Nutzer bearbeiten -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+
+        <h2>⚙️ Nutzer bearbeiten</h2>
+
+        <input
+            id="editNameInput"
+            type="text"
+            placeholder="Name"
+            autocomplete="off"
+        >
+
+        <p style="margin-bottom:8px;font-weight:700;">
+            Status
+        </p>
+
+        <div class="status-buttons">
+
+            <button class="status-button"
+                    onclick="setEditStatus('present')">
+                🟢 Anwesend
+            </button>
+
+            <button class="status-button"
+                    onclick="setEditStatus('missing')">
+                🔴 Fehlend
+            </button>
+
+            <button class="status-button"
+                    onclick="openLateFromEdit()">
+                🟠 Zu spät
+            </button>
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button class="modal-button cancel"
+                    onclick="closeModal('editModal')">
+                Abbrechen
+            </button>
+
+            <button class="modal-button primary"
+                    onclick="saveEdit()">
+                Speichern
+            </button>
+
+        </div>
+
+        <button class="danger" onclick="deleteCurrentUser()">
+            🗑️ Nutzer löschen
+        </button>
+
+    </div>
+</div>
+
+
 <script>
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const subject = document.getElementById("subject").value;
-        const message = document.getElementById("message").value;
-        const recipient = "crazyfunworld24@gmail.com";
-        const mailSubject =
-            encodeURIComponent(subject);
-        const mailBody =
-            encodeURIComponent(
-                "Hallo RFG-Team,\n\n" +
-                message +
-                "\n\n--------------------\n" +
-                "Name: " + name + "\n" +
-                "E-Mail: " + email
-            );
-        window.location.href =
-            "mailto:" + recipient +
-            "?subject=" + mailSubject +
-            "&body=" + mailBody;
+
+let users = JSON.parse(localStorage.getItem("attendanceUsers")) || [];
+
+let currentUserId = null;
+let lateUserId = null;
+let editStatus = null;
+
+
+/* =========================
+   SPEICHERN
+========================= */
+
+function saveUsers() {
+    localStorage.setItem(
+        "attendanceUsers",
+        JSON.stringify(users)
+    );
+}
+
+
+/* =========================
+   ID
+========================= */
+
+function createId() {
+    return Date.now().toString() +
+           Math.random().toString(36).substring(2);
+}
+
+
+/* =========================
+   NUTZER HINZUFÜGEN
+========================= */
+
+function openAddModal() {
+
+    document.getElementById("nameInput").value = "";
+
+    document
+        .getElementById("addModal")
+        .classList.add("show");
+
+    setTimeout(() => {
+        document.getElementById("nameInput").focus();
+    }, 200);
+}
+
+
+function addUser() {
+
+    const input =
+        document.getElementById("nameInput");
+
+    const name = input.value.trim();
+
+    if (!name) {
+        alert("Bitte einen Namen eingeben.");
+        return;
+    }
+
+    users.push({
+        id: createId(),
+        name: name,
+        status: "present",
+        lateMinutes: 0
     });
+
+    saveUsers();
+
+    closeModal("addModal");
+
+    renderUsers();
+}
+
+
+/* =========================
+   NUTZERLISTE
+========================= */
+
+function renderUsers() {
+
+    const list =
+        document.getElementById("userList");
+
+    list.innerHTML = "";
+
+    if (users.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">👥</div>
+                <strong>Noch keine Nutzer</strong>
+                <div style="margin-top:6px;">
+                    Tippe oben auf +, um einen Nutzer hinzuzufügen.
+                </div>
+            </div>
+        `;
+
+        updateStats();
+        return;
+    }
+
+    users.forEach(user => {
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className = "user-wrapper";
+
+        wrapper.innerHTML = `
+
+            <div class="swipe-background swipe-left">
+                <span>🔴 Fehlend</span>
+                <span>←</span>
+            </div>
+
+            <div class="swipe-background swipe-right">
+                <span>→</span>
+                <span>🟠 Zu spät</span>
+            </div>
+
+            <div class="user-card">
+
+                <div class="avatar">
+                    ${getInitial(user.name)}
+                </div>
+
+                <div class="user-info">
+
+                    <div class="user-name">
+                        ${escapeHTML(user.name)}
+                    </div>
+
+                    ${getStatusHTML(user)}
+
+                </div>
+
+                <button class="more-button">
+                    ⋯
+                </button>
+
+            </div>
+        `;
+
+        list.appendChild(wrapper);
+
+        const card =
+            wrapper.querySelector(".user-card");
+
+        const moreButton =
+            wrapper.querySelector(".more-button");
+
+        moreButton.addEventListener(
+            "click",
+            (event) => {
+
+                event.stopPropagation();
+
+                openEditModal(user.id);
+            }
+        );
+
+        setupSwipe(card, user);
+    });
+
+    updateStats();
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+function getStatusHTML(user) {
+
+    if (user.status === "missing") {
+
+        return `
+            <div class="status missing">
+                🔴 Fehlend
+            </div>
+        `;
+    }
+
+    if (user.status === "late") {
+
+        return `
+            <div class="status late">
+                🟠 ${user.lateMinutes} Min. zu spät
+            </div>
+        `;
+    }
+
+    return `
+        <div class="status present">
+            🟢 Anwesend
+        </div>
+    `;
+}
+
+
+/* =========================
+   SWIPE
+========================= */
+
+function setupSwipe(card, user) {
+
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+
+    card.addEventListener("touchstart", e => {
+
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        dragging = true;
+
+        card.style.transition = "none";
+
+    }, { passive: true });
+
+
+    card.addEventListener("touchmove", e => {
+
+        if (!dragging) return;
+
+        currentX = e.touches[0].clientX;
+
+        let diff = currentX - startX;
+
+        if (Math.abs(diff) > 5) {
+
+            card.style.transform =
+                `translateX(${diff}px)`;
+        }
+
+    }, { passive: true });
+
+
+    card.addEventListener("touchend", () => {
+
+        dragging = false;
+
+        const diff = currentX - startX;
+
+        card.style.transition =
+            "transform .25s ease";
+
+        if (diff < -100) {
+
+            card.style.transform =
+                "translateX(-100%)";
+
+            setTimeout(() => {
+
+                markMissing(user.id);
+
+            }, 180);
+
+        } else if (diff > 100) {
+
+            card.style.transform =
+                "translateX(100%)";
+
+            setTimeout(() => {
+
+                openLateModal(user.id);
+
+            }, 180);
+
+        } else {
+
+            card.style.transform =
+                "translateX(0)";
+        }
+
+    });
+}
+
+
+/* =========================
+   FEHLEND
+========================= */
+
+function markMissing(id) {
+
+    const user =
+        users.find(u => u.id === id);
+
+    if (!user) return;
+
+    user.status = "missing";
+    user.lateMinutes = 0;
+
+    saveUsers();
+    renderUsers();
+}
+
+
+/* =========================
+   ZU SPÄT
+========================= */
+
+function openLateModal(id) {
+
+    lateUserId = id;
+
+    const user =
+        users.find(u => u.id === id);
+
+    if (!user) return;
+
+    document.getElementById("lateUserText").textContent =
+        user.name + " ist zu spät.";
+
+    document.getElementById("minutesInput").value = "";
+
+    document
+        .getElementById("lateModal")
+        .classList.add("show");
+
+    setTimeout(() => {
+
+        document
+            .getElementById("minutesInput")
+            .focus();
+
+    }, 200);
+}
+
+
+function saveLate() {
+
+    const input =
+        document.getElementById("minutesInput");
+
+    const minutes =
+        parseInt(input.value);
+
+    if (!minutes || minutes < 1) {
+
+        alert("Bitte eine gültige Minutenzahl eingeben.");
+
+        return;
+    }
+
+    const user =
+        users.find(u => u.id === lateUserId);
+
+    if (!user) return;
+
+    user.status = "late";
+    user.lateMinutes = minutes;
+
+    saveUsers();
+
+    closeModal("lateModal");
+
+    renderUsers();
+}
+
+
+/* =========================
+   BEARBEITEN
+========================= */
+
+function openEditModal(id) {
+
+    currentUserId = id;
+
+    const user =
+        users.find(u => u.id === id);
+
+    if (!user) return;
+
+    document.getElementById("editNameInput").value =
+        user.name;
+
+    editStatus = user.status;
+
+    document
+        .getElementById("editModal")
+        .classList.add("show");
+}
+
+
+function setEditStatus(status) {
+
+    editStatus = status;
+}
+
+
+function openLateFromEdit() {
+
+    const id = currentUserId;
+
+    closeModal("editModal");
+
+    setTimeout(() => {
+
+        openLateModal(id);
+
+    }, 250);
+}
+
+
+function saveEdit() {
+
+    const user =
+        users.find(u => u.id === currentUserId);
+
+    if (!user) return;
+
+    const name =
+        document
+            .getElementById("editNameInput")
+            .value.trim();
+
+    if (!name) {
+
+        alert("Bitte einen Namen eingeben.");
+
+        return;
+    }
+
+    user.name = name;
+
+    if (editStatus === "present") {
+
+        user.status = "present";
+        user.lateMinutes = 0;
+
+    } else if (editStatus === "missing") {
+
+        user.status = "missing";
+        user.lateMinutes = 0;
+    }
+
+    saveUsers();
+
+    closeModal("editModal");
+
+    renderUsers();
+}
+
+
+/* =========================
+   LÖSCHEN
+========================= */
+
+function deleteCurrentUser() {
+
+    const user =
+        users.find(u => u.id === currentUserId);
+
+    if (!user) return;
+
+    const confirmed =
+        confirm(
+            `"${user.name}" wirklich löschen?`
+        );
+
+    if (!confirmed) return;
+
+    users =
+        users.filter(
+            u => u.id !== currentUserId
+        );
+
+    saveUsers();
+
+    closeModal("editModal");
+
+    renderUsers();
+}
+
+
+/* =========================
+   STATISTIK
+========================= */
+
+function updateStats() {
+
+    const total = users.length;
+
+    const present =
+        users.filter(
+            u => u.status === "present"
+        ).length;
+
+    const missing =
+        users.filter(
+            u => u.status === "missing"
+        ).length;
+
+    document.getElementById("totalCount")
+        .textContent = total;
+
+    document.getElementById("presentCount")
+        .textContent = present;
+
+    document.getElementById("missingCount")
+        .textContent = missing;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function closeModal(id) {
+
+    document
+        .getElementById(id)
+        .classList.remove("show");
+}
+
+
+document.querySelectorAll(".modal-overlay")
+.forEach(overlay => {
+
+    overlay.addEventListener("click", e => {
+
+        if (e.target === overlay) {
+
+            overlay.classList.remove("show");
+
+        }
+
+    });
+
+});
+
+
+/* =========================
+   HILFSFUNKTIONEN
+========================= */
+
+function getInitial(name) {
+
+    return name
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+}
+
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+
+/* =========================
+   START
+========================= */
+
+renderUsers();
+
 </script>
+
 </body>
 </html>
