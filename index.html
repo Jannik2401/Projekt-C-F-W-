@@ -117,13 +117,27 @@ button.success {
 }
 
 .user {
+    position: relative;
+    overflow: hidden;
     border: 1px solid #e5e5ea;
     border-radius: 15px;
+    min-height: 120px;
+    touch-action: pan-y;
+    user-select: none;
+    background: white;
+}
+
+.user-content {
+    position: relative;
+    z-index: 2;
+    min-height: 120px;
     padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 15px;
+    background: white;
+    transition: transform .25s ease;
 }
 
 .user-info strong {
@@ -140,6 +154,41 @@ button.success {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
+}
+
+.swipe-action {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.swipe-action.left {
+    left: 0;
+    background: #ff9500;
+}
+
+.swipe-action.right {
+    right: 0;
+    background: #ff3b30;
+}
+
+.swipe-hint {
+    margin: 0 0 15px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #eef6ff;
+    color: #24527a;
+    font-size: 14px;
+    text-align: center;
 }
 
 .badge {
@@ -201,12 +250,8 @@ button.success {
     color: #777;
 }
 
-.hidden {
-    display: none;
-}
-
 @media (max-width: 650px) {
-    .user {
+    .user-content {
         flex-direction: column;
         align-items: flex-start;
     }
@@ -231,161 +276,163 @@ button.success {
 
 <div class="container">
 
-    <!-- EINSTELLUNGEN -->
-    <section class="card">
-        <h2>⚙️ Einstellungen</h2>
+<section class="card">
+    <h2>⚙️ Einstellungen</h2>
 
-        <div class="settings-grid">
-            <div>
-                <label>
-                    <strong>Ab wann gilt man als zu spät?</strong>
-                </label>
-                <input type="time" id="lateTime" value="08:00">
-            </div>
-
-            <div>
-                <label>
-                    <strong>Klassenname</strong>
-                </label>
-                <input type="text" id="className" placeholder="z. B. 10A">
-            </div>
+    <div class="settings-grid">
+        <div>
+            <label>
+                <strong>Ab wann gilt man als zu spät?</strong>
+            </label>
+            <input type="time" id="lateTime" value="08:00">
         </div>
 
-        <button onclick="saveSettings()" class="success">
-            Einstellungen speichern
-        </button>
-    </section>
-
-
-    <!-- NUTZER HINZUFÜGEN -->
-    <section class="card">
-        <h2>👤 Nutzer hinzufügen</h2>
-
-        <input
-            type="text"
-            id="userName"
-            placeholder="Vor- und Nachname"
-        >
-
-        <input
-            type="text"
-            id="userNumber"
-            placeholder="Schülernummer (optional)"
-        >
-
-        <button onclick="addUser()">
-            Nutzer hinzufügen
-        </button>
-
-        <button onclick="generateRandomUsers()" class="warning">
-            🎲 10 zufällige Nutzer erstellen
-        </button>
-
-        <button onclick="deleteAllUsers()" class="danger">
-            🗑️ Alle Nutzer löschen
-        </button>
-    </section>
-
-
-    <!-- STATISTIK -->
-    <section class="card">
-        <h2>📊 Übersicht</h2>
-
-        <div class="stats">
-            <div class="stat">
-                <strong id="userCount">0</strong>
-                Nutzer
-            </div>
-
-            <div class="stat">
-                <strong id="entryCount">0</strong>
-                Klassenbuch-Einträge
-            </div>
-
-            <div class="stat">
-                <strong id="lateCount">0</strong>
-                Verspätungen
-            </div>
-
-            <div class="stat">
-                <strong id="absentCount">0</strong>
-                Fehlzeiten
-            </div>
+        <div>
+            <label>
+                <strong>Klassenname</strong>
+            </label>
+            <input type="text" id="className" placeholder="z. B. 10A">
         </div>
-    </section>
+    </div>
 
+    <button onclick="saveSettings()" class="success">
+        Einstellungen speichern
+    </button>
+</section>
 
-    <!-- NUTZERLISTE -->
-    <section class="card">
-        <h2>👥 Nutzerliste</h2>
+<section class="card">
+    <h2>👤 Nutzer hinzufügen</h2>
 
-        <input
-            type="search"
-            id="searchUser"
-            placeholder="🔎 Nutzer suchen..."
-            oninput="renderUsers()"
-        >
+    <input
+        type="text"
+        id="userName"
+        placeholder="Vor- und Nachname"
+    >
 
-        <div id="userList" class="user-list"></div>
-    </section>
+    <input
+        type="text"
+        id="userNumber"
+        placeholder="Schülernummer (optional)"
+    >
 
+    <button onclick="addUser()">
+        Nutzer hinzufügen
+    </button>
 
-    <!-- KLASSENBUCH -->
-    <section class="card">
-        <h2>📝 Klassenbuch-Eintrag</h2>
+    <button onclick="generateRandomUsers()" class="warning">
+        🎲 10 zufällige Nutzer erstellen
+    </button>
 
-        <select id="entryUser">
-            <option value="">Nutzer auswählen</option>
-        </select>
+    <button onclick="deleteAllUsers()" class="danger">
+        🗑️ Alle Nutzer löschen
+    </button>
+</section>
 
-        <select id="entryType">
-            <option value="Anwesend">Anwesend</option>
-            <option value="Zu spät">Zu spät</option>
-            <option value="Abwesend">Abwesend</option>
-            <option value="Entschuldigt">Entschuldigt</option>
-        </select>
+<section class="card">
+    <h2>📊 Übersicht</h2>
 
-        <input type="date" id="entryDate">
+    <div class="stats">
+        <div class="stat">
+            <strong id="userCount">0</strong>
+            Nutzer
+        </div>
 
-        <textarea
-            id="entryNote"
-            placeholder="Notiz / Bemerkung..."
-        ></textarea>
+        <div class="stat">
+            <strong id="entryCount">0</strong>
+            Klassenbuch-Einträge
+        </div>
 
-        <button onclick="addEntry()">
-            Eintrag hinzufügen
-        </button>
-    </section>
+        <div class="stat">
+            <strong id="lateCount">0</strong>
+            Verspätungen
+        </div>
 
+        <div class="stat">
+            <strong id="absentCount">0</strong>
+            Fehlzeiten
+        </div>
+    </div>
+</section>
 
-    <!-- EINTRÄGE -->
-    <section class="card">
-        <h2>📖 Klassenbuch</h2>
+<section class="card">
+    <h2>👥 Nutzerliste</h2>
 
-        <div id="entries"></div>
-    </section>
+    <p class="swipe-hint">
+        Auf einem Nutzer nach links wischen = zu spät ·
+        nach rechts wischen = fehlt
+    </p>
+
+    <input
+        type="search"
+        id="searchUser"
+        placeholder="🔎 Nutzer suchen..."
+        oninput="renderUsers()"
+    >
+
+    <div id="userList" class="user-list"></div>
+</section>
+
+<section class="card">
+    <h2>📝 Klassenbuch-Eintrag</h2>
+
+    <select id="entryUser">
+        <option value="">Nutzer auswählen</option>
+    </select>
+
+    <select id="entryType">
+        <option value="Anwesend">Anwesend</option>
+        <option value="Zu spät">Zu spät</option>
+        <option value="Abwesend">Abwesend</option>
+        <option value="Entschuldigt">Entschuldigt</option>
+    </select>
+
+    <input type="date" id="entryDate">
+
+    <textarea
+        id="entryNote"
+        placeholder="Notiz / Bemerkung..."
+    ></textarea>
+
+    <button onclick="addEntry()">
+        Eintrag hinzufügen
+    </button>
+</section>
+
+<section class="card">
+    <h2>📖 Klassenbuch</h2>
+
+    <div id="entries"></div>
+</section>
 
 </div>
 
-
 <script>
 
-let users = JSON.parse(localStorage.getItem("klassenbuch_users")) || [];
-let entries = JSON.parse(localStorage.getItem("klassenbuch_entries")) || [];
+let users =
+    JSON.parse(localStorage.getItem("klassenbuch_users")) || [];
 
-let settings = JSON.parse(
-    localStorage.getItem("klassenbuch_settings")
-) || {
-    lateTime: "08:00",
-    className: ""
-};
+let entries =
+    JSON.parse(localStorage.getItem("klassenbuch_entries")) || [];
+
+let settings =
+    JSON.parse(localStorage.getItem("klassenbuch_settings")) || {
+        lateTime: "08:00",
+        className: ""
+    };
+
+let swipeStartX = 0;
+let swipeStartY = 0;
+let swipeCurrentX = 0;
+let activeSwipeElement = null;
+let swipeMoved = false;
 
 
-// ------------------------------------
-// SPEICHERN
-// ------------------------------------
+// ==============================
+// DATEN SPEICHERN
+// ==============================
 
 function saveData() {
+
     localStorage.setItem(
         "klassenbuch_users",
         JSON.stringify(users)
@@ -403,11 +450,12 @@ function saveData() {
 }
 
 
-// ------------------------------------
+// ==============================
 // EINSTELLUNGEN
-// ------------------------------------
+// ==============================
 
 function loadSettings() {
+
     document.getElementById("lateTime").value =
         settings.lateTime || "08:00";
 
@@ -416,6 +464,7 @@ function loadSettings() {
 
     updateHeader();
 }
+
 
 function saveSettings() {
 
@@ -426,65 +475,85 @@ function saveSettings() {
         document.getElementById("className").value.trim();
 
     saveData();
+
     updateHeader();
 
     alert("Einstellungen gespeichert.");
 }
 
+
 function updateHeader() {
 
-    const subtitle = document.querySelector("header p");
+    const subtitle =
+        document.querySelector("header p");
 
     if (settings.className) {
+
         subtitle.textContent =
-            "Klasse " + settings.className +
+            "Klasse " +
+            settings.className +
             " · Nutzer, Anwesenheit und Einträge verwalten";
+
     } else {
+
         subtitle.textContent =
             "Nutzer, Anwesenheit und Einträge verwalten";
     }
 }
 
 
-// ------------------------------------
+// ==============================
 // NUTZER HINZUFÜGEN
-// ------------------------------------
+// ==============================
 
 function addUser() {
 
     const name =
-        document.getElementById("userName").value.trim();
+        document.getElementById("userName")
+        .value
+        .trim();
 
     const number =
-        document.getElementById("userNumber").value.trim();
+        document.getElementById("userNumber")
+        .value
+        .trim();
 
     if (!name) {
+
         alert("Bitte einen Namen eingeben.");
+
         return;
     }
 
     users.push({
+
         id: Date.now() + Math.random(),
+
         name: name,
+
         number: number,
+
         created: new Date().toISOString()
     });
 
     document.getElementById("userName").value = "";
+
     document.getElementById("userNumber").value = "";
 
     saveData();
+
     renderAll();
 }
 
 
-// ------------------------------------
+// ==============================
 // 10 ZUFÄLLIGE NUTZER
-// ------------------------------------
+// ==============================
 
 function generateRandomUsers() {
 
     const names = [
+
         "Max Mustermann",
         "Anna Müller",
         "Leon Schneider",
@@ -512,21 +581,29 @@ function generateRandomUsers() {
         "David Schmitz"
     ];
 
-    const availableNames = names.filter(name =>
-        !users.some(user => user.name === name)
-    );
+    const availableNames =
+        names.filter(name =>
+            !users.some(user =>
+                user.name === name
+            )
+        );
 
     if (availableNames.length < 10) {
 
-        // Falls bereits viele Testnutzer existieren,
-        // werden eindeutige Testnamen erzeugt.
         for (let i = 0; i < 10; i++) {
 
             users.push({
+
                 id: Date.now() + Math.random(),
-                name: "Testnutzer " + (users.length + 1),
+
+                name:
+                    "Testnutzer " +
+                    (users.length + 1),
+
                 number: "",
-                created: new Date().toISOString()
+
+                created:
+                    new Date().toISOString()
             });
         }
 
@@ -538,147 +615,209 @@ function generateRandomUsers() {
             .forEach((name, index) => {
 
                 users.push({
-                    id: Date.now() + Math.random(),
+
+                    id:
+                        Date.now() +
+                        Math.random(),
+
                     name: name,
-                    number: String(users.length + index + 1),
-                    created: new Date().toISOString()
+
+                    number:
+                        String(
+                            users.length +
+                            index +
+                            1
+                        ),
+
+                    created:
+                        new Date().toISOString()
                 });
 
             });
     }
 
     saveData();
+
     renderAll();
 
-    alert("10 zufällige Nutzer wurden erstellt.");
+    alert(
+        "10 zufällige Nutzer wurden erstellt."
+    );
 }
 
 
-// ------------------------------------
+// ==============================
 // ALLE NUTZER LÖSCHEN
-// ------------------------------------
+// ==============================
 
 function deleteAllUsers() {
 
     if (users.length === 0) {
-        alert("Es sind keine Nutzer vorhanden.");
+
+        alert(
+            "Es sind keine Nutzer vorhanden."
+        );
+
         return;
     }
 
-    const confirmation = confirm(
-        "⚠️ Wirklich ALLE Nutzer löschen?\n\n" +
-        "Diese Aktion kann nicht rückgängig gemacht werden."
-    );
+    const confirmation =
+        confirm(
+            "⚠️ Wirklich ALLE Nutzer löschen?\n\n" +
+            "Diese Aktion kann nicht rückgängig gemacht werden."
+        );
 
     if (!confirmation) return;
 
-    const deleteEntries = confirm(
-        "Sollen auch alle Klassenbuch-Einträge gelöscht werden?"
-    );
+    const deleteEntries =
+        confirm(
+            "Sollen auch alle Klassenbuch-Einträge gelöscht werden?"
+        );
 
     users = [];
 
     if (deleteEntries) {
+
         entries = [];
     }
 
     saveData();
+
     renderAll();
 
-    alert("Alle Nutzer wurden gelöscht.");
+    alert(
+        "Alle Nutzer wurden gelöscht."
+    );
 }
 
 
-// ------------------------------------
-// NUTZER LÖSCHEN
-// ------------------------------------
+// ==============================
+// EINEN NUTZER LÖSCHEN
+// ==============================
 
 function deleteUser(id) {
 
-    const user = users.find(u => u.id === id);
+    const user =
+        users.find(u => u.id === id);
 
     if (!user) return;
 
-    if (!confirm(
-        'Soll "' + user.name + '" wirklich gelöscht werden?'
-    )) {
+    if (
+        !confirm(
+            'Soll "' +
+            user.name +
+            '" wirklich gelöscht werden?'
+        )
+    ) {
+
         return;
     }
 
-    users = users.filter(u => u.id !== id);
+    users =
+        users.filter(
+            u => u.id !== id
+        );
 
     saveData();
+
     renderAll();
 }
 
 
-// ------------------------------------
+// ==============================
 // NUTZER BEARBEITEN
-// ------------------------------------
+// ==============================
 
 function editUser(id) {
 
-    const user = users.find(u => u.id === id);
+    const user =
+        users.find(u => u.id === id);
 
     if (!user) return;
 
-    const newName = prompt(
-        "Neuer Name:",
-        user.name
-    );
+    const newName =
+        prompt(
+            "Neuer Name:",
+            user.name
+        );
 
     if (newName === null) return;
 
-    const name = newName.trim();
+    const name =
+        newName.trim();
 
     if (!name) {
-        alert("Der Name darf nicht leer sein.");
+
+        alert(
+            "Der Name darf nicht leer sein."
+        );
+
         return;
     }
 
-    const newNumber = prompt(
-        "Schülernummer:",
-        user.number || ""
-    );
+    const newNumber =
+        prompt(
+            "Schülernummer:",
+            user.number || ""
+        );
 
     if (newNumber === null) return;
 
     user.name = name;
-    user.number = newNumber.trim();
+
+    user.number =
+        newNumber.trim();
 
     saveData();
+
     renderAll();
 }
 
 
-// ------------------------------------
+// ==============================
 // NUTZERLISTE
-// ------------------------------------
+// ==============================
 
 function renderUsers() {
 
     const list =
-        document.getElementById("userList");
+        document.getElementById(
+            "userList"
+        );
 
     const search =
-        document.getElementById("searchUser")
-            .value
-            .toLowerCase()
-            .trim();
+        document.getElementById(
+            "searchUser"
+        )
+        .value
+        .toLowerCase()
+        .trim();
 
-    const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(search) ||
-        (user.number || "").toLowerCase().includes(search)
-    );
+    const filteredUsers =
+        users.filter(user =>
+
+            user.name
+                .toLowerCase()
+                .includes(search)
+
+            ||
+
+            (user.number || "")
+                .toLowerCase()
+                .includes(search)
+        );
 
     list.innerHTML = "";
 
     if (filteredUsers.length === 0) {
 
         list.innerHTML =
-            '<div class="empty">Keine Nutzer gefunden.</div>';
+            '<div class="empty">' +
+            'Keine Nutzer gefunden.' +
+            '</div>';
 
         updateEntryUserSelect();
+
         return;
     }
 
@@ -699,67 +838,119 @@ function renderUsers() {
                 e.type === "Abwesend"
             ).length;
 
-        const div = document.createElement("div");
+        const div =
+            document.createElement("div");
 
         div.className = "user";
 
         div.innerHTML = `
-            <div class="user-info">
-                <strong>${escapeHtml(user.name)}</strong>
-                <span>
-                    ${
-                        user.number
-                        ? "Schülernummer: " +
-                          escapeHtml(user.number)
-                        : "Keine Schülernummer"
-                    }
-                </span>
-                <br>
 
-                ${
-                    late > 0
-                    ? `<span class="badge late">
-                        ${late}× zu spät
-                       </span>`
-                    : ""
-                }
-
-                ${
-                    absent > 0
-                    ? `<span class="badge absent">
-                        ${absent}× abwesend
-                       </span>`
-                    : ""
-                }
-
-                ${
-                    late === 0 && absent === 0
-                    ? `<span class="badge ok">
-                        Keine Auffälligkeiten
-                       </span>`
-                    : ""
-                }
+            <div class="swipe-action left">
+                ←<br>
+                Zu spät
             </div>
 
-            <div class="user-actions">
-                <button
-                    onclick="showUserEntries(${user.id})"
-                    class="secondary">
-                    📖 Einträge
-                </button>
+            <div class="swipe-action right">
+                Fehlt<br>
+                →
+            </div>
 
-                <button
-                    onclick="editUser(${user.id})">
-                    ✏️ Bearbeiten
-                </button>
+            <div class="user-content">
 
-                <button
-                    onclick="deleteUser(${user.id})"
-                    class="danger">
-                    🗑️ Löschen
-                </button>
+                <div class="user-info">
+
+                    <strong>
+                        ${escapeHtml(user.name)}
+                    </strong>
+
+                    <span>
+
+                        ${
+                            user.number
+
+                            ? "Schülernummer: " +
+                              escapeHtml(user.number)
+
+                            : "Keine Schülernummer"
+                        }
+
+                    </span>
+
+                    <br>
+
+                    ${
+                        late > 0
+
+                        ? `<span class="badge late">
+                            ${late}× zu spät
+                           </span>`
+
+                        : ""
+                    }
+
+                    ${
+                        absent > 0
+
+                        ? `<span class="badge absent">
+                            ${absent}× abwesend
+                           </span>`
+
+                        : ""
+                    }
+
+                    ${
+                        late === 0 &&
+                        absent === 0
+
+                        ? `<span class="badge ok">
+                            Keine Auffälligkeiten
+                           </span>`
+
+                        : ""
+                    }
+
+                </div>
+
+                <div class="user-actions">
+
+                    <button
+                        onclick="showUserEntries(${user.id})"
+                        class="secondary">
+
+                        📖 Einträge
+
+                    </button>
+
+                    <button
+                        onclick="editUser(${user.id})">
+
+                        ✏️ Bearbeiten
+
+                    </button>
+
+                    <button
+                        onclick="deleteUser(${user.id})"
+                        class="danger">
+
+                        🗑️ Löschen
+
+                    </button>
+
+                </div>
+
             </div>
         `;
+
+        const content =
+            div.querySelector(
+                ".user-content"
+            );
+
+        addSwipeEvents(
+            div,
+            content,
+            user.id
+        );
 
         list.appendChild(div);
     });
@@ -768,96 +959,388 @@ function renderUsers() {
 }
 
 
-// ------------------------------------
+// ==============================
+// WISCHEN
+// ==============================
+
+function addSwipeEvents(
+    card,
+    content,
+    userId
+) {
+
+    card.addEventListener(
+        "touchstart",
+        function(event) {
+
+            if (
+                event.touches.length !== 1
+            ) return;
+
+            swipeStartX =
+                event.touches[0].clientX;
+
+            swipeStartY =
+                event.touches[0].clientY;
+
+            swipeCurrentX =
+                swipeStartX;
+
+            activeSwipeElement =
+                content;
+
+            swipeMoved = false;
+
+            content.style.transition =
+                "none";
+
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    card.addEventListener(
+        "touchmove",
+        function(event) {
+
+            if (
+                !activeSwipeElement ||
+                event.touches.length !== 1
+            ) return;
+
+            swipeCurrentX =
+                event.touches[0].clientX;
+
+            const currentY =
+                event.touches[0].clientY;
+
+            const deltaX =
+                swipeCurrentX -
+                swipeStartX;
+
+            const deltaY =
+                currentY -
+                swipeStartY;
+
+            if (
+                Math.abs(deltaY) >
+                Math.abs(deltaX)
+            ) {
+
+                return;
+            }
+
+            if (
+                Math.abs(deltaX) > 10
+            ) {
+
+                swipeMoved = true;
+            }
+
+            const limitedDelta =
+                Math.max(
+                    -125,
+                    Math.min(
+                        125,
+                        deltaX
+                    )
+                );
+
+            content.style.transform =
+                "translateX(" +
+                limitedDelta +
+                "px)";
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    card.addEventListener(
+        "touchend",
+        function() {
+
+            if (!activeSwipeElement)
+                return;
+
+            const deltaX =
+                swipeCurrentX -
+                swipeStartX;
+
+            content.style.transition =
+                "transform .25s ease";
+
+            if (
+                Math.abs(deltaX) >= 80
+            ) {
+
+                if (deltaX < 0) {
+
+                    addSwipeEntry(
+                        userId,
+                        "Zu spät"
+                    );
+
+                } else {
+
+                    addSwipeEntry(
+                        userId,
+                        "Abwesend"
+                    );
+                }
+            }
+
+            content.style.transform =
+                "translateX(0)";
+
+            activeSwipeElement = null;
+
+            setTimeout(
+                function() {
+
+                    swipeMoved = false;
+
+                },
+                50
+            );
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    card.addEventListener(
+        "click",
+        function(event) {
+
+            if (swipeMoved) {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+            }
+        },
+        true
+    );
+}
+
+
+// ==============================
+// WISCH-EINTRAG
+// ==============================
+
+function addSwipeEntry(
+    userId,
+    type
+) {
+
+    const today =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+    const user =
+        users.find(
+            u => u.id === userId
+        );
+
+    if (!user) return;
+
+    entries.unshift({
+
+        id:
+            Date.now() +
+            Math.random(),
+
+        userId:
+            userId,
+
+        type:
+            type,
+
+        date:
+            today,
+
+        note:
+            "",
+
+        created:
+            new Date().toISOString()
+    });
+
+    saveData();
+
+    renderAll();
+
+    alert(
+
+        user.name +
+        ": " +
+
+        (
+            type === "Zu spät"
+
+            ? "zu spät eingetragen."
+
+            : "fehlt eingetragen."
+        )
+    );
+}
+
+
+// ==============================
 // DROPDOWN
-// ------------------------------------
+// ==============================
 
 function updateEntryUserSelect() {
 
     const select =
-        document.getElementById("entryUser");
+        document.getElementById(
+            "entryUser"
+        );
 
-    const oldValue = select.value;
+    const oldValue =
+        select.value;
 
     select.innerHTML =
-        '<option value="">Nutzer auswählen</option>';
+        '<option value="">' +
+        'Nutzer auswählen' +
+        '</option>';
 
     users.forEach(user => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value = user.id;
+        option.value =
+            user.id;
 
         option.textContent =
             user.name +
-            (user.number
-                ? " (" + user.number + ")"
-                : "");
 
-        select.appendChild(option);
+            (
+                user.number
+
+                ? " (" +
+                  user.number +
+                  ")"
+
+                : ""
+            );
+
+        select.appendChild(
+            option
+        );
     });
 
-    if (users.some(u =>
-        String(u.id) === oldValue
-    )) {
-        select.value = oldValue;
+    if (
+        users.some(
+            u =>
+                String(u.id) ===
+                oldValue
+        )
+    ) {
+
+        select.value =
+            oldValue;
     }
 }
 
 
-// ------------------------------------
+// ==============================
 // KLASSENBUCH-EINTRAG
-// ------------------------------------
+// ==============================
 
 function addEntry() {
 
     const userId =
-        document.getElementById("entryUser").value;
+        document.getElementById(
+            "entryUser"
+        ).value;
 
     const type =
-        document.getElementById("entryType").value;
+        document.getElementById(
+            "entryType"
+        ).value;
 
     const date =
-        document.getElementById("entryDate").value;
+        document.getElementById(
+            "entryDate"
+        ).value;
 
     const note =
-        document.getElementById("entryNote").value.trim();
+        document.getElementById(
+            "entryNote"
+        )
+        .value
+        .trim();
 
     if (!userId) {
-        alert("Bitte einen Nutzer auswählen.");
+
+        alert(
+            "Bitte einen Nutzer auswählen."
+        );
+
         return;
     }
 
     if (!date) {
-        alert("Bitte ein Datum auswählen.");
+
+        alert(
+            "Bitte ein Datum auswählen."
+        );
+
         return;
     }
 
     entries.unshift({
-        id: Date.now() + Math.random(),
-        userId: Number(userId),
-        type: type,
-        date: date,
-        note: note,
-        created: new Date().toISOString()
+
+        id:
+            Date.now() +
+            Math.random(),
+
+        userId:
+            Number(userId),
+
+        type:
+            type,
+
+        date:
+            date,
+
+        note:
+            note,
+
+        created:
+            new Date().toISOString()
     });
 
-    document.getElementById("entryNote").value = "";
+    document.getElementById(
+        "entryNote"
+    ).value = "";
 
     saveData();
+
     renderAll();
 }
 
 
-// ------------------------------------
+// ==============================
 // EINTRÄGE ANZEIGEN
-// ------------------------------------
+// ==============================
 
 function renderEntries() {
 
     const container =
-        document.getElementById("entries");
+        document.getElementById(
+            "entries"
+        );
 
     container.innerHTML = "";
 
@@ -874,20 +1357,30 @@ function renderEntries() {
     entries.forEach(entry => {
 
         const user =
-            users.find(u =>
-                u.id === entry.userId
+            users.find(
+                u =>
+                    u.id ===
+                    entry.userId
             );
 
         const div =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        div.className = "entry";
+        div.className =
+            "entry";
 
         div.innerHTML = `
+
             <strong>
+
                 ${escapeHtml(
-                    user ? user.name : "Gelöschter Nutzer"
+                    user
+                    ? user.name
+                    : "Gelöschter Nutzer"
                 )}
+
             </strong>
 
             <br>
@@ -904,14 +1397,20 @@ function renderEntries() {
 
             ${
                 entry.note
-                ? `<p>${escapeHtml(entry.note)}</p>`
+
+                ? `<p>
+                    ${escapeHtml(entry.note)}
+                   </p>`
+
                 : ""
             }
 
             <button
                 class="danger"
                 onclick="deleteEntry(${entry.id})">
+
                 Eintrag löschen
+
             </button>
         `;
 
@@ -920,45 +1419,55 @@ function renderEntries() {
 }
 
 
-// ------------------------------------
+// ==============================
 // EINTRAG LÖSCHEN
-// ------------------------------------
+// ==============================
 
 function deleteEntry(id) {
 
-    if (!confirm(
-        "Diesen Klassenbuch-Eintrag löschen?"
-    )) {
+    if (
+        !confirm(
+            "Diesen Klassenbuch-Eintrag löschen?"
+        )
+    ) {
+
         return;
     }
 
     entries =
-        entries.filter(entry =>
-            entry.id !== id
+        entries.filter(
+            entry =>
+                entry.id !== id
         );
 
     saveData();
+
     renderAll();
 }
 
 
-// ------------------------------------
-// EINTRÄGE EINES NUTZERS
-// ------------------------------------
+// ==============================
+// NUTZER-EINTRÄGE
+// ==============================
 
 function showUserEntries(id) {
 
     const user =
-        users.find(u => u.id === id);
+        users.find(
+            u => u.id === id
+        );
 
     if (!user) return;
 
     const userEntries =
-        entries.filter(e =>
-            e.userId === id
+        entries.filter(
+            e =>
+                e.userId === id
         );
 
-    if (userEntries.length === 0) {
+    if (
+        userEntries.length === 0
+    ) {
 
         alert(
             "Für " +
@@ -974,55 +1483,68 @@ function showUserEntries(id) {
         user.name +
         "\n\n";
 
-    userEntries.forEach(entry => {
+    userEntries.forEach(
+        entry => {
 
-        text +=
-            formatDate(entry.date) +
-            " – " +
-            entry.type;
-
-        if (entry.note) {
             text +=
+                formatDate(
+                    entry.date
+                ) +
                 " – " +
-                entry.note;
-        }
+                entry.type;
 
-        text += "\n";
-    });
+            if (entry.note) {
+
+                text +=
+                    " – " +
+                    entry.note;
+            }
+
+            text += "\n";
+        }
+    );
 
     alert(text);
 }
 
 
-// ------------------------------------
+// ==============================
 // STATISTIK
-// ------------------------------------
+// ==============================
 
 function updateStats() {
 
-    document.getElementById("userCount")
-        .textContent = users.length;
+    document.getElementById(
+        "userCount"
+    ).textContent =
+        users.length;
 
-    document.getElementById("entryCount")
-        .textContent = entries.length;
+    document.getElementById(
+        "entryCount"
+    ).textContent =
+        entries.length;
 
-    document.getElementById("lateCount")
-        .textContent =
-            entries.filter(e =>
+    document.getElementById(
+        "lateCount"
+    ).textContent =
+        entries.filter(
+            e =>
                 e.type === "Zu spät"
-            ).length;
+        ).length;
 
-    document.getElementById("absentCount")
-        .textContent =
-            entries.filter(e =>
+    document.getElementById(
+        "absentCount"
+    ).textContent =
+        entries.filter(
+            e =>
                 e.type === "Abwesend"
-            ).length;
+        ).length;
 }
 
 
-// ------------------------------------
+// ==============================
 // DATUM
-// ------------------------------------
+// ==============================
 
 function formatDate(date) {
 
@@ -1031,51 +1553,79 @@ function formatDate(date) {
     const parts =
         date.split("-");
 
-    if (parts.length !== 3) {
+    if (
+        parts.length !== 3
+    ) {
+
         return date;
     }
 
     return (
+
         parts[2] +
         "." +
         parts[1] +
         "." +
         parts[0]
+
     );
 }
 
 
-// ------------------------------------
+// ==============================
 // HTML SICHER MACHEN
-// ------------------------------------
+// ==============================
 
 function escapeHtml(value) {
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
-// ------------------------------------
+// ==============================
 // ALLES AKTUALISIEREN
-// ------------------------------------
+// ==============================
 
 function renderAll() {
 
     renderUsers();
+
     renderEntries();
+
     updateStats();
+
     updateEntryUserSelect();
 }
 
 
-// ------------------------------------
+// ==============================
 // START
-// ------------------------------------
+// ==============================
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -1088,8 +1638,9 @@ document.addEventListener(
                 .toISOString()
                 .split("T")[0];
 
-        document.getElementById("entryDate")
-            .value = today;
+        document.getElementById(
+            "entryDate"
+        ).value = today;
 
         renderAll();
     }
