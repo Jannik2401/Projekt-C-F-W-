@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KasseKat POS - 100 Produkte</title>
+    <title>KasseKat POS - Numpad Eingabe</title>
     <style>
         :root {
             --bg-grid: #e4e7eb;
@@ -260,6 +260,14 @@
             font-size: 10px;
             color: #64748b;
             text-transform: uppercase;
+        }
+
+        .total-box-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2563eb;
+            text-align: right;
+            min-height: 24px;
         }
 
         .numpad {
@@ -640,8 +648,8 @@
                         <div class="warning-day">⚠️ Geschäftstag: 29.10</div>
 
                         <div class="total-box">
-                            <span class="total-box-label">Summe</span>
-                            <span id="posTotalAmount">0,00 €</span>
+                            <span class="total-box-label">Eingabe / Betrag</span>
+                            <div id="numpadInputDisplay" class="total-box-value">0,00 €</div>
                         </div>
 
                         <div class="numpad">
@@ -653,17 +661,17 @@
                             <button class="num-btn" onclick="pressNum('4')">4</button>
                             <button class="num-btn" onclick="pressNum('5')">5</button>
                             <button class="num-btn" onclick="pressNum('6')">6</button>
-                            <button class="num-btn" onclick="clearLastNumpad()">✉</button>
+                            <button class="num-btn" onclick="clearLastNumpadChar()">✉</button>
 
                             <button class="num-btn" onclick="pressNum('1')">1</button>
                             <button class="num-btn" onclick="pressNum('2')">2</button>
                             <button class="num-btn" onclick="pressNum('3')">3</button>
                             <button class="num-btn" onclick="clearCartCompletely()">🗑</button>
 
-                            <button class="num-btn yellow" onclick="clearCartCompletely()">C</button>
+                            <button class="num-btn yellow" onclick="clearNumpadInput()">C</button>
                             <button class="num-btn" onclick="pressNum('00')">00</button>
                             <button class="num-btn" onclick="openCameraScanner()">📷</button>
-                            <button class="num-btn yellow" onclick="checkoutOrder()">⏎</button>
+                            <button class="num-btn yellow" onclick="submitNumpadInput()">⏎</button>
                         </div>
                     </div>
                 </div>
@@ -924,7 +932,6 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // 100 Fertige Gastro-Produkte mit echten EAN-Codes
         let products = JSON.parse(localStorage.getItem('k_products_100')) || [
             { id: 1, name: "Espresso", price: 2.20, category: "Kaffee", barcode: "4001100000010" },
             { id: 2, name: "Cappuccino", price: 3.50, category: "Kaffee", barcode: "4001100000027" },
@@ -1048,6 +1055,7 @@
         let selectedCartIndex = null;
         let activeCategory = 'Alle';
         let discountMultiplier = 1.0;
+        let numpadBuffer = '';
         let activeScannerTarget = null;
         let scannerStream = null;
 
@@ -1060,6 +1068,7 @@
                 renderPosGrid();
                 renderCart();
                 updateTableStatusDisplay();
+                updateNumpadDisplay();
             } else if(viewName === 'tables') {
                 renderTablesGrid();
             } else if(viewName === 'products') {
@@ -1069,6 +1078,53 @@
             } else if(viewName === 'zbon') {
                 renderZBon();
             }
+        }
+
+        // Numpad Logik
+        function pressNum(val) {
+            numpadBuffer += val;
+            updateNumpadDisplay();
+        }
+
+        function clearLastNumpadChar() {
+            numpadBuffer = numpadBuffer.slice(0, -1);
+            updateNumpadDisplay();
+        }
+
+        function clearNumpadInput() {
+            numpadBuffer = '';
+            updateNumpadDisplay();
+        }
+
+        function updateNumpadDisplay() {
+            const display = document.getElementById('numpadInputDisplay');
+            if(numpadBuffer === '') {
+                display.textContent = '0,00 €';
+            } else {
+                let num = parseInt(numpadBuffer) / 100;
+                display.textContent = num.toFixed(2).replace('.', ',') + ' €';
+            }
+        }
+
+        function submitNumpadInput() {
+            if(numpadBuffer === '') return;
+            let price = parseInt(numpadBuffer) / 100;
+            if(price <= 0) return;
+
+            const t = getCurrentTable();
+            t.cart.push({
+                id: Date.now(),
+                name: "Freier Artikel (" + price.toFixed(2).replace('.', ',') + " €)",
+                price: price,
+                qty: 1,
+                note: ''
+            });
+            t.occupied = true;
+            calcTableSum(t);
+            renderCart();
+            numpadBuffer = '';
+            updateNumpadDisplay();
+            saveData();
         }
 
         // Kasse Logik
@@ -1106,12 +1162,20 @@
         function addProductToCart(prodId) {
             const p = products.find(x => x.id === prodId);
             if(!p) return;
+
+            let qtyToAdd = 1;
+            if(numpadBuffer !== '') {
+                qtyToAdd = parseInt(numpadBuffer) || 1;
+                numpadBuffer = '';
+                updateNumpadDisplay();
+            }
+
             const t = getCurrentTable();
             const existing = t.cart.find(x => x.id === prodId && !x.note);
             if(existing) {
-                existing.qty++;
+                existing.qty += qtyToAdd;
             } else {
-                t.cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, note: '' });
+                t.cart.push({ id: p.id, name: p.name, price: p.price, qty: qtyToAdd, note: '' });
             }
             t.occupied = true;
             calcTableSum(t);
@@ -1168,6 +1232,8 @@
             t.sum = 0;
             t.occupied = false;
             selectedCartIndex = null;
+            numpadBuffer = '';
+            updateNumpadDisplay();
             renderCart();
             saveData();
         }
