@@ -15,7 +15,7 @@
     --text-color: #1e293b;
     --muted-color: #64748b;
     
-    /* Produktkacheln Farben aus den Screenshots */
+    /* Produktkacheln Farben */
     --tile-blue: #5b7393;
     --tile-orange: #d97736;
     --tile-grey: #8c9095;
@@ -39,7 +39,6 @@
 
 body {
     background-color: var(--bg-pattern);
-    /* Feines Raster-Muster aus den Screenshots */
     background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
     background-size: 12px 12px;
     color: var(--text-color);
@@ -70,13 +69,29 @@ body {
     cursor: pointer;
 }
 
+.search-box-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .search-input-top {
     background: #ffffff;
     border: none;
     border-radius: 16px;
-    padding: 6px 16px;
+    padding: 6px 36px 6px 16px;
     font-size: 13px;
-    width: 200px;
+    width: 240px;
+    color: var(--text-color);
+}
+
+.cam-trigger-btn {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .topbar-right {
@@ -102,7 +117,7 @@ body {
     display: none !important;
 }
 
-/* 1. DASHBOARD / HAUPTMENÜ */
+/* DASHBOARD */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -143,7 +158,7 @@ body {
     color: #475569;
 }
 
-/* 2. KASSEN-BILD SCHIRM (POS) */
+/* POS LAYOUT */
 .pos-layout {
     display: grid;
     grid-template-columns: 340px 1fr;
@@ -180,10 +195,6 @@ body {
     font-size: 13px;
     border-bottom: 1px solid #f1f5f9;
     align-items: center;
-}
-
-.cart-row.selected {
-    background: #e2e8f0;
 }
 
 /* TASTENFELD & TOTAL */
@@ -273,14 +284,9 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.tile:active {
-    opacity: 0.8;
-}
-
 .tile-title { font-size: 14px; text-align: center; }
 .tile-price { font-size: 13px; text-align: center; }
 
-/* RECHTE UNTERE BUTTON-LEISTE */
 .action-bar-bottom {
     display: grid;
     grid-template-columns: repeat(6, 1fr) 1.5fr;
@@ -299,11 +305,11 @@ body {
     cursor: pointer;
 }
 
-.action-btn.yellow { background: #eab308; }
 .action-btn.green { background: #84cc16; }
+.action-btn.yellow { background: #eab308; }
 .action-btn.checkout { background: #65a30d; font-size: 22px; }
 
-/* TABELLEN (PRODUKTVERWALTUNG & MITGLIEDER) */
+/* TABLES */
 .subpage-header {
     background: #ffffff;
     padding: 12px 16px;
@@ -353,11 +359,11 @@ body {
     color: var(--muted-color);
 }
 
-/* MODAL / POPUP (z. B. Bestellen & Mitglieder) */
+/* MODALS */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -400,15 +406,26 @@ body {
 
 .btn-modal-save { background: #fef08a; color: #854d0e; }
 .btn-modal-order { background: #a3e635; color: #365314; }
+
+/* SCANNER MODAL */
+.scanner-video {
+    width: 100%;
+    height: 260px;
+    background: #000;
+    object-fit: cover;
+}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR (Immer sichtbar) -->
+<!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
         <span class="topbar-icon" onclick="showPage('page-dashboard')">🐱</span>
-        <input type="text" class="search-input-top" placeholder="🔍 Auswählen   Suchen">
+        <div class="search-box-wrap">
+            <input type="text" id="topSearchInput" class="search-input-top" placeholder="Auswählen / Barcode scannen" onkeydown="handleSearchBarcode(event)">
+            <button class="cam-trigger-btn" onclick="openCameraScanner()" title="Kamera öffnen">📷</button>
+        </div>
     </div>
     <div class="topbar-right">
         <span onclick="showPage('page-pos')" style="cursor:pointer;">🛒 POS</span>
@@ -473,11 +490,9 @@ body {
         </div>
     </div>
 
-    <!-- 2. POS / KASSEN SEITE -->
+    <!-- 2. POS SEITE -->
     <div id="page-pos" class="page hidden">
         <div class="pos-layout">
-            
-            <!-- LINKS: BON & TASTENFELD -->
             <div class="pos-left">
                 <div class="cart-table-header">
                     <span>Menge</span>
@@ -485,12 +500,10 @@ body {
                     <span style="text-align:right;">Betrag</span>
                 </div>
 
-                <div id="cartItemsList" class="cart-items-list">
-                    <!-- Dynamische Artikel im Warenkorb -->
-                </div>
+                <div id="cartItemsList" class="cart-items-list"></div>
 
                 <div class="pos-bottom-left">
-                    <div class="warning-bar">⚠️ Geschäftstag: <span id="currentDateStr">29.10</span></div>
+                    <div class="warning-bar">⚠️ Geschäftstag: 29.10</div>
                     
                     <div class="total-display">
                         <span class="total-label">Total</span>
@@ -498,34 +511,31 @@ body {
                     </div>
 
                     <div class="numpad-grid">
-                        <button class="num-btn" onclick="pressNum('7')">7</button>
-                        <button class="num-btn" onclick="pressNum('8')">8</button>
-                        <button class="num-btn" onclick="pressNum('9')">9</button>
-                        <button class="num-btn" onclick="pressNum('0')">0</button>
+                        <button class="num-btn">7</button>
+                        <button class="num-btn">8</button>
+                        <button class="num-btn">9</button>
+                        <button class="num-btn">0</button>
 
-                        <button class="num-btn" onclick="pressNum('4')">4</button>
-                        <button class="num-btn" onclick="pressNum('5')">5</button>
-                        <button class="num-btn" onclick="pressNum('6')">6</button>
+                        <button class="num-btn">4</button>
+                        <button class="num-btn">5</button>
+                        <button class="num-btn">6</button>
                         <button class="num-btn" onclick="clearCart()">⌫</button>
 
-                        <button class="num-btn" onclick="pressNum('1')">1</button>
-                        <button class="num-btn" onclick="pressNum('2')">2</button>
-                        <button class="num-btn" onclick="pressNum('3')">3</button>
+                        <button class="num-btn">1</button>
+                        <button class="num-btn">2</button>
+                        <button class="num-btn">3</button>
                         <button class="num-btn" onclick="clearCart()">🗑</button>
 
                         <button class="num-btn yellow" onclick="clearCart()">C</button>
-                        <button class="num-btn" onclick="pressNum('0')">0</button>
-                        <button class="num-btn">🔍</button>
+                        <button class="num-btn">0</button>
+                        <button class="num-btn" onclick="openCameraScanner()">📷</button>
                         <button class="num-btn">☖</button>
                     </div>
                 </div>
             </div>
 
-            <!-- RECHTS: PRODUKT-KACHELN & FUNKTIONEN -->
             <div class="pos-right">
-                <div id="productGrid" class="product-tiles-grid">
-                    <!-- Artikel werden dynamisch geladen -->
-                </div>
+                <div id="productGrid" class="product-tiles-grid"></div>
 
                 <div class="action-bar-bottom">
                     <button class="action-btn green" onclick="showPage('page-members')">👤</button>
@@ -540,7 +550,6 @@ body {
                     <button class="action-btn checkout" onclick="openOrderModal()">✓</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -558,7 +567,7 @@ body {
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Kategorien</th>
+                    <th>Barcode</th>
                     <th>Produktname</th>
                     <th>Alle</th>
                     <th>Dieser Monat</th>
@@ -566,9 +575,7 @@ body {
                     <th>Preis</th>
                 </tr>
             </thead>
-            <tbody id="productsTableBody">
-                <!-- Dynamische Produkte -->
-            </tbody>
+            <tbody id="productsTableBody"></tbody>
         </table>
     </div>
 
@@ -580,7 +587,7 @@ body {
         </div>
 
         <div class="table-filter-bar">
-            <input type="text" class="search-field-wide" placeholder="🔍 ID|Name|Mobiltelefonnummer (letzte 4 Ziffern)|Verbrauchsmenge+">
+            <input type="text" class="search-field-wide" placeholder="🔍 ID|Name|Mobiltelefonnummer">
         </div>
 
         <table class="data-table">
@@ -592,17 +599,13 @@ body {
                     <th>Punkte</th>
                 </tr>
             </thead>
-            <tbody id="membersTableBody">
-                <!-- Mitglieder -->
-            </tbody>
+            <tbody id="membersTableBody"></tbody>
         </table>
     </div>
 
-    <!-- 5. BESTELLUNGEN SEITE -->
+    <!-- 5. BESTELLUNGEN -->
     <div id="page-orders" class="page hidden">
-        <div class="subpage-header">
-            <span class="subpage-title">Liste bestellen</span>
-        </div>
+        <div class="subpage-header"><span class="subpage-title">Liste bestellen</span></div>
         <table class="data-table">
             <thead>
                 <tr>
@@ -613,14 +616,13 @@ body {
                     <th>Erstellungszeit</th>
                 </tr>
             </thead>
-            <tbody id="ordersTableBody">
-            </tbody>
+            <tbody id="ordersTableBody"></tbody>
         </table>
     </div>
 
 </div>
 
-<!-- ORDER MODAL (POPUP WIE IN PROMPT IMAGE 2) -->
+<!-- ORDER MODAL -->
 <div id="orderModal" class="modal-overlay hidden">
     <div class="modal-dialog">
         <div id="modalPiecesHeader" class="modal-header-title">0 Stücke</div>
@@ -635,16 +637,29 @@ body {
     </div>
 </div>
 
+<!-- CAMERA SCANNER MODAL -->
+<div id="scannerModal" class="modal-overlay hidden">
+    <div class="modal-dialog" style="width: 360px;">
+        <div class="modal-header-title">Barcode scannen</div>
+        <video id="scannerVideo" class="scanner-video" autoplay playsinline></video>
+        <div id="scannerStatus" style="padding: 10px; font-size: 12px; text-align: center; color: var(--muted-color);">
+            Kamera wird gestartet...
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-save" style="background:#cbd5e1; color:#000;" onclick="closeCameraScanner()">Schließen</button>
+        </div>
+    </div>
+</div>
+
 <script>
-/* DATEN-SPEICHER (Keine vordefinierten Artikel) */
 let products = JSON.parse(localStorage.getItem("pos_products")) || [];
-let members = JSON.parse(localStorage.getItem("pos_members")) || [
-    { name: "Dennis Küper", verbrauch: "-", mal: "-", punkte: "-" }
-];
+let members = JSON.parse(localStorage.getItem("pos_members")) || [{ name: "Dennis Küper", verbrauch: "-", mal: "-", punkte: "-" }];
 let cart = [];
 let orders = JSON.parse(localStorage.getItem("pos_orders")) || [];
 
-// Farbschema für Kacheln
+let scannerStream = null;
+let scannerInterval = null;
+
 const tileColors = ["var(--tile-blue)", "var(--tile-orange)", "var(--tile-grey)", "var(--tile-teal)", "var(--tile-pink)"];
 
 /* NAVIGATION */
@@ -665,7 +680,7 @@ function showPage(pageId) {
 function renderPosProducts() {
     const grid = document.getElementById('productGrid');
     if(products.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; color: #64748b;">Keine Produkte vorhanden. Bitte unter 'Produktverwaltung' Anlegen.</div>`;
+        grid.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; color: #64748b;">Keine Produkte angelegt. Bitte unter 'Produktverwaltung' Anlegen.</div>`;
         return;
     }
 
@@ -696,12 +711,10 @@ function addToCart(productId) {
 function renderCart() {
     const list = document.getElementById('cartItemsList');
     let total = 0;
-    let count = 0;
 
     list.innerHTML = cart.map(item => {
         const sum = item.price * item.qty;
         total += sum;
-        count += item.qty;
         return `
             <div class="cart-row">
                 <span>${escapeHtml(item.name)}</span>
@@ -727,7 +740,81 @@ function escapeHtml(t) {
     return String(t || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* MODAL / BESTELLEN */
+/* BARCODE Suchen & Eingabe */
+function handleSearchBarcode(e) {
+    if (e.key === "Enter") {
+        const value = e.target.value.trim();
+        if(!value) return;
+
+        const product = products.find(p => String(p.barcode) === value || p.name.toLowerCase().includes(value.toLowerCase()));
+        if(product) {
+            showPage('page-pos');
+            addToCart(product.id);
+            e.target.value = "";
+        } else {
+            alert("Artikel mit Barcode '" + value + "' nicht gefunden.");
+        }
+    }
+}
+
+/* KAMERA BARCODE SCANNER */
+async function openCameraScanner() {
+    document.getElementById('scannerModal').classList.remove('hidden');
+    const video = document.getElementById('scannerVideo');
+    const status = document.getElementById('scannerStatus');
+
+    if (!('BarcodeDetector' in window)) {
+        status.textContent = "BarcodeDetector wird von diesem Browser nicht unterstützt. Bitte gib den Barcode im Suchfeld ein.";
+        return;
+    }
+
+    try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "environment" } }
+        });
+        video.srcObject = scannerStream;
+
+        const detector = new BarcodeDetector({
+            formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'upc_a']
+        });
+
+        status.textContent = "Halt den Barcode vor die Kamera...";
+
+        scannerInterval = setInterval(async () => {
+            try {
+                const barcodes = await detector.detect(video);
+                if (barcodes.length > 0) {
+                    const code = barcodes[0].rawValue;
+                    handleScannedCode(code);
+                }
+            } catch (err) {}
+        }, 500);
+
+    } catch (err) {
+        status.textContent = "Kamerazugriff verweigert oder nicht verfügbar.";
+    }
+}
+
+function handleScannedCode(code) {
+    const product = products.find(p => String(p.barcode) === String(code));
+    if (product) {
+        closeCameraScanner();
+        showPage('page-pos');
+        addToCart(product.id);
+    } else {
+        document.getElementById('scannerStatus').textContent = "Erkannt: " + code + " (Kein Produkt gefunden)";
+    }
+}
+
+function closeCameraScanner() {
+    if (scannerInterval) clearInterval(scannerInterval);
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById('scannerModal').classList.add('hidden');
+}
+
+/* BESTELLEN MODAL */
 function openOrderModal() {
     if(cart.length === 0) return;
     const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
@@ -769,7 +856,7 @@ function renderProductsTable() {
 
     body.innerHTML = products.map(p => `
         <tr>
-            <td>${escapeHtml(p.category || 'Allgemein')}</td>
+            <td>${escapeHtml(p.barcode || '-')}</td>
             <td><strong>${escapeHtml(p.name)}</strong></td>
             <td>1</td>
             <td>1</td>
@@ -784,12 +871,13 @@ function addNewProductPrompt() {
     if(!name) return;
     const price = parseFloat(prompt("Preis in €:", "1.00"));
     if(isNaN(price)) return;
+    const barcode = prompt("Barcode / EAN (optional):", "");
 
     products.push({
         id: Date.now(),
         name: name,
         price: price,
-        category: "Standard"
+        barcode: barcode || ""
     });
 
     localStorage.setItem("pos_products", JSON.stringify(products));
@@ -818,7 +906,7 @@ function addNewMemberPrompt() {
     }
 }
 
-/* BESTELLUNGEN LISTE */
+/* BESTELLUNGEN */
 function renderOrdersTable() {
     const body = document.getElementById('ordersTableBody');
     body.innerHTML = orders.map(o => `
@@ -832,7 +920,6 @@ function renderOrdersTable() {
     `).join('');
 }
 
-/* START */
 showPage('page-dashboard');
 </script>
 </body>
