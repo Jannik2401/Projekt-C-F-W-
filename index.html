@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KasseKat POS - Komplettes Sortiment</title>
+    <title>KasseKat POS - 100 Produkte</title>
     <style>
         :root {
             --bg-grid: #e4e7eb;
@@ -262,11 +262,6 @@
             text-transform: uppercase;
         }
 
-        .total-box-value {
-            font-size: 32px;
-            font-weight: 900;
-        }
-
         .numpad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -297,6 +292,8 @@
             gap: 8px;
             margin-bottom: 12px;
             align-items: center;
+            overflow-x: auto;
+            padding-bottom: 4px;
         }
 
         .cat-tab {
@@ -307,6 +304,7 @@
             background: #ffffff;
             border: 1px solid var(--border-color);
             cursor: pointer;
+            white-space: nowrap;
         }
         .cat-tab.active {
             background: #f59e0b;
@@ -323,6 +321,7 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .product-grid {
@@ -672,7 +671,8 @@
                 <!-- Rechts: Produktkacheln & Aktionsleiste -->
                 <div class="pos-right">
                     <div class="categories-bar">
-                        <div class="cat-tab active" onclick="filterCategory('Alle', this)">Alle</div>
+                        <div class="cat-tab active" onclick="filterCategory('Alle', this)">Alle (100)</div>
+                        <div class="cat-tab" onclick="filterCategory('Kaffee', this)">Kaffee</div>
                         <div class="cat-tab" onclick="filterCategory('Getränke', this)">Getränke</div>
                         <div class="cat-tab" onclick="filterCategory('Speisen', this)">Speisen</div>
                         <div class="cat-tab" onclick="filterCategory('Dessert', this)">Dessert</div>
@@ -713,7 +713,7 @@
         <div id="view-products" class="view hidden">
             <div class="generic-view">
                 <div class="view-header-bar">
-                    <div class="view-title">Produktverwaltung</div>
+                    <div class="view-title">Produktverwaltung (100 Artikel)</div>
                     <button class="btn-primary" onclick="openProductModal()">+ Neues Produkt</button>
                 </div>
                 <input type="text" class="filter-input" placeholder="🔍 Suche Name, Barcode..." oninput="filterProductsTable(this.value)">
@@ -869,6 +869,7 @@
                 <div class="form-group">
                     <label>Kategorie:</label>
                     <select id="prodCategory">
+                        <option value="Kaffee">Kaffee</option>
                         <option value="Getränke">Getränke</option>
                         <option value="Speisen">Speisen</option>
                         <option value="Dessert">Dessert</option>
@@ -923,30 +924,112 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Komplettes Sortiment (Getränke, Speisen, Dessert, Alkohol, Bestseller)
-        let products = JSON.parse(localStorage.getItem('k_products')) || [
-            { id: 1, name: "Espresso", price: 2.20, category: "Getränke", barcode: "400123" },
-            { id: 2, name: "Cappuccino", price: 3.50, category: "Getränke", barcode: "400124" },
-            { id: 3, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "400125" },
-            { id: 4, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "400126" },
-            { id: 5, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "400127" },
-            { id: 6, name: "Club Sandwich", price: 7.50, category: "Speisen", barcode: "400128" },
-            { id: 7, name: "Muffin Schoko", price: 2.80, category: "Dessert", barcode: "400129" },
-            { id: 8, name: "Cheesecake", price: 3.80, category: "Dessert", barcode: "400130" },
-            { id: 9, name: "Latte Macchiato", price: 3.80, category: "Getränke", barcode: "400131" },
-            { id: 10, name: "Cafe Crema", price: 2.80, category: "Getränke", barcode: "400132" },
-            { id: 11, name: "Apfelschorle 0.5l", price: 2.60, category: "Getränke", barcode: "400133" },
-            { id: 12, name: "Eistee Zitrone", price: 2.90, category: "Getränke", barcode: "400134" },
-            { id: 13, name: "Burger Menü", price: 11.50, category: "Speisen", barcode: "400135" },
-            { id: 14, name: "Caesar Salad", price: 9.20, category: "Speisen", barcode: "400136" },
-            { id: 15, name: "Pommes Frites", price: 4.00, category: "Speisen", barcode: "400137" },
-            { id: 16, name: "Pasta Bolognese", price: 10.50, category: "Speisen", barcode: "400138" },
-            { id: 17, name: "Tiramisu", price: 4.50, category: "Dessert", barcode: "400139" },
-            { id: 18, name: "Schokoeis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "400140" },
-            { id: 19, name: "Bier 0.5l", price: 4.20, category: "Alkohol", barcode: "400141" },
-            { id: 20, name: "Weißwein 0.2l", price: 5.00, category: "Alkohol", barcode: "400142" },
-            { id: 21, name: "Rotwein 0.2l", price: 5.20, category: "Alkohol", barcode: "400143" },
-            { id: 22, name: "Aperol Spritz", price: 7.50, category: "Alkohol", barcode: "400144" }
+        // 100 Fertige Gastro-Produkte mit echten EAN-Codes
+        let products = JSON.parse(localStorage.getItem('k_products_100')) || [
+            { id: 1, name: "Espresso", price: 2.20, category: "Kaffee", barcode: "4001100000010" },
+            { id: 2, name: "Cappuccino", price: 3.50, category: "Kaffee", barcode: "4001100000027" },
+            { id: 3, name: "Latte Macchiato", price: 3.80, category: "Kaffee", barcode: "4001100000034" },
+            { id: 4, name: "Cafe Crema", price: 2.80, category: "Kaffee", barcode: "4001100000041" },
+            { id: 5, name: "Doppelter Espresso", price: 3.20, category: "Kaffee", barcode: "4001100000058" },
+            { id: 6, name: "Milchkaffee", price: 3.60, category: "Kaffee", barcode: "4001100000065" },
+            { id: 7, name: "Espresso Macchiato", price: 2.50, category: "Kaffee", barcode: "4001100000072" },
+            { id: 8, name: "Americano", price: 2.90, category: "Kaffee", barcode: "4001100000089" },
+            { id: 9, name: "Heiße Schokolade", price: 3.50, category: "Kaffee", barcode: "4001100000096" },
+            { id: 10, name: "Chai Latte", price: 3.90, category: "Kaffee", barcode: "4001100000102" },
+            { id: 11, name: "Frischer Minztee", price: 3.20, category: "Kaffee", barcode: "4001100000119" },
+            { id: 12, name: "Earl Grey Tee", price: 2.80, category: "Kaffee", barcode: "4001100000126" },
+            { id: 13, name: "Grüner Tee", price: 2.80, category: "Kaffee", barcode: "4001100000133" },
+            { id: 14, name: "Kamillentee", price: 2.80, category: "Kaffee", barcode: "4001100000140" },
+            { id: 15, name: "Früchtetee", price: 2.80, category: "Kaffee", barcode: "4001100000157" },
+            { id: 16, name: "Eiskaffee", price: 4.50, category: "Kaffee", barcode: "4001100000164" },
+            { id: 17, name: "Eisschokolade", price: 4.50, category: "Kaffee", barcode: "4001100000171" },
+            { id: 18, name: "Kaffee Sirup Vanille", price: 0.60, category: "Kaffee", barcode: "4001100000188" },
+            { id: 19, name: "Kaffee Sirup Karamell", price: 0.60, category: "Kaffee", barcode: "4001100000195" },
+            { id: 20, name: "Hafermilch Aufpreis", price: 0.50, category: "Kaffee", barcode: "4001100000201" },
+
+            { id: 21, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "4001100000218" },
+            { id: 22, name: "Mineralwasser Stille 0.5l", price: 2.50, category: "Getränke", barcode: "4001100000225" },
+            { id: 23, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000232" },
+            { id: 24, name: "Cola Zero 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000249" },
+            { id: 25, name: "Fanta 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000256" },
+            { id: 26, name: "Sprite 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000263" },
+            { id: 27, name: "Mezzo Mix 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000270" },
+            { id: 28, name: "Apfelschorle 0.5l", price: 3.20, category: "Getränke", barcode: "4001100000287" },
+            { id: 29, name: "Rhabarberschorle 0.33l", price: 3.30, category: "Getränke", barcode: "4001100000294" },
+            { id: 30, name: "Maracujaschorle 0.33l", price: 3.30, category: "Getränke", barcode: "4001100000300" },
+            { id: 31, name: "Eistee Zitrone 0.33l", price: 3.00, category: "Getränke", barcode: "4001100000317" },
+            { id: 32, name: "Eistee Pfirsich 0.33l", price: 3.00, category: "Getränke", barcode: "4001100000324" },
+            { id: 33, name: "Bitter Lemon 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000331" },
+            { id: 34, name: "Tonic Water 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000348" },
+            { id: 35, name: "Ginger Ale 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000355" },
+            { id: 36, name: "Orangensaft frisch 0.3l", price: 4.20, category: "Getränke", barcode: "4001100000362" },
+            { id: 37, name: "Apfelsaft naturtrüb 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000379" },
+            { id: 38, name: "Kirschsaft 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000386" },
+            { id: 39, name: "Banane Nektar 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000393" },
+            { id: 40, name: "Energy Drink 0.25l", price: 3.80, category: "Getränke", barcode: "4001100000409" },
+
+            { id: 41, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "4001100000416" },
+            { id: 42, name: "Flammkuchen Lachs", price: 10.50, category: "Speisen", barcode: "4001100000423" },
+            { id: 43, name: "Flammkuchen Vegetarisch", price: 8.50, category: "Speisen", barcode: "4001100000430" },
+            { id: 44, name: "Club Sandwich", price: 7.50, category: "Speisen", barcode: "4001100000447" },
+            { id: 45, name: "Burger Menü Classic", price: 11.50, category: "Speisen", barcode: "4001100000454" },
+            { id: 46, name: "Cheeseburger Menü", price: 12.50, category: "Speisen", barcode: "4001100000461" },
+            { id: 47, name: "Veggie Burger Menü", price: 11.00, category: "Speisen", barcode: "4001100000478" },
+            { id: 48, name: "Caesar Salad", price: 9.20, category: "Speisen", barcode: "4001100000485" },
+            { id: 49, name: "Thunfisch Salat", price: 9.80, category: "Speisen", barcode: "4001100000492" },
+            { id: 50, name: "Pommes Frites groß", price: 4.50, category: "Speisen", barcode: "4001100000508" },
+            { id: 51, name: "Süßkartoffel Pommes", price: 5.50, category: "Speisen", barcode: "4001100000515" },
+            { id: 52, name: "Currywurst mit Pommes", price: 8.50, category: "Speisen", barcode: "4001100000522" },
+            { id: 53, name: "Pasta Bolognese", price: 10.50, category: "Speisen", barcode: "4001100000539" },
+            { id: 54, name: "Pasta Carbonara", price: 10.50, category: "Speisen", barcode: "4001100000546" },
+            { id: 55, name: "Pizza Margherita", price: 8.50, category: "Speisen", barcode: "4001100000553" },
+            { id: 56, name: "Pizza Salami", price: 9.50, category: "Speisen", barcode: "4001100000560" },
+            { id: 57, name: "Pizza Tonno", price: 10.00, category: "Speisen", barcode: "4001100000577" },
+            { id: 58, name: "Panini Schinken-Käse", price: 5.20, category: "Speisen", barcode: "4001100000584" },
+            { id: 59, name: "Panini Mozzarella-Tomate", price: 5.20, category: "Speisen", barcode: "4001100000591" },
+            { id: 60, name: "Tagessuppe mit Brot", price: 5.90, category: "Speisen", barcode: "4001100000607" },
+
+            { id: 61, name: "Muffin Schoko", price: 2.80, category: "Dessert", barcode: "4001100000614" },
+            { id: 62, name: "Muffin Blaubeere", price: 2.80, category: "Dessert", barcode: "4001100000621" },
+            { id: 63, name: "Cheesecake", price: 3.80, category: "Dessert", barcode: "4001100000638" },
+            { id: 64, name: "Tiramisu", price: 4.50, category: "Dessert", barcode: "4001100000645" },
+            { id: 65, name: "Apfelkuchen warm", price: 3.80, category: "Dessert", barcode: "4001100000652" },
+            { id: 66, name: "Schokoeis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000669" },
+            { id: 67, name: "Vanilleeis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000676" },
+            { id: 68, name: "Erdbeereis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000683" },
+            { id: 69, name: "Waffel mit Puderzucker", price: 4.00, category: "Dessert", barcode: "4001100000690" },
+            { id: 70, name: "Waffel mit Kirschen & Sahne", price: 5.80, category: "Dessert", barcode: "4001100000706" },
+            { id: 71, name: "Donut Glasiert", price: 2.50, category: "Dessert", barcode: "4001100000713" },
+            { id: 72, name: "Donut Schoko", price: 2.70, category: "Dessert", barcode: "4001100000720" },
+            { id: 73, name: "Brownie", price: 3.20, category: "Dessert", barcode: "4001100000737" },
+            { id: 74, name: "Panna Cotta", price: 4.20, category: "Dessert", barcode: "4001100000744" },
+            { id: 75, name: "Fruchtsalat frisch", price: 4.80, category: "Dessert", barcode: "4001100000751" },
+            { id: 76, name: "Cookie Schoko", price: 2.20, category: "Dessert", barcode: "4001100000768" },
+            { id: 77, name: "Croissant Butter", price: 2.40, category: "Dessert", barcode: "4001100000775" },
+            { id: 78, name: "Croissant Schoko", price: 2.80, category: "Dessert", barcode: "4001100000782" },
+            { id: 79, name: "Milchreis mit Zimt", price: 3.90, category: "Dessert", barcode: "4001100000799" },
+            { id: 80, name: "Portion Schlagsahne", price: 0.80, category: "Dessert", barcode: "4001100000805" },
+
+            { id: 81, name: "Bier vom Fass 0.3l", price: 3.60, category: "Alkohol", barcode: "4001100000812" },
+            { id: 82, name: "Bier vom Fass 0.5l", price: 4.50, category: "Alkohol", barcode: "4001100000829" },
+            { id: 83, name: "Weizenbier 0.5l", price: 4.60, category: "Alkohol", barcode: "4001100000836" },
+            { id: 84, name: "Alkoholfreies Bier 0.5l", price: 4.20, category: "Alkohol", barcode: "4001100000843" },
+            { id: 85, name: "Radler 0.5l", price: 4.30, category: "Alkohol", barcode: "4001100000850" },
+            { id: 86, name: "Weißwein Riesling 0.2l", price: 5.50, category: "Alkohol", barcode: "4001100000867" },
+            { id: 87, name: "Rotwein Merlot 0.2l", price: 5.80, category: "Alkohol", barcode: "4001100000874" },
+            { id: 88, name: "Roséwein 0.2l", price: 5.50, category: "Alkohol", barcode: "4001100000881" },
+            { id: 89, name: "Weinschorle 0.4l", price: 4.90, category: "Alkohol", barcode: "4001100000898" },
+            { id: 90, name: "Prosecco Glas 0.1l", price: 4.50, category: "Alkohol", barcode: "4001100000904" },
+            { id: 91, name: "Aperol Spritz", price: 7.50, category: "Alkohol", barcode: "4001100000911" },
+            { id: 92, name: "Hugo", price: 7.50, category: "Alkohol", barcode: "4001100000928" },
+            { id: 93, name: "Gin Tonic", price: 8.90, category: "Alkohol", barcode: "4001100000935" },
+            { id: 94, name: "Cuba Libre", price: 8.90, category: "Alkohol", barcode: "4001100000942" },
+            { id: 95, name: "Wodka Lemon", price: 8.50, category: "Alkohol", barcode: "4001100000959" },
+            { id: 96, name: "Tequila Shot", price: 3.00, category: "Alkohol", barcode: "4001100000966" },
+            { id: 97, name: "Jägermeister Shot", price: 3.00, category: "Alkohol", barcode: "4001100000973" },
+            { id: 98, name: "Sambuca Shot", price: 3.00, category: "Alkohol", barcode: "4001100000980" },
+            { id: 99, name: "Long Island Icetea", price: 10.50, category: "Alkohol", barcode: "4001100000997" },
+            { id: 100, name: "Caipirinha", price: 8.90, category: "Alkohol", barcode: "4001100001000" }
         ];
 
         let members = JSON.parse(localStorage.getItem('k_members')) || [
@@ -956,8 +1039,8 @@
 
         let tables = JSON.parse(localStorage.getItem('k_tables')) || Array.from({length: 12}, (_, i) => ({ id: i+1, occupied: i === 0, sum: i === 0 ? 11.00 : 0.00, cart: i === 0 ? [
             {id:1, name:"Espresso", price:2.20, qty:1, note:""},
-            {id:7, name:"Muffin Schoko", price:2.80, qty:1, note:""},
-            {id:3, name:"Mineralwasser 0.5l", price:2.50, qty:1, note:""},
+            {id:61, name:"Muffin Schoko", price:2.80, qty:1, note:""},
+            {id:21, name:"Mineralwasser 0.5l", price:2.50, qty:1, note:""},
             {id:2, name:"Cappuccino", price:3.50, qty:1, note:""}
         ] : []}));
 
@@ -994,7 +1077,7 @@
             let filtered = products;
             if(activeCategory !== 'Alle') {
                 if(activeCategory === 'Bestseller') {
-                    filtered = products.slice(0, 8);
+                    filtered = products.slice(0, 12);
                 } else {
                     filtered = products.filter(p => p.category === activeCategory);
                 }
@@ -1266,8 +1349,8 @@
             } else {
                 document.getElementById('productModalTitle').textContent = 'Neues Produkt anlegen';
                 document.getElementById('prodName').value = '';
-                document.getElementById('prodBarcode').value = '400' + Math.floor(Math.random()*900+100);
-                document.getElementById('prodCategory').value = 'Getränke';
+                document.getElementById('prodBarcode').value = '40011000' + Math.floor(Math.random()*900+100);
+                document.getElementById('prodCategory').value = 'Kaffee';
                 document.getElementById('prodPrice').value = '';
             }
             document.getElementById('modalProduct').classList.remove('hidden');
@@ -1392,7 +1475,7 @@
         }
 
         function saveData() {
-            localStorage.setItem('k_products', JSON.stringify(products));
+            localStorage.setItem('k_products_100', JSON.stringify(products));
             localStorage.setItem('k_members', JSON.stringify(members));
             localStorage.setItem('k_tables', JSON.stringify(tables));
         }
