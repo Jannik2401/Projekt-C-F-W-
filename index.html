@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KasseKat POS - Numpad Eingabe</title>
+    <title>KasseKat POS - Komplettsystem</title>
     <style>
         :root {
             --bg-grid: #e4e7eb;
@@ -11,13 +11,6 @@
             --topbar-text: #ffffff;
             --border-color: #cbd5e1;
             --text-main: #1e293b;
-            --accent-yellow: #facc15;
-            --accent-green: #22c55e;
-            --tile-blue: #475569;
-            --tile-orange: #d97706;
-            --tile-teal: #0d9488;
-            --tile-pink: #e11d48;
-            --tile-purple: #7c3aed;
         }
 
         * {
@@ -87,7 +80,7 @@
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             font-size: 13px;
             font-weight: 500;
         }
@@ -100,6 +93,15 @@
             opacity: 0.9;
         }
         .nav-item:hover { opacity: 1; }
+
+        .user-badge {
+            background: #334155;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #475569;
+        }
 
         /* MAIN CONTAINER */
         .app-container {
@@ -121,32 +123,35 @@
         /* 1. DASHBOARD */
         .dashboard-wrapper {
             max-width: 960px;
-            margin: 40px auto;
+            margin: 30px auto;
             text-align: center;
+            overflow-y: auto;
+            max-height: calc(100vh - 60px);
+            padding: 10px;
         }
 
         .dashboard-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .dashboard-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #64748b;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            gap: 20px;
         }
 
         .dash-card {
             background: #ffffff;
             border-radius: 16px;
-            padding: 24px 16px;
+            padding: 20px 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -159,12 +164,12 @@
         .dash-card:active { transform: scale(0.98); }
 
         .dash-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            font-size: 32px;
+            margin-bottom: 10px;
         }
 
         .dash-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
         }
 
@@ -173,6 +178,7 @@
             display: grid;
             grid-template-columns: 420px 1fr;
             height: 100%;
+            overflow: hidden;
         }
 
         .pos-left {
@@ -180,6 +186,7 @@
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
 
         .cart-table-header {
@@ -191,11 +198,14 @@
             font-weight: bold;
             color: #64748b;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
+        /* Warenkorb mit echtem Scrollen */
         .cart-items {
             flex: 1;
             overflow-y: auto;
+            background: #fff;
         }
 
         .cart-row {
@@ -222,22 +232,22 @@
             background: #f8fafc;
             border-top: 1px solid var(--border-color);
             padding: 10px;
+            flex-shrink: 0;
         }
 
         .table-status-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            margin-bottom: 8px;
-            padding: 0 4px;
+            font-size: 12px;
+            margin-bottom: 4px;
         }
 
         .table-name { font-weight: bold; color: #1e3a8a; }
         .table-release { color: #dc2626; cursor: pointer; font-weight: 500; }
 
         .warning-day {
-            font-size: 12px;
+            font-size: 11px;
             color: #d97706;
             font-weight: bold;
             margin-bottom: 6px;
@@ -246,10 +256,10 @@
         .total-box {
             background: #ffffff;
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 8px 12px;
             text-align: right;
             border-radius: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             position: relative;
         }
 
@@ -263,11 +273,10 @@
         }
 
         .total-box-value {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             color: #2563eb;
             text-align: right;
-            min-height: 24px;
         }
 
         .numpad {
@@ -279,8 +288,8 @@
         .num-btn {
             background: #ffffff;
             border: 1px solid var(--border-color);
-            height: 48px;
-            font-size: 18px;
+            height: 42px;
+            font-size: 17px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -293,6 +302,8 @@
             display: flex;
             flex-direction: column;
             padding: 12px;
+            height: 100%;
+            overflow: hidden;
         }
 
         .categories-bar {
@@ -302,6 +313,7 @@
             align-items: center;
             overflow-x: auto;
             padding-bottom: 4px;
+            flex-shrink: 0;
         }
 
         .cat-tab {
@@ -339,6 +351,7 @@
             flex: 1;
             align-content: start;
             overflow-y: auto;
+            padding-bottom: 10px;
         }
 
         .prod-tile {
@@ -362,14 +375,14 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             gap: 6px;
-            margin-top: 12px;
+            flex-shrink: 0;
         }
 
         .act-btn {
-            height: 52px;
+            height: 50px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -380,9 +393,9 @@
         .act-btn.blue { background: #4f46e5; }
         .act-btn.green-dark { background: #15803d; }
         .act-btn.brown { background: #b45309; }
-        .act-btn.orange { background: #d97706; font-size: 14px; }
-        .act-btn.yellow { background: #facc15; color: #1e293b; font-size: 14px; }
-        .act-btn.green-check { background: #16a34a; font-size: 20px; }
+        .act-btn.orange { background: #d97706; font-size: 13px; }
+        .act-btn.yellow { background: #facc15; color: #1e293b; font-size: 13px; }
+        .act-btn.green-check { background: #16a34a; font-size: 18px; }
 
         /* 3. TISCHPLAN */
         .tables-view {
@@ -518,7 +531,7 @@
         .modal-box {
             background: #ffffff;
             border-radius: 12px;
-            width: 420px;
+            width: 440px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
@@ -533,6 +546,8 @@
 
         .modal-body {
             padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         .form-group {
@@ -597,8 +612,10 @@
             <div class="nav-item" onclick="switchView('pos')">🛒 Kasse</div>
             <div class="nav-item" onclick="switchView('tables')">🪑 Tische</div>
             <div class="nav-item" onclick="switchView('products')">📦 Produkte</div>
-            <div class="nav-item" onclick="switchView('members')">👥 Mitglieder</div>
+            <div class="nav-item" onclick="switchView('members')">👥 Kunden</div>
+            <div class="nav-item" onclick="switchView('staff')">🛡️ Personal & Differenz</div>
             <div class="nav-item" onclick="switchView('zbon')">📊 Z-Bon</div>
+            <div class="user-badge" id="currentUserBadge" onclick="openLoginModal()">👤 Jannik (Admin)</div>
         </div>
     </header>
 
@@ -608,21 +625,15 @@
         <div id="view-dashboard" class="view">
             <div class="dashboard-wrapper">
                 <div class="dashboard-title">KasseKat Hauptmenü</div>
-                <div class="dashboard-subtitle">Wählen Sie eine Funktion aus dem System</div>
+                <div class="dashboard-subtitle">Angemeldet als: <span id="dashUserRole" style="font-weight:bold; color:#1e3a8a;">Jannik (Admin)</span></div>
 
                 <div class="dashboard-grid">
                     <div class="dash-card" onclick="switchView('pos')"><div class="dash-icon">🛒</div><div class="dash-label">Kasse</div></div>
                     <div class="dash-card" onclick="switchView('tables')"><div class="dash-icon">🪑</div><div class="dash-label">Tischbestellung</div></div>
-                    <div class="dash-card" onclick="switchView('orders')"><div class="dash-icon">📋</div><div class="dash-label">Liste bestellen</div></div>
-                    <div class="dash-card" onclick="alert('Buch führen Modul')"><div class="dash-icon">🧮</div><div class="dash-label">Buch führen</div></div>
                     <div class="dash-card" onclick="switchView('products')"><div class="dash-icon">📑</div><div class="dash-label">Produktverwaltung</div></div>
-                    <div class="dash-card" onclick="alert('Terminverwaltung Modul')"><div class="dash-icon">🕒</div><div class="dash-label">Terminverwaltung</div></div>
-                    <div class="dash-card" onclick="switchView('members')"><div class="dash-icon">👤</div><div class="dash-label">Mitgliederliste</div></div>
-                    <div class="dash-card" onclick="alert('Logbuch Mitglied')"><div class="dash-icon">💳</div><div class="dash-label">Logbuch Mitglied</div></div>
-                    <div class="dash-card" onclick="alert('Finanzstatistiken')"><div class="dash-icon">📊</div><div class="dash-label">Finanzstatistiken</div></div>
-                    <div class="dash-card" onclick="switchView('zbon')"><div class="dash-icon">📅</div><div class="dash-label">Tagesabschluss</div></div>
-                    <div class="dash-card" onclick="alert('Log-Zentrum')"><div class="dash-icon">📋</div><div class="dash-label">Log-Zentrum</div></div>
-                    <div class="dash-card" onclick="alert('Einstellungen')"><div class="dash-icon">⚙️</div><div class="dash-label">Einstellungen</div></div>
+                    <div class="dash-card" onclick="switchView('members')"><div class="dash-icon">👤</div><div class="dash-label">Kunden & Guthaben</div></div>
+                    <div class="dash-card" onclick="switchView('staff')"><div class="dash-icon">🛡️</div><div class="dash-label">Personal & Verkäufe</div></div>
+                    <div class="dash-card" onclick="switchView('zbon')"><div class="dash-icon">📅</div><div class="dash-label">Tagesabschluss (Z-Bon)</div></div>
                 </div>
             </div>
         </div>
@@ -698,7 +709,7 @@
                         <button class="act-btn orange" onclick="checkoutOrder()">Bestellen</button>
                         <button class="act-btn yellow" onclick="changeQty(-1)">-</button>
                         <button class="act-btn yellow" onclick="changeQty(1)">+</button>
-                        <button class="act-btn yellow" onclick="filterCategory('Bestseller', document.querySelector('.cat-tab:nth-last-child(2)'))">Bestseller</button>
+                        <button class="act-btn yellow" onclick="filterCategory('Bestseller', document.querySelector('.cat-tab:nth-last-child(2)'))">⭐</button>
                         <button class="act-btn yellow" onclick="openDiscountModal()">%</button>
                         <button class="act-btn green-check" onclick="checkoutOrder()">✓</button>
                     </div>
@@ -740,14 +751,14 @@
             </div>
         </div>
 
-        <!-- 5. MITGLIEDER & KUNDEN -->
+        <!-- 5. KUNDEN & GUTHABEN -->
         <div id="view-members" class="view hidden">
             <div class="generic-view">
                 <div class="view-header-bar">
-                    <div class="view-title">Mitglieder- & Kundenliste</div>
-                    <button class="btn-primary" onclick="openMemberModal()">+ Neues Mitglied</button>
+                    <div class="view-title">Kunden- & Guthabenverwaltung</div>
+                    <button class="btn-primary" onclick="openMemberModal()">+ Neuer Kunde</button>
                 </div>
-                <input type="text" class="filter-input" placeholder="🔍 Suche Mitglied Name, Telefon..." oninput="filterMembersTable(this.value)">
+                <input type="text" class="filter-input" placeholder="🔍 Suche Kunde Name, Telefon..." oninput="filterMembersTable(this.value)">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -763,7 +774,30 @@
             </div>
         </div>
 
-        <!-- 6. Z-BON / TAGESABSCHLUSS -->
+        <!-- 6. PERSONAL & VERKÄUFE -->
+        <div id="view-staff" class="view hidden">
+            <div class="generic-view">
+                <div class="view-header-bar">
+                    <div class="view-title">Personal-Statistik & Kassensturz (Differenzen)</div>
+                    <button class="btn-primary" onclick="openStaffModal()">+ Mitarbeiter anlegen</button>
+                </div>
+                <div id="staffStatsContainer" style="margin-bottom: 20px;"></div>
+                <h3 style="margin-bottom: 10px;">Protokollierte Verkäufe nach Bediener:</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Zeitstempel</th>
+                            <th>Bediener</th>
+                            <th>Summe</th>
+                            <th>Zahlungsart</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesProtocolBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. Z-BON / TAGESABSCHLUSS -->
         <div id="view-zbon" class="view hidden">
             <div class="generic-view" style="max-width: 600px; margin: 20px auto; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div class="view-title" style="text-align:center; margin-bottom: 20px;">Tagesabschluss (Z-Bon)</div>
@@ -776,6 +810,27 @@
 
     <!-- MODALS -->
 
+    <!-- Login Modal -->
+    <div id="modalLogin" class="modal-overlay hidden">
+        <div class="modal-box" style="width: 360px;">
+            <div class="modal-title">Kassen-Login / Bediener wechseln</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Mitarbeiter / Admin wählen:</label>
+                    <select id="loginStaffSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>PIN / Passwort (Admin: Jannik = 1234):</label>
+                    <input type="password" id="loginPinInput" placeholder="PIN eingeben">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalLogin')">Abbrechen</button>
+                <button class="btn-confirm" onclick="confirmLogin()">Anmelden</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Checkout Modal -->
     <div id="modalCheckout" class="modal-overlay hidden">
         <div class="modal-box">
@@ -784,16 +839,23 @@
                 <div style="font-size: 18px; font-weight: bold; margin-bottom: 14px; text-align:center;" id="checkoutTotalText">Gesamt: 0,00 €</div>
                 <div class="form-group">
                     <label>Zahlungsart wählen:</label>
-                    <select id="payMethod" onchange="toggleCashInput()">
+                    <select id="payMethod" onchange="togglePaymentInputs()">
                         <option value="bar">Barzahlung</option>
                         <option value="karte">EC / Kreditkarte</option>
-                        <option value="guthaben">Guthaben abuchen</option>
+                        <option value="guthaben">Guthaben abbuchen</option>
                     </select>
                 </div>
+                <!-- Bar Input -->
                 <div class="form-group" id="cashInputGroup">
                     <label>Gegeben (€):</label>
                     <input type="number" id="cashGiven" step="0.01" oninput="calcChange()">
                     <div style="margin-top: 8px; font-weight: bold; color: #16a34a;" id="changeAmountText">Rückgeld: 0,00 €</div>
+                </div>
+                <!-- Guthaben Kunden-Auswahl -->
+                <div class="form-group hidden" id="creditInputGroup">
+                    <label>Kundenkonto wählen:</label>
+                    <select id="checkoutCustomerSelect"></select>
+                    <div style="margin-top: 6px; font-size: 12px; color: #64748b;" id="checkoutCustomerBalance">Aktuelles Guthaben: 0,00 €</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -806,15 +868,15 @@
     <!-- Customer / Guthaben Modal -->
     <div id="modalCustomer" class="modal-overlay hidden">
         <div class="modal-box" style="width: 500px;">
-            <div class="modal-title">Kunde auswählen & Guthaben verwalten</div>
+            <div class="modal-title">Kunden auswählen & Guthaben verwalten</div>
             <div class="modal-body">
-                <div style="max-height: 250px; overflow-y: auto; margin-bottom: 14px;" id="customerListModal"></div>
+                <div style="max-height: 220px; overflow-y: auto; margin-bottom: 14px;" id="customerListModal"></div>
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 14px 0;">
                 <div style="font-weight: bold; margin-bottom: 8px; font-size: 13px;">Guthaben aufladen (+10€, +20€ etc.):</div>
                 <div style="display: flex; gap: 8px;">
                     <select id="creditMemberSelect" style="flex:1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;"></select>
                     <input type="number" id="creditAmountInput" placeholder="Betrag (€)" style="width: 100px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
-                    <button class="btn-primary" onclick="addCustomCredit()">Guthaben hinzufügen</button>
+                    <button class="btn-primary" onclick="addCustomCredit()">Aufladen</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -871,7 +933,7 @@
                     <label>Barcode / EAN:</label>
                     <div style="display:flex; gap:6px;">
                         <input type="text" id="prodBarcode" style="flex:1;">
-                        <button class="btn-primary" onclick="scanBarcodeIntoProductForm()" style="padding: 6px 12px;">📷 Scan</button>
+                        <button class="btn-primary" onclick="openCameraScanner('productForm')" style="padding: 6px 12px;">📷 Scan</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -897,10 +959,10 @@
         </div>
     </div>
 
-    <!-- Member Add Modal -->
+    <!-- Customer Add Modal -->
     <div id="modalMember" class="modal-overlay hidden">
         <div class="modal-box">
-            <div class="modal-title">Neues Mitglied / Kunde</div>
+            <div class="modal-title">Neuen Kunden anlegen</div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>Name:</label>
@@ -914,6 +976,34 @@
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeModal('modalMember')">Abbrechen</button>
                 <button class="btn-confirm" onclick="saveMemberData()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Add Modal -->
+    <div id="modalStaff" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Mitarbeiter / Bediener anlegen</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="staffNameInput">
+                </div>
+                <div class="form-group">
+                    <label>Rolle:</label>
+                    <select id="staffRoleInput">
+                        <option value="Mitarbeiter">Mitarbeiter</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>PIN:</label>
+                    <input type="password" id="staffPinInput">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalStaff')">Abbrechen</button>
+                <button class="btn-confirm" onclick="saveStaffData()">Speichern</button>
             </div>
         </div>
     </div>
@@ -946,102 +1036,26 @@
             { id: 11, name: "Frischer Minztee", price: 3.20, category: "Kaffee", barcode: "4001100000119" },
             { id: 12, name: "Earl Grey Tee", price: 2.80, category: "Kaffee", barcode: "4001100000126" },
             { id: 13, name: "Grüner Tee", price: 2.80, category: "Kaffee", barcode: "4001100000133" },
-            { id: 14, name: "Kamillentee", price: 2.80, category: "Kaffee", barcode: "4001100000140" },
-            { id: 15, name: "Früchtetee", price: 2.80, category: "Kaffee", barcode: "4001100000157" },
-            { id: 16, name: "Eiskaffee", price: 4.50, category: "Kaffee", barcode: "4001100000164" },
-            { id: 17, name: "Eisschokolade", price: 4.50, category: "Kaffee", barcode: "4001100000171" },
-            { id: 18, name: "Kaffee Sirup Vanille", price: 0.60, category: "Kaffee", barcode: "4001100000188" },
-            { id: 19, name: "Kaffee Sirup Karamell", price: 0.60, category: "Kaffee", barcode: "4001100000195" },
-            { id: 20, name: "Hafermilch Aufpreis", price: 0.50, category: "Kaffee", barcode: "4001100000201" },
-
             { id: 21, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "4001100000218" },
-            { id: 22, name: "Mineralwasser Stille 0.5l", price: 2.50, category: "Getränke", barcode: "4001100000225" },
             { id: 23, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000232" },
-            { id: 24, name: "Cola Zero 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000249" },
-            { id: 25, name: "Fanta 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000256" },
-            { id: 26, name: "Sprite 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000263" },
-            { id: 27, name: "Mezzo Mix 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000270" },
-            { id: 28, name: "Apfelschorle 0.5l", price: 3.20, category: "Getränke", barcode: "4001100000287" },
-            { id: 29, name: "Rhabarberschorle 0.33l", price: 3.30, category: "Getränke", barcode: "4001100000294" },
-            { id: 30, name: "Maracujaschorle 0.33l", price: 3.30, category: "Getränke", barcode: "4001100000300" },
-            { id: 31, name: "Eistee Zitrone 0.33l", price: 3.00, category: "Getränke", barcode: "4001100000317" },
-            { id: 32, name: "Eistee Pfirsich 0.33l", price: 3.00, category: "Getränke", barcode: "4001100000324" },
-            { id: 33, name: "Bitter Lemon 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000331" },
-            { id: 34, name: "Tonic Water 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000348" },
-            { id: 35, name: "Ginger Ale 0.2l", price: 2.80, category: "Getränke", barcode: "4001100000355" },
-            { id: 36, name: "Orangensaft frisch 0.3l", price: 4.20, category: "Getränke", barcode: "4001100000362" },
-            { id: 37, name: "Apfelsaft naturtrüb 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000379" },
-            { id: 38, name: "Kirschsaft 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000386" },
-            { id: 39, name: "Banane Nektar 0.3l", price: 3.50, category: "Getränke", barcode: "4001100000393" },
-            { id: 40, name: "Energy Drink 0.25l", price: 3.80, category: "Getränke", barcode: "4001100000409" },
-
             { id: 41, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "4001100000416" },
-            { id: 42, name: "Flammkuchen Lachs", price: 10.50, category: "Speisen", barcode: "4001100000423" },
-            { id: 43, name: "Flammkuchen Vegetarisch", price: 8.50, category: "Speisen", barcode: "4001100000430" },
-            { id: 44, name: "Club Sandwich", price: 7.50, category: "Speisen", barcode: "4001100000447" },
-            { id: 45, name: "Burger Menü Classic", price: 11.50, category: "Speisen", barcode: "4001100000454" },
             { id: 46, name: "Cheeseburger Menü", price: 12.50, category: "Speisen", barcode: "4001100000461" },
-            { id: 47, name: "Veggie Burger Menü", price: 11.00, category: "Speisen", barcode: "4001100000478" },
-            { id: 48, name: "Caesar Salad", price: 9.20, category: "Speisen", barcode: "4001100000485" },
-            { id: 49, name: "Thunfisch Salat", price: 9.80, category: "Speisen", barcode: "4001100000492" },
-            { id: 50, name: "Pommes Frites groß", price: 4.50, category: "Speisen", barcode: "4001100000508" },
-            { id: 51, name: "Süßkartoffel Pommes", price: 5.50, category: "Speisen", barcode: "4001100000515" },
-            { id: 52, name: "Currywurst mit Pommes", price: 8.50, category: "Speisen", barcode: "4001100000522" },
-            { id: 53, name: "Pasta Bolognese", price: 10.50, category: "Speisen", barcode: "4001100000539" },
-            { id: 54, name: "Pasta Carbonara", price: 10.50, category: "Speisen", barcode: "4001100000546" },
-            { id: 55, name: "Pizza Margherita", price: 8.50, category: "Speisen", barcode: "4001100000553" },
-            { id: 56, name: "Pizza Salami", price: 9.50, category: "Speisen", barcode: "4001100000560" },
-            { id: 57, name: "Pizza Tonno", price: 10.00, category: "Speisen", barcode: "4001100000577" },
-            { id: 58, name: "Panini Schinken-Käse", price: 5.20, category: "Speisen", barcode: "4001100000584" },
-            { id: 59, name: "Panini Mozzarella-Tomate", price: 5.20, category: "Speisen", barcode: "4001100000591" },
-            { id: 60, name: "Tagessuppe mit Brot", price: 5.90, category: "Speisen", barcode: "4001100000607" },
-
             { id: 61, name: "Muffin Schoko", price: 2.80, category: "Dessert", barcode: "4001100000614" },
-            { id: 62, name: "Muffin Blaubeere", price: 2.80, category: "Dessert", barcode: "4001100000621" },
-            { id: 63, name: "Cheesecake", price: 3.80, category: "Dessert", barcode: "4001100000638" },
-            { id: 64, name: "Tiramisu", price: 4.50, category: "Dessert", barcode: "4001100000645" },
-            { id: 65, name: "Apfelkuchen warm", price: 3.80, category: "Dessert", barcode: "4001100000652" },
-            { id: 66, name: "Schokoeis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000669" },
-            { id: 67, name: "Vanilleeis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000676" },
-            { id: 68, name: "Erdbeereis (2 Kugeln)", price: 3.50, category: "Dessert", barcode: "4001100000683" },
-            { id: 69, name: "Waffel mit Puderzucker", price: 4.00, category: "Dessert", barcode: "4001100000690" },
-            { id: 70, name: "Waffel mit Kirschen & Sahne", price: 5.80, category: "Dessert", barcode: "4001100000706" },
-            { id: 71, name: "Donut Glasiert", price: 2.50, category: "Dessert", barcode: "4001100000713" },
-            { id: 72, name: "Donut Schoko", price: 2.70, category: "Dessert", barcode: "4001100000720" },
-            { id: 73, name: "Brownie", price: 3.20, category: "Dessert", barcode: "4001100000737" },
-            { id: 74, name: "Panna Cotta", price: 4.20, category: "Dessert", barcode: "4001100000744" },
-            { id: 75, name: "Fruchtsalat frisch", price: 4.80, category: "Dessert", barcode: "4001100000751" },
-            { id: 76, name: "Cookie Schoko", price: 2.20, category: "Dessert", barcode: "4001100000768" },
-            { id: 77, name: "Croissant Butter", price: 2.40, category: "Dessert", barcode: "4001100000775" },
-            { id: 78, name: "Croissant Schoko", price: 2.80, category: "Dessert", barcode: "4001100000782" },
-            { id: 79, name: "Milchreis mit Zimt", price: 3.90, category: "Dessert", barcode: "4001100000799" },
-            { id: 80, name: "Portion Schlagsahne", price: 0.80, category: "Dessert", barcode: "4001100000805" },
-
             { id: 81, name: "Bier vom Fass 0.3l", price: 3.60, category: "Alkohol", barcode: "4001100000812" },
-            { id: 82, name: "Bier vom Fass 0.5l", price: 4.50, category: "Alkohol", barcode: "4001100000829" },
-            { id: 83, name: "Weizenbier 0.5l", price: 4.60, category: "Alkohol", barcode: "4001100000836" },
-            { id: 84, name: "Alkoholfreies Bier 0.5l", price: 4.20, category: "Alkohol", barcode: "4001100000843" },
-            { id: 85, name: "Radler 0.5l", price: 4.30, category: "Alkohol", barcode: "4001100000850" },
-            { id: 86, name: "Weißwein Riesling 0.2l", price: 5.50, category: "Alkohol", barcode: "4001100000867" },
-            { id: 87, name: "Rotwein Merlot 0.2l", price: 5.80, category: "Alkohol", barcode: "4001100000874" },
-            { id: 88, name: "Roséwein 0.2l", price: 5.50, category: "Alkohol", barcode: "4001100000881" },
-            { id: 89, name: "Weinschorle 0.4l", price: 4.90, category: "Alkohol", barcode: "4001100000898" },
-            { id: 90, name: "Prosecco Glas 0.1l", price: 4.50, category: "Alkohol", barcode: "4001100000904" },
-            { id: 91, name: "Aperol Spritz", price: 7.50, category: "Alkohol", barcode: "4001100000911" },
-            { id: 92, name: "Hugo", price: 7.50, category: "Alkohol", barcode: "4001100000928" },
-            { id: 93, name: "Gin Tonic", price: 8.90, category: "Alkohol", barcode: "4001100000935" },
-            { id: 94, name: "Cuba Libre", price: 8.90, category: "Alkohol", barcode: "4001100000942" },
-            { id: 95, name: "Wodka Lemon", price: 8.50, category: "Alkohol", barcode: "4001100000959" },
-            { id: 96, name: "Tequila Shot", price: 3.00, category: "Alkohol", barcode: "4001100000966" },
-            { id: 97, name: "Jägermeister Shot", price: 3.00, category: "Alkohol", barcode: "4001100000973" },
-            { id: 98, name: "Sambuca Shot", price: 3.00, category: "Alkohol", barcode: "4001100000980" },
-            { id: 99, name: "Long Island Icetea", price: 10.50, category: "Alkohol", barcode: "4001100000997" },
-            { id: 100, name: "Caipirinha", price: 8.90, category: "Alkohol", barcode: "4001100001000" }
+            { id: 99, name: "Long Island Icetea", price: 10.50, category: "Alkohol", barcode: "4001100000997" }
         ];
 
         let members = JSON.parse(localStorage.getItem('k_members')) || [
-            { id: 1, name: "Dennis Küper", phone: "-", credit: 0.00, points: 0 },
+            { id: 1, name: "Dennis Küper", phone: "-", credit: 25.00, points: 10 },
             { id: 2, name: "Maximilian Mustermann", phone: "0176123456", credit: 15.00, points: 42 }
+        ];
+
+        let staffList = JSON.parse(localStorage.getItem('k_staff')) || [
+            { id: 1, name: "Jannik", role: "Admin", pin: "1234", salesTotal: 266.10, cashExpected: 266.10, cashReal: 266.10 }
+        ];
+
+        let salesProtocol = JSON.parse(localStorage.getItem('k_sales')) || [
+            { time: "29.10.2026 - 19:42", staff: "Jannik", total: 266.10, method: "Barzahlung" }
         ];
 
         let tables = JSON.parse(localStorage.getItem('k_tables')) || Array.from({length: 12}, (_, i) => ({ id: i+1, occupied: i === 0, sum: i === 0 ? 11.00 : 0.00, cart: i === 0 ? [
@@ -1052,6 +1066,7 @@
         ] : []}));
 
         let currentTableId = 1;
+        let currentStaff = staffList[0]; // Jannik (Admin)
         let selectedCartIndex = null;
         let activeCategory = 'Alle';
         let discountMultiplier = 1.0;
@@ -1075,8 +1090,38 @@
                 renderProductsTable();
             } else if(viewName === 'members') {
                 renderMembersTable();
+            } else if(viewName === 'staff') {
+                renderStaffView();
             } else if(viewName === 'zbon') {
                 renderZBon();
+            }
+        }
+
+        function updateHeaderUserBadge() {
+            document.getElementById('currentUserBadge').textContent = `👤 ${currentStaff.name} (${currentStaff.role})`;
+            document.getElementById('dashUserRole').textContent = `${currentStaff.name} (${currentStaff.role})`;
+        }
+
+        // Login Modal
+        function openLoginModal() {
+            const select = document.getElementById('loginStaffSelect');
+            select.innerHTML = staffList.map(s => `<option value="${s.id}">${s.name} (${s.role})</option>`).join('');
+            document.getElementById('loginPinInput').value = '';
+            document.getElementById('modalLogin').classList.remove('hidden');
+        }
+
+        function confirmLogin() {
+            const sId = parseInt(document.getElementById('loginStaffSelect').value);
+            const pin = document.getElementById('loginPinInput').value;
+            const staff = staffList.find(x => x.id === sId);
+
+            if(staff && staff.pin === pin) {
+                currentStaff = staff;
+                updateHeaderUserBadge();
+                closeModal('modalLogin');
+                alert('Erfolgreich angemeldet als ' + staff.name);
+            } else {
+                alert('Falsche PIN! (Admin Standard PIN: 1234)');
             }
         }
 
@@ -1139,7 +1184,7 @@
                 }
             }
 
-            const colors = ['var(--tile-blue)', 'var(--tile-orange)', 'var(--tile-teal)', 'var(--tile-pink)', 'var(--tile-purple)'];
+            const colors = ['#475569', '#d97706', '#0d9488', '#e11d48', '#7c3aed'];
             grid.innerHTML = filtered.map((p, idx) => `
                 <div class="prod-tile" style="background: ${colors[idx % colors.length]};" onclick="addProductToCart(${p.id})">
                     <div class="prod-tile-title">${p.name}</div>
@@ -1196,9 +1241,6 @@
                     <div style="text-align:right;">${(item.price * item.qty * discountMultiplier).toFixed(2).replace('.', ',')} €</div>
                 </div>
             `).join('');
-
-            const sum = t.cart.reduce((acc, item) => acc + (item.price * item.qty), 0) * discountMultiplier;
-            document.getElementById('posTotalAmount').textContent = sum.toFixed(2).replace('.', ',') + ' €';
         }
 
         function selectCartRow(idx) {
@@ -1279,25 +1321,96 @@
             }
         }
 
+        // Checkout / Bezahlen Modal & Guthaben Kunden-Liste
+        function checkoutOrder() {
+            const t = getCurrentTable();
+            if(t.cart.length === 0) { alert('Warenkorb ist leer!'); return; }
+            document.getElementById('checkoutTotalText').textContent = 'Gesamt: ' + t.sum.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('cashGiven').value = t.sum.toFixed(2);
+            
+            // Kunden Dropdown befüllen
+            const custSelect = document.getElementById('checkoutCustomerSelect');
+            custSelect.innerHTML = members.map(m => `<option value="${m.id}">${m.name} (Guthaben: ${m.credit.toFixed(2)} €)</option>`).join('');
+            
+            document.getElementById('payMethod').value = 'bar';
+            togglePaymentInputs();
+            calcChange();
+            document.getElementById('modalCheckout').classList.remove('hidden');
+        }
+
+        function togglePaymentInputs() {
+            const method = document.getElementById('payMethod').value;
+            document.getElementById('cashInputGroup').style.display = method === 'bar' ? 'block' : 'none';
+            document.getElementById('creditInputGroup').style.display = method === 'guthaben' ? 'block' : 'none';
+            if(method === 'guthaben') updateCheckoutCustomerBalance();
+        }
+
+        function updateCheckoutCustomerBalance() {
+            const mId = parseInt(document.getElementById('checkoutCustomerSelect').value);
+            const m = members.find(x => x.id === mId);
+            if(m) {
+                document.getElementById('checkoutCustomerBalance').textContent = 'Aktuelles Guthaben: ' + m.credit.toFixed(2).replace('.', ',') + ' €';
+            }
+        }
+
+        function calcChange() {
+            const t = getCurrentTable();
+            const given = parseFloat(document.getElementById('cashGiven').value) || 0;
+            const change = given - t.sum;
+            document.getElementById('changeAmountText').textContent = 'Rückgeld: ' + (change >= 0 ? change.toFixed(2).replace('.', ',') + ' €' : 'Zu wenig!');
+        }
+
+        function confirmPayment() {
+            const t = getCurrentTable();
+            const method = document.getElementById('payMethod').value;
+
+            if(method === 'guthaben') {
+                const mId = parseInt(document.getElementById('checkoutCustomerSelect').value);
+                const m = members.find(x => x.id === mId);
+                if(m) {
+                    if(m.credit < t.sum) {
+                        alert('Fehler: Der Kunde hat nicht genügend Guthaben!');
+                        return;
+                    }
+                    m.credit -= t.sum;
+                }
+            }
+
+            // Umsatz für Mitarbeiter speichern & protokollieren
+            currentStaff.salesTotal += t.sum;
+            if(method === 'bar') currentStaff.cashExpected += t.sum;
+
+            salesProtocol.unshift({
+                time: new Date().toLocaleDateString() + ' - ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                staff: currentStaff.name,
+                total: t.sum,
+                method: method === 'bar' ? 'Barzahlung' : (method === 'karte' ? 'EC / Karte' : 'Guthaben')
+            });
+
+            saveData();
+            alert('Bezahlung erfolgreich abgeschlossen durch ' + currentStaff.name + '!');
+            releaseTable();
+            closeModal('modalCheckout');
+        }
+
         // Kunden & Guthaben Modal
         function openCustomerModal() {
+            renderCustomerModalList();
+            document.getElementById('modalCustomer').classList.remove('hidden');
+        }
+
+        function renderCustomerModalList() {
             const list = document.getElementById('customerListModal');
             const select = document.getElementById('creditMemberSelect');
 
             list.innerHTML = members.map(m => `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; border-bottom: 1px solid #f1f5f9;">
                     <div><strong>${m.name}</strong><br><small style="color:#64748b;">Guthaben: ${m.credit.toFixed(2).replace('.', ',')} € | ${m.points} Pkt</small></div>
-                    <button class="btn-primary" onclick="assignCustomerToOrder('${m.name}')">Auswählen</button>
+                    <button class="btn-primary" onclick="alert('Kunde ${m.name} ausgewählt.')">Auswählen</button>
                 </div>
             `).join('');
 
             select.innerHTML = members.map(m => `<option value="${m.id}">${m.name} (${m.credit.toFixed(2)}€)</option>`).join('');
-            document.getElementById('modalCustomer').classList.remove('hidden');
-        }
-
-        function assignCustomerToOrder(name) {
-            alert('Kunde "' + name + '" der Bestellung zugewiesen.');
-            closeModal('modalCustomer');
         }
 
         function addCustomCredit() {
@@ -1309,7 +1422,7 @@
             if(m) {
                 m.credit += amt;
                 saveData();
-                openCustomerModal();
+                renderCustomerModalList();
                 alert('Guthaben erfolgreich um ' + amt.toFixed(2) + ' € aufgeladen!');
             }
         }
@@ -1349,34 +1462,6 @@
             calcTableSum(t);
             renderCart();
             closeModal('modalDiscount');
-        }
-
-        // Checkout / Bezahlen Modal
-        function checkoutOrder() {
-            const t = getCurrentTable();
-            if(t.cart.length === 0) { alert('Warenkorb ist leer!'); return; }
-            document.getElementById('checkoutTotalText').textContent = 'Gesamt: ' + t.sum.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('cashGiven').value = t.sum.toFixed(2);
-            calcChange();
-            document.getElementById('modalCheckout').classList.remove('hidden');
-        }
-
-        function toggleCashInput() {
-            const method = document.getElementById('payMethod').value;
-            document.getElementById('cashInputGroup').style.display = method === 'bar' ? 'block' : 'none';
-        }
-
-        function calcChange() {
-            const t = getCurrentTable();
-            const given = parseFloat(document.getElementById('cashGiven').value) || 0;
-            const change = given - t.sum;
-            document.getElementById('changeAmountText').textContent = 'Rückgeld: ' + (change >= 0 ? change.toFixed(2).replace('.', ',') + ' €' : 'Zu wenig!');
-        }
-
-        function confirmPayment() {
-            alert('Bezahlung erfolgreich abgeschlossen! Bon wurde gedruckt.');
-            releaseTable();
-            closeModal('modalCheckout');
         }
 
         // Produktverwaltung
@@ -1450,7 +1535,7 @@
             }
         }
 
-        // Mitgliederverwaltung
+        // Kundenverwaltung View
         function renderMembersTable() {
             const tbody = document.getElementById('membersTableBody');
             tbody.innerHTML = members.map(m => `
@@ -1459,7 +1544,7 @@
                     <td>${m.phone}</td>
                     <td>${m.credit.toFixed(2).replace('.', ',')} €</td>
                     <td>${m.points} Pkt</td>
-                    <td><span class="action-link" onclick="alert('Mitglied bearbeiten')">Bearbeiten</span></td>
+                    <td><span class="action-link" onclick="alert('Kunde bearbeiten')">Bearbeiten</span></td>
                 </tr>
             `).join('');
         }
@@ -1487,23 +1572,77 @@
             renderMembersTable();
         }
 
+        // Personal & Differenz View
+        function renderStaffView() {
+            const statsContainer = document.getElementById('staffStatsContainer');
+            statsContainer.innerHTML = staffList.map(s => {
+                let diff = s.cashReal - s.cashExpected;
+                return `
+                    <div style="background:#f8fafc; border:1px solid var(--border-color); padding:14px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${s.name}</strong> (${s.role})<br>
+                            <small style="color:#64748b;">Gesamtumsatz: <strong>${s.salesTotal.toFixed(2).replace('.', ',')} €</strong></small>
+                        </div>
+                        <div>
+                            <span>Kassenstand Soll: ${s.cashExpected.toFixed(2).replace('.', ',')} €</span> | 
+                            <span>Ist: <input type="number" step="0.01" value="${s.cashReal}" style="width:80px; padding:4px;" onchange="updateCashReal(${s.id}, this.value)"> €</span>
+                            <strong style="color: ${diff === 0 ? '#16a34a' : '#dc2626'}; margin-left:10px;">Differenz: ${diff.toFixed(2).replace('.', ',')} €</strong>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const tbody = document.getElementById('salesProtocolBody');
+            tbody.innerHTML = salesProtocol.map(sp => `
+                <tr>
+                    <td>${sp.time}</td>
+                    <td><strong>${sp.staff}</strong></td>
+                    <td>${sp.total.toFixed(2).replace('.', ',')} €</td>
+                    <td>${sp.method}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateCashReal(sId, val) {
+            const s = staffList.find(x => x.id === sId);
+            if(s) {
+                s.cashReal = parseFloat(val) || 0;
+                saveData();
+                renderStaffView();
+            }
+        }
+
+        function openStaffModal() {
+            document.getElementById('staffNameInput').value = '';
+            document.getElementById('staffPinInput').value = '';
+            document.getElementById('modalStaff').classList.remove('hidden');
+        }
+
+        function saveStaffData() {
+            const name = document.getElementById('staffNameInput').value;
+            const role = document.getElementById('staffRoleInput').value;
+            const pin = document.getElementById('staffPinInput').value;
+            if(!name || !pin) { alert('Name und PIN erforderlich.'); return; }
+            staffList.push({ id: Date.now(), name, role, pin, salesTotal: 0, cashExpected: 0, cashReal: 0 });
+            saveData();
+            closeModal('modalStaff');
+            renderStaffView();
+        }
+
         // Z-Bon
         function renderZBon() {
             const content = document.getElementById('zbonContent');
-            const totalSum = tables.reduce((acc, t) => acc + t.sum, 0);
+            const totalSum = tables.reduce((acc, t) => acc + t.sum, 0) + salesProtocol.reduce((acc, s) => acc + s.total, 0);
             content.innerHTML = `
                 ================================<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KASSEKAT TAGESABSCHLUSS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
                 ================================<br>
-                Datum: 29.10.2026 - 21:15 Uhr<br>
-                Geschäftstag: 29.10<br>
+                Datum: 29.10.2026 - 22:00 Uhr<br>
+                Zuständiger Admin: Jannik<br>
                 --------------------------------<br>
                 Gesamtumsatz (Brutto): ${totalSum.toFixed(2).replace('.', ',')} €<br>
-                Bar-Einnahmen: ${totalSum.toFixed(2).replace('.', ',')} €<br>
-                EC-Karten Umsätze: 0,00 €<br>
-                Guthaben Abchuchungen: 0,00 €<br>
                 --------------------------------<br>
-                Anzahl Tische belegt: ${tables.filter(t=>t.occupied).length}<br>
+                Anzahl Transaktionen: ${salesProtocol.length + 1}<br>
                 ================================<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z-BON ERFOLGREICH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
                 ================================
@@ -1532,10 +1671,6 @@
             document.getElementById('modalScanner').classList.add('hidden');
         }
 
-        function scanBarcodeIntoProductForm() {
-            openCameraScanner('productForm');
-        }
-
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
@@ -1544,9 +1679,12 @@
             localStorage.setItem('k_products_100', JSON.stringify(products));
             localStorage.setItem('k_members', JSON.stringify(members));
             localStorage.setItem('k_tables', JSON.stringify(tables));
+            localStorage.setItem('k_staff', JSON.stringify(staffList));
+            localStorage.setItem('k_sales', JSON.stringify(salesProtocol));
         }
 
-        // Start auf Dashboard
+        // Start
+        updateHeaderUserBadge();
         switchView('dashboard');
     </script>
 </body>
