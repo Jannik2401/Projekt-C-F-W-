@@ -1,1416 +1,1387 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>KasseKat POS - Kamerasystem mit Auswahl</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    kat: {
-                        dark: '#1e293b',
-                        header: '#2d3748',
-                        bg: '#e2e4e8',
-                        border: '#cbd5e1',
-                        blue: '#5b7393',
-                        orange: '#d97736',
-                        grey: '#8c9095',
-                        teal: '#00828a',
-                        green: '#388e3c',
-                        pink: '#e57373',
-                        yellow: '#eab308'
-                    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KasseKat POS</title>
+    <style>
+        :root {
+            --bg-grid: #e4e7eb;
+            --topbar-bg: #222b3c;
+            --topbar-text: #ffffff;
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --accent-yellow: #facc15;
+            --accent-green: #22c55e;
+            --tile-blue: #475569;
+            --tile-orange: #d97706;
+            --tile-teal: #0d9488;
+            --tile-pink: #e11d48;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-grid);
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 16px 16px;
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 48px;
+            background: var(--topbar-bg);
+            color: var(--topbar-text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-cat {
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 36px 6px 16px;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+        }
+
+        .search-box button {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.9;
+        }
+        .nav-item:hover { opacity: 1; }
+
+        /* MAIN CONTAINER */
+        .app-container {
+            height: calc(100vh - 48px);
+            position: relative;
+        }
+
+        .view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 1. DASHBOARD */
+        .dashboard-wrapper {
+            max-width: 960px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .dashboard-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .dash-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.1s;
+        }
+
+        .dash-card:hover { transform: translateY(-2px); }
+        .dash-card:active { transform: scale(0.98); }
+
+        .dash-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .dash-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 2. KASSE VIEW */
+        .pos-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            height: 100%;
+        }
+
+        .pos-left {
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-table-header {
+            display: grid;
+            grid-template-columns: 1fr 60px 80px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            font-size: 12px;
+            font-weight: bold;
+            color: #64748b;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .cart-row {
+            display: grid;
+            grid-template-columns: 1fr 60px 80px;
+            padding: 12px 14px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .cart-row.selected {
+            background: #fef08a;
+        }
+
+        .cart-row-note {
+            font-size: 11px;
+            color: #d97706;
+            margin-top: 2px;
+        }
+
+        .pos-bottom {
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            padding: 10px;
+        }
+
+        .table-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .table-name { font-weight: bold; color: #1e3a8a; }
+        .table-release { color: #dc2626; cursor: pointer; font-weight: 500; }
+
+        .warning-day {
+            font-size: 12px;
+            color: #d97706;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .total-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: right;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .total-box-label {
+            position: absolute;
+            left: 10px;
+            top: 4px;
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .total-box-value {
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .num-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            height: 48px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .num-btn:active { background: #e2e8f0; }
+        .num-btn.yellow { background: #fef08a; }
+
+        /* POS RIGHT */
+        .pos-right {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+
+        .categories-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .cat-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .cat-tab.active {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #f59e0b;
+        }
+
+        .add-prod-btn {
+            margin-left: auto;
+            background: #f59e0b;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            flex: 1;
+            align-content: start;
+        }
+
+        .prod-tile {
+            height: 85px;
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .prod-tile:active { opacity: 0.8; }
+        .prod-tile-title { font-size: 14px; }
+        .prod-tile-price { font-size: 13px; text-align: right; }
+
+        /* ACTION BAR BOTTOM */
+        .action-bar {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .act-btn {
+            height: 52px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+        .act-btn.blue { background: #4f46e5; }
+        .act-btn.green-dark { background: #15803d; }
+        .act-btn.brown { background: #b45309; }
+        .act-btn.orange { background: #d97706; font-size: 14px; }
+        .act-btn.yellow { background: #facc15; color: #1e293b; font-size: 14px; }
+        .act-btn.green-check { background: #16a34a; font-size: 20px; }
+
+        /* 3. TISCHPLAN */
+        .tables-view {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .tables-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        .table-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .table-card.occupied {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .table-card-top {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .table-card-status {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e2e8f0;
+        }
+        .table-card.occupied .table-card-status {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+        .table-card-sum {
+            font-size: 16px;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        /* 4. TABELLEN VIEWS (Produkte, Mitglieder, etc.) */
+        .generic-view {
+            padding: 24px;
+            flex: 1;
+            background: #ffffff;
+            overflow-y: auto;
+        }
+
+        .view-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .view-title { font-size: 20px; font-weight: bold; }
+
+        .btn-primary {
+            background: #f59e0b;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .action-link {
+            color: #d97706;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .action-link.delete { color: #dc2626; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 420px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-title {
+            background: #f8fafc;
+            padding: 14px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #64748b;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .modal-footer button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .btn-cancel { background: #e2e8f0; color: #334155; }
+        .btn-confirm { background: #facc15; color: #854d0e; }
+        .btn-success { background: #22c55e; color: #ffffff; }
+
+        /* CAMERA SCANNER MODAL */
+        .scanner-video {
+            width: 100%;
+            height: 260px;
+            background: #000;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="logo-cat" onclick="switchView('dashboard')">🐱</span>
+            <div class="search-box">
+                <input type="text" id="topSearchInput" placeholder="Barcode / Artikel..." onkeydown="handleSearchInput(event)">
+                <button onclick="openCameraScanner()">📷</button>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="nav-item" onclick="switchView('pos')">🛒 Kasse</div>
+            <div class="nav-item" onclick="switchView('tables')">🪑 Tische</div>
+            <div class="nav-item" onclick="switchView('products')">📦 Produkte</div>
+            <div class="nav-item" onclick="switchView('members')">👥 Mitglieder</div>
+            <div class="nav-item" onclick="switchView('zbon')">📊 Z-Bon</div>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- 1. DASHBOARD -->
+        <div id="view-dashboard" class="view">
+            <div class="dashboard-wrapper">
+                <div class="dashboard-title">KasseKat Hauptmenü</div>
+                <div class="dashboard-subtitle">Wählen Sie eine Funktion aus dem System</div>
+
+                <div class="dashboard-grid">
+                    <div class="dash-card" onclick="switchView('pos')"><div class="dash-icon">🛒</div><div class="dash-label">Kasse</div></div>
+                    <div class="dash-card" onclick="switchView('tables')"><div class="dash-icon">🪑</div><div class="dash-label">Tischbestellung</div></div>
+                    <div class="dash-card" onclick="switchView('orders')"><div class="dash-icon">📋</div><div class="dash-label">Liste bestellen</div></div>
+                    <div class="dash-card" onclick="alert('Buch führen Modul')"><div class="dash-icon">🧮</div><div class="dash-label">Buch führen</div></div>
+                    <div class="dash-card" onclick="switchView('products')"><div class="dash-icon">📑</div><div class="dash-label">Produktverwaltung</div></div>
+                    <div class="dash-card" onclick="alert('Terminverwaltung Modul')"><div class="dash-icon">🕒</div><div class="dash-label">Terminverwaltung</div></div>
+                    <div class="dash-card" onclick="switchView('members')"><div class="dash-icon">👤</div><div class="dash-label">Mitgliederliste</div></div>
+                    <div class="dash-card" onclick="alert('Logbuch Mitglied')"><div class="dash-icon">💳</div><div class="dash-label">Logbuch Mitglied</div></div>
+                    <div class="dash-card" onclick="alert('Finanzstatistiken')"><div class="dash-icon">📊</div><div class="dash-label">Finanzstatistiken</div></div>
+                    <div class="dash-card" onclick="switchView('zbon')"><div class="dash-icon">📅</div><div class="dash-label">Tagesabschluss</div></div>
+                    <div class="dash-card" onclick="alert('Log-Zentrum')"><div class="dash-icon">📋</div><div class="dash-label">Log-Zentrum</div></div>
+                    <div class="dash-card" onclick="alert('Einstellungen')"><div class="dash-icon">⚙️</div><div class="dash-label">Einstellungen</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. KASSE VIEW -->
+        <div id="view-pos" class="view hidden">
+            <div class="pos-layout">
+                <!-- Links: Bon & Numpad -->
+                <div class="pos-left">
+                    <div class="cart-table-header">
+                        <span>Artikel</span>
+                        <span>Stk</span>
+                        <span style="text-align:right;">Betrag</span>
+                    </div>
+
+                    <div id="cartItemsList" class="cart-items"></div>
+
+                    <div class="pos-bottom">
+                        <div class="table-status-bar">
+                            <span class="table-name" id="currentTableName">Tisch 1</span>
+                            <span class="table-release" onclick="releaseTable()">Freigeben</span>
+                        </div>
+                        <div class="warning-day">⚠️ Geschäftstag: 29.10</div>
+
+                        <div class="total-box">
+                            <span class="total-box-label">Summe</span>
+                            <span id="posTotalAmount">0,00 €</span>
+                        </div>
+
+                        <div class="numpad">
+                            <button class="num-btn" onclick="pressNum('7')">7</button>
+                            <button class="num-btn" onclick="pressNum('8')">8</button>
+                            <button class="num-btn" onclick="pressNum('9')">9</button>
+                            <button class="num-btn" onclick="pressNum('0')">0</button>
+
+                            <button class="num-btn" onclick="pressNum('4')">4</button>
+                            <button class="num-btn" onclick="pressNum('5')">5</button>
+                            <button class="num-btn" onclick="pressNum('6')">6</button>
+                            <button class="num-btn" onclick="clearLastNumpad()">✉</button>
+
+                            <button class="num-btn" onclick="pressNum('1')">1</button>
+                            <button class="num-btn" onclick="pressNum('2')">2</button>
+                            <button class="num-btn" onclick="pressNum('3')">3</button>
+                            <button class="num-btn" onclick="clearCartCompletely()">🗑</button>
+
+                            <button class="num-btn yellow" onclick="clearCartCompletely()">C</button>
+                            <button class="num-btn" onclick="pressNum('00')">00</button>
+                            <button class="num-btn" onclick="openCameraScanner()">📷</button>
+                            <button class="num-btn yellow" onclick="checkoutOrder()">⏎</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rechts: Produktkacheln & Aktionsleiste -->
+                <div class="pos-right">
+                    <div class="categories-bar">
+                        <div class="cat-tab active" onclick="filterCategory('Alle', this)">Alle</div>
+                        <div class="cat-tab" onclick="filterCategory('Getränke', this)">Getränke</div>
+                        <div class="cat-tab" onclick="filterCategory('Speisen', this)">Speisen</div>
+                        <div class="cat-tab" onclick="filterCategory('Dessert', this)">Dessert</div>
+                        <div class="cat-tab" onclick="filterCategory('Bestseller', this)">Bestseller</div>
+                        <button class="add-prod-btn" onclick="openProductModal()">+ Produkt</button>
+                    </div>
+
+                    <div id="posProductGrid" class="product-grid"></div>
+
+                    <div class="action-bar">
+                        <button class="act-btn blue" onclick="openCustomerModal()" title="Kunde auswählen">👤</button>
+                        <button class="act-btn green-dark" onclick="switchView('tables')" title="Tisch wählen">🪑</button>
+                        <button class="act-btn brown" onclick="openProductNoteModal()" title="Produkt Notiz">🏷️</button>
+                        <button class="act-btn orange" onclick="checkoutOrder()">Bestellen</button>
+                        <button class="act-btn yellow" onclick="changeQty(-1)">-</button>
+                        <button class="act-btn yellow" onclick="changeQty(1)">+</button>
+                        <button class="act-btn yellow" onclick="filterCategory('Bestseller', document.querySelector('.cat-tab:nth-child(5)'))">Bestseller</button>
+                        <button class="act-btn yellow" onclick="openDiscountModal()">%</button>
+                        <button class="act-btn green-check" onclick="checkoutOrder()">✓</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TISCHPLAN VIEW -->
+        <div id="view-tables" class="view hidden">
+            <div class="tables-view">
+                <div class="tables-header">
+                    <h2>Tischplan & Raumübersicht</h2>
+                    <button class="btn-primary" onclick="switchView('pos')">Zur Kasse</button>
+                </div>
+                <div id="tablesGrid" class="tables-grid"></div>
+            </div>
+        </div>
+
+        <!-- 4. PRODUKTVERWALTUNG -->
+        <div id="view-products" class="view hidden">
+            <div class="generic-view">
+                <div class="view-header-bar">
+                    <div class="view-title">Produktverwaltung</div>
+                    <button class="btn-primary" onclick="openProductModal()">+ Neues Produkt</button>
+                </div>
+                <input type="text" class="filter-input" placeholder="🔍 Suche Name, Barcode..." oninput="filterProductsTable(this.value)">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Barcode</th>
+                            <th>Produktname</th>
+                            <th>Kategorie</th>
+                            <th>Preis</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. MITGLIEDER & KUNDEN -->
+        <div id="view-members" class="view hidden">
+            <div class="generic-view">
+                <div class="view-header-bar">
+                    <div class="view-title">Mitglieder- & Kundenliste</div>
+                    <button class="btn-primary" onclick="openMemberModal()">+ Neues Mitglied</button>
+                </div>
+                <input type="text" class="filter-input" placeholder="🔍 Suche Mitglied Name, Telefon..." oninput="filterMembersTable(this.value)">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Telefon</th>
+                            <th>Guthaben</th>
+                            <th>Punkte</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. Z-BON / TAGESABSCHLUSS -->
+        <div id="view-zbon" class="view hidden">
+            <div class="generic-view" style="max-width: 600px; margin: 20px auto; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div class="view-title" style="text-align:center; margin-bottom: 20px;">Tagesabschluss (Z-Bon)</div>
+                <div id="zbonContent" style="font-family: monospace; font-size: 14px; line-height: 1.6; background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;"></div>
+                <button class="btn-primary" style="width: 100%;" onclick="alert('Z-Bon erfolgreich gedruckt!')">Bon Drucken</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Checkout Modal -->
+    <div id="modalCheckout" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Bezahlung abschließen</div>
+            <div class="modal-body">
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 14px; text-align:center;" id="checkoutTotalText">Gesamt: 0,00 €</div>
+                <div class="form-group">
+                    <label>Zahlungsart wählen:</label>
+                    <select id="payMethod" onchange="toggleCashInput()">
+                        <option value="bar">Barzahlung</option>
+                        <option value="karte">EC / Kreditkarte</option>
+                        <option value="guthaben">Guthaben abuchen</option>
+                    </select>
+                </div>
+                <div class="form-group" id="cashInputGroup">
+                    <label>Gegeben (€):</label>
+                    <input type="number" id="cashGiven" step="0.01" oninput="calcChange()">
+                    <div style="margin-top: 8px; font-weight: bold; color: #16a34a;" id="changeAmountText">Rückgeld: 0,00 €</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalCheckout')">Abbrechen</button>
+                <button class="btn-success" onclick="confirmPayment()">Bestätigen & Drucken</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer / Guthaben Modal -->
+    <div id="modalCustomer" class="modal-overlay hidden">
+        <div class="modal-box" style="width: 500px;">
+            <div class="modal-title">Kunde auswählen & Guthaben verwalten</div>
+            <div class="modal-body">
+                <div style="max-height: 250px; overflow-y: auto; margin-bottom: 14px;" id="customerListModal"></div>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 14px 0;">
+                <div style="font-weight: bold; margin-bottom: 8px; font-size: 13px;">Guthaben aufladen (+10€, +20€ etc.):</div>
+                <div style="display: flex; gap: 8px;">
+                    <select id="creditMemberSelect" style="flex:1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;"></select>
+                    <input type="number" id="creditAmountInput" placeholder="Betrag (€)" style="width: 100px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <button class="btn-primary" onclick="addCustomCredit()">Guthaben hinzufügen</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalCustomer')">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Note Modal -->
+    <div id="modalNote" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Produkt Notiz / Extrawunsch</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Notiz für gewählten Artikel:</label>
+                    <input type="text" id="productNoteInput" placeholder="z.B. ohne Zwiebeln, extra scharf...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalNote')">Abbrechen</button>
+                <button class="btn-confirm" onclick="saveProductNote()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div id="modalDiscount" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Rabatt vergeben</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Rabatt in Prozent (%):</label>
+                    <input type="number" id="discountPercentInput" placeholder="z.B. 10">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalDiscount')">Abbrechen</button>
+                <button class="btn-confirm" onclick="applyDiscount()">Anwenden</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Add/Edit Modal -->
+    <div id="modalProduct" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title" id="productModalTitle">Neues Produkt anlegen</div>
+            <div class="modal-body">
+                <input type="hidden" id="editProdId">
+                <div class="form-group">
+                    <label>Produktname:</label>
+                    <input type="text" id="prodName">
+                </div>
+                <div class="form-group">
+                    <label>Barcode / EAN:</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="prodBarcode" style="flex:1;">
+                        <button class="btn-primary" onclick="scanBarcodeIntoProductForm()" style="padding: 6px 12px;">📷 Scan</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Kategorie:</label>
+                    <select id="prodCategory">
+                        <option value="Getränke">Getränke</option>
+                        <option value="Speisen">Speisen</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Bestseller">Bestseller</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Preis (€):</label>
+                    <input type="number" id="prodPrice" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalProduct')">Abbrechen</button>
+                <button class="btn-confirm" onclick="saveProductData()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Add Modal -->
+    <div id="modalMember" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Neues Mitglied / Kunde</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="memberName">
+                </div>
+                <div class="form-group">
+                    <label>Telefon:</label>
+                    <input type="text" id="memberPhone">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('modalMember')">Abbrechen</button>
+                <button class="btn-confirm" onclick="saveMemberData()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Scanner Modal -->
+    <div id="modalScanner" class="modal-overlay hidden">
+        <div class="modal-box" style="width: 360px;">
+            <div class="modal-title">Barcode scannen</div>
+            <video id="scannerVideo" class="scanner-video" autoplay playsinline></video>
+            <div style="padding: 10px; font-size: 12px; text-align: center; color: #64748b;" id="scannerStatus">Kamera aktiv...</div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeCameraScanner()">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Standard Daten (wird in localStorage gespeichert)
+        let products = JSON.parse(localStorage.getItem('k_products')) || [
+            { id: 1, name: "Espresso", price: 2.20, category: "Getränke", barcode: "400123" },
+            { id: 2, name: "Cappuccino", price: 3.50, category: "Getränke", barcode: "400124" },
+            { id: 3, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "400125" },
+            { id: 4, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "400126" },
+            { id: 5, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "400127" },
+            { id: 6, name: "Club Sandwich", price: 7.50, category: "Speisen", barcode: "400128" },
+            { id: 7, name: "Muffin Schoko", price: 2.80, category: "Dessert", barcode: "400129" },
+            { id: 8, name: "Cheesecake", price: 3.80, category: "Dessert", barcode: "400130" }
+        ];
+
+        let members = JSON.parse(localStorage.getItem('k_members')) || [
+            { id: 1, name: "Dennis Küper", phone: "-", credit: 0.00, points: 0 },
+            { id: 2, name: "Maximilian Mustermann", phone: "0176123456", credit: 15.00, points: 42 }
+        ];
+
+        let tables = JSON.parse(localStorage.getItem('k_tables')) || Array.from({length: 12}, (_, i) => ({ id: i+1, occupied: i === 0, sum: i === 0 ? 11.00 : 0.00, cart: i === 0 ? [
+            {id:1, name:"Espresso", price:2.20, qty:1, note:""},
+            {id:7, name:"Muffin Schoko", price:2.80, qty:1, note:""},
+            {id:3, name:"Mineralwasser 0.5l", price:2.50, qty:1, note:""},
+            {id:2, name:"Cappuccino", price:3.50, qty:1, note:""}
+        ] : []}));
+
+        let currentTableId = 1;
+        let selectedCartIndex = null;
+        let activeCategory = 'Alle';
+        let discountMultiplier = 1.0;
+        let activeScannerTarget = null; // 'pos' or 'productForm'
+        let scannerStream = null;
+
+        // Navigation
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+
+            if(viewName === 'pos') {
+                renderPosGrid();
+                renderCart();
+                updateTableStatusDisplay();
+            } else if(viewName === 'tables') {
+                renderTablesGrid();
+            } else if(viewName === 'products') {
+                renderProductsTable();
+            } else if(viewName === 'members') {
+                renderMembersTable();
+            } else if(viewName === 'zbon') {
+                renderZBon();
+            }
+        }
+
+        // Kasse Logik
+        function renderPosGrid() {
+            const grid = document.getElementById('posProductGrid');
+            let filtered = products;
+            if(activeCategory !== 'Alle') {
+                if(activeCategory === 'Bestseller') {
+                    filtered = products.slice(0, 4);
+                } else {
+                    filtered = products.filter(p => p.category === activeCategory);
+                }
+            }
+
+            const colors = ['var(--tile-blue)', 'var(--tile-orange)', 'var(--tile-teal)', 'var(--tile-pink)'];
+            grid.innerHTML = filtered.map((p, idx) => `
+                <div class="prod-tile" style="background: ${colors[idx % colors.length]};" onclick="addProductToCart(${p.id})">
+                    <div class="prod-tile-title">${p.name}</div>
+                    <div class="prod-tile-price">${p.price.toFixed(2).replace('.', ',')} €</div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(cat, el) {
+            activeCategory = cat;
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+            if(el) el.classList.add('active');
+            renderPosGrid();
+        }
+
+        function getCurrentTable() {
+            return tables.find(t => t.id === currentTableId);
+        }
+
+        function addProductToCart(prodId) {
+            const p = products.find(x => x.id === prodId);
+            if(!p) return;
+            const t = getCurrentTable();
+            const existing = t.cart.find(x => x.id === prodId && !x.note);
+            if(existing) {
+                existing.qty++;
+            } else {
+                t.cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, note: '' });
+            }
+            t.occupied = true;
+            calcTableSum(t);
+            renderCart();
+            saveData();
+        }
+
+        function renderCart() {
+            const t = getCurrentTable();
+            const list = document.getElementById('cartItemsList');
+            list.innerHTML = t.cart.map((item, idx) => `
+                <div class="cart-row ${selectedCartIndex === idx ? 'selected' : ''}" onclick="selectCartRow(${idx})">
+                    <div>
+                        <div>${item.name}</div>
+                        ${item.note ? `<div class="cart-row-note">📌 ${item.note}</div>` : ''}
+                    </div>
+                    <div>x${item.qty}</div>
+                    <div style="text-align:right;">${(item.price * item.qty * discountMultiplier).toFixed(2).replace('.', ',')} €</div>
+                </div>
+            `).join('');
+
+            const sum = t.cart.reduce((acc, item) => acc + (item.price * item.qty), 0) * discountMultiplier;
+            document.getElementById('posTotalAmount').textContent = sum.toFixed(2).replace('.', ',') + ' €';
+        }
+
+        function selectCartRow(idx) {
+            selectedCartIndex = selectedCartIndex === idx ? null : idx;
+            renderCart();
+        }
+
+        function changeQty(delta) {
+            const t = getCurrentTable();
+            if(selectedCartIndex === null && t.cart.length > 0) selectedCartIndex = t.cart.length - 1;
+            if(selectedCartIndex !== null && t.cart[selectedCartIndex]) {
+                t.cart[selectedCartIndex].qty += delta;
+                if(t.cart[selectedCartIndex].qty <= 0) {
+                    t.cart.splice(selectedCartIndex, 1);
+                    selectedCartIndex = null;
+                }
+                calcTableSum(t);
+                renderCart();
+                saveData();
+            }
+        }
+
+        function calcTableSum(t) {
+            t.sum = t.cart.reduce((acc, item) => acc + (item.price * item.qty), 0) * discountMultiplier;
+            if(t.cart.length === 0) t.occupied = false;
+        }
+
+        function clearCartCompletely() {
+            const t = getCurrentTable();
+            t.cart = [];
+            t.sum = 0;
+            t.occupied = false;
+            selectedCartIndex = null;
+            renderCart();
+            saveData();
+        }
+
+        function updateTableStatusDisplay() {
+            document.getElementById('currentTableName').textContent = 'Tisch ' + currentTableId;
+        }
+
+        function releaseTable() {
+            clearCartCompletely();
+        }
+
+        // Tische View
+        function renderTablesGrid() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = tables.map(t => `
+                <div class="table-card ${t.occupied ? 'occupied' : ''}" onclick="selectTable(${t.id})">
+                    <div class="table-card-top">
+                        <span>Tisch ${t.id}</span>
+                        <span class="table-card-status">${t.occupied ? 'Belegt' : 'Frei'}</span>
+                    </div>
+                    <div class="table-card-sum">${t.sum.toFixed(2).replace('.', ',')} €</div>
+                </div>
+            `).join('');
+        }
+
+        function selectTable(id) {
+            currentTableId = id;
+            switchView('pos');
+        }
+
+        // Suche oben / Barcode Handler
+        function handleSearchInput(e) {
+            if(e.key === 'Enter') {
+                const val = e.target.value.trim().toLowerCase();
+                const found = products.find(p => p.barcode === val || p.name.toLowerCase().includes(val));
+                if(found) {
+                    addProductToCart(found.id);
+                    e.target.value = '';
+                } else {
+                    alert('Produkt nicht gefunden!');
                 }
             }
         }
-    }
-</script>
-<style>
-    body {
-        background-color: #e2e4e8;
-        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-        background-size: 12px 12px;
-        color: #1e293b;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        user-select: none;
-        -webkit-user-select: none;
-        overflow: hidden;
-    }
 
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #94a3b8;
-        border-radius: 3px;
-    }
+        // Kunden & Guthaben Modal
+        function openCustomerModal() {
+            const list = document.getElementById('customerListModal');
+            const select = document.getElementById('creditMemberSelect');
 
-    .btn-act {
-        transition: transform 0.05s ease, filter 0.05s ease, background-color 0.1s ease;
-        touch-action: manipulation;
-    }
-    .btn-act:active {
-        transform: scale(0.95) !important;
-        filter: brightness(0.88);
-    }
-
-    .num-btn {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        height: 52px;
-        font-size: 20px;
-        font-weight: 800;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 3px rgba(0,0,0,0.06);
-        user-select: none;
-    }
-    .num-btn.yellow {
-        background: #fef08a;
-        color: #854d0e;
-        border-color: #fde047;
-    }
-
-    @media print {
-        body * {
-            visibility: hidden;
-        }
-        #printableReceipt, #printableReceipt * {
-            visibility: visible;
-        }
-        #printableReceipt {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            background: white;
-            color: black;
-            padding: 20px;
-        }
-    }
-</style>
-</head>
-<body class="h-screen w-screen flex flex-col">
-
-<header class="h-12 bg-kat-header text-white flex items-center justify-between px-3 text-sm z-30 shadow-md flex-shrink-0">
-    <div class="flex items-center gap-2 sm:gap-3">
-        <button onclick="window.showPage('page-dashboard')" class="btn-act flex items-center gap-2 hover:bg-slate-700 px-2 py-1 rounded transition" title="Hauptmenü">
-            <span class="text-2xl">🐱</span>
-            <span class="font-extrabold tracking-wider text-amber-400 text-sm sm:text-base">KasseKat</span>
-        </button>
-
-        <!-- Search Bar with Scanner Quick Launcher -->
-        <div class="relative flex items-center">
-            <input type="text" id="topSearchInput" 
-                   class="bg-white text-slate-800 text-xs rounded-full py-1.5 pl-3 pr-8 w-36 sm:w-64 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-inner" 
-                   placeholder="🔍 Barcode / Artikel..." 
-                   onkeydown="window.handleSearchBarcode(event)">
-            <button onclick="window.openCameraScanner()" class="btn-act absolute right-2 text-slate-600 hover:text-slate-900 transition text-base" title="Kamera Barcode-Scanner öffnen">
-                📷
-            </button>
-        </div>
-    </div>
-
-    <!-- Quick Links -->
-    <nav class="flex items-center gap-1 sm:gap-2 text-xs font-semibold">
-        <button onclick="window.showPage('page-pos')" class="btn-act hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded flex items-center gap-1">
-            <span>🛒</span> <span class="hidden md:inline">Kasse</span>
-        </button>
-        <button onclick="window.showPage('page-tables')" class="btn-act hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded flex items-center gap-1">
-            <span>🪑</span> <span class="hidden md:inline">Tische</span>
-        </button>
-        <button onclick="window.showPage('page-produkts')" class="btn-act hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded flex items-center gap-1">
-            <span>📦</span> <span class="hidden md:inline">Produkte</span>
-        </button>
-        <button onclick="window.showPage('page-members')" class="btn-act hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded flex items-center gap-1">
-            <span>👥</span> <span class="hidden md:inline">Mitglieder</span>
-        </button>
-        <button onclick="window.showPage('page-zreport')" class="btn-act hover:bg-slate-700 px-2 sm:px-2.5 py-1.5 rounded flex items-center gap-1 text-amber-300">
-            <span>📅</span> <span class="hidden md:inline">Z-Bon</span>
-        </button>
-    </nav>
-</header>
-
-<main class="flex-1 relative overflow-hidden">
-
-    <section id="page-dashboard" class="page-view h-full overflow-y-auto p-4 sm:p-8">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-black text-slate-800">KasseKat Hauptmenü</h1>
-                <p class="text-xs text-slate-500 mt-1">Wählen Sie eine Funktion aus dem System</p>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-                <div onclick="window.showPage('page-pos')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">🛒</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Kasse</span>
+            list.innerHTML = members.map(m => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; border-bottom: 1px solid #f1f5f9;">
+                    <div><strong>${m.name}</strong><br><small style="color:#64748b;">Guthaben: ${m.credit.toFixed(2).replace('.', ',')} € | ${m.points} Pkt</small></div>
+                    <button class="btn-primary" onclick="assignCustomerToOrder('${m.name}')">Auswählen</button>
                 </div>
-                <div onclick="window.showPage('page-tables')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">🪑</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Tischbestellung</span>
-                </div>
-                <div onclick="window.showPage('page-orders')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">📋</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Liste bestellen</span>
-                </div>
-                <div onclick="window.showPage('page-zreport')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">🧮</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Buch führen</span>
-                </div>
-                <div onclick="window.showPage('page-produkts')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">📑</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Produktverwaltung</span>
-                </div>
-                <div onclick="window.triggerAppointmentNotice()" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">🕒</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Terminverwaltung</span>
-                </div>
-                <div onclick="window.showPage('page-members')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">👤</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Mitgliederliste</span>
-                </div>
-                <div onclick="window.showPage('page-members')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">💳</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Logbuch Mitglied</span>
-                </div>
-                <div onclick="window.showPage('page-zreport')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">📊</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Finanzstatistiken</span>
-                </div>
-                <div onclick="window.showPage('page-zreport')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">📅</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Tagesabschluss</span>
-                </div>
-                <div onclick="window.showPage('page-orders')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">📋</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Log-Zentrum</span>
-                </div>
-                <div onclick="window.showPage('page-settings')" class="btn-act flex flex-col items-center cursor-pointer group">
-                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-md group-hover:shadow-lg">⚙️</div>
-                    <span class="mt-2 text-xs font-bold text-slate-700">Einstellungen</span>
-                </div>
-            </div>
-        </div>
-    </section>
+            `).join('');
 
-    <section id="page-pos" class="page-view hidden h-full grid grid-cols-1 md:grid-cols-12">
-        <div class="md:col-span-5 bg-white border-r border-slate-300 flex flex-col h-full overflow-hidden">
-            <div class="grid grid-cols-12 bg-slate-100 text-xs font-bold text-slate-600 p-2 border-b border-slate-300">
-                <span class="col-span-6">Artikel</span>
-                <span class="col-span-2 text-center">Stk</span>
-                <span class="col-span-4 text-right">Betrag</span>
-            </div>
-
-            <div id="cartItemsList" class="flex-1 overflow-y-auto divide-y divide-slate-100 p-1"></div>
-
-            <div id="cartMemberBanner" class="hidden bg-amber-50 border-t border-amber-200 px-3 py-1 flex justify-between items-center text-xs">
-                <span id="cartMemberName" class="font-bold text-amber-800">Gast: -</span>
-                <button onclick="window.detachMemberFromCart()" class="text-rose-600 hover:underline font-bold">Entfernen</button>
-            </div>
-            <div id="cartTableBanner" class="hidden bg-blue-50 border-t border-blue-200 px-3 py-1 flex justify-between items-center text-xs">
-                <span id="cartTableName" class="font-bold text-blue-800">Tisch: -</span>
-                <button onclick="window.clearCurrentTableSelection()" class="text-rose-600 hover:underline font-bold">Freigeben</button>
-            </div>
-
-            <div class="bg-slate-100 border-t border-slate-300 p-2 flex flex-col gap-2">
-                <div class="flex items-center justify-between px-1">
-                    <span class="text-xs font-bold text-amber-700">⚠️ Geschäftstag: <span id="currentDateStr">29.10</span></span>
-                    <span id="cartDiscountLabel" class="text-xs font-bold text-rose-600 hidden">Rabatt: 0%</span>
-                </div>
-
-                <div class="bg-white border border-slate-300 rounded p-2 text-right relative shadow-inner">
-                    <span class="absolute left-2 top-1 text-[10px] uppercase font-black text-slate-400">Summe</span>
-                    <span id="posTotalAmount" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">0,00 €</span>
-                </div>
-
-                <div class="grid grid-cols-4 gap-1.5">
-                    <button class="num-btn btn-act" onclick="window.numpadInput('7')">7</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('8')">8</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('9')">9</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('0')">0</button>
-
-                    <button class="num-btn btn-act" onclick="window.numpadInput('4')">4</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('5')">5</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('6')">6</button>
-                    <button class="num-btn btn-act text-rose-600" onclick="window.numpadBackspace()" title="Rücktaste">⌫</button>
-
-                    <button class="num-btn btn-act" onclick="window.numpadInput('1')">1</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('2')">2</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('3')">3</button>
-                    <button class="num-btn btn-act text-rose-600" onclick="window.clearCart()" title="Warenkorb leeren">🗑</button>
-
-                    <button class="num-btn btn-act yellow" onclick="window.clearNumpadOrCart()">C</button>
-                    <button class="num-btn btn-act" onclick="window.numpadInput('00')">00</button>
-                    <button class="num-btn btn-act" onclick="window.openCameraScanner()" title="Kamera Barcode-Scanner">📷</button>
-                    <button class="num-btn btn-act bg-amber-400 text-amber-950 border-amber-500" onclick="window.applyCustomNumpadQty()" title="Menge Übernehmen">⏎</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="md:col-span-7 flex flex-col h-full overflow-hidden p-3 gap-3">
-            <div class="flex items-center justify-between">
-                <div id="categoryTabs" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold"></div>
-                <button onclick="window.openProductEditModal(null)" class="btn-act bg-amber-500 text-amber-950 text-xs font-black px-3 py-1.5 rounded-full flex-shrink-0 shadow">
-                    + Produkt
-                </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto">
-                <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5"></div>
-            </div>
-
-            <div class="grid grid-cols-6 sm:grid-cols-10 gap-1.5 pt-2 border-t border-slate-300">
-                <button onclick="window.openMemberSelectionModal()" class="btn-act h-12 rounded bg-lime-600 hover:bg-lime-700 text-white font-bold text-lg flex items-center justify-center shadow" title="Mitglied zuweisen">👤</button>
-                <button onclick="window.showPage('page-tables')" class="btn-act h-12 rounded bg-lime-600 hover:bg-lime-700 text-white font-bold text-lg flex items-center justify-center shadow" title="Tischplan">🪑</button>
-                <button onclick="window.applyDiscountPrompt()" class="btn-act h-12 rounded bg-lime-600 hover:bg-lime-700 text-white font-bold text-lg flex items-center justify-center shadow" title="Rabatt">🏷️</button>
-                
-                <button onclick="window.openCheckoutModal()" class="btn-act h-12 col-span-2 rounded bg-amber-500 hover:bg-amber-600 text-amber-950 font-black text-sm transition shadow flex items-center justify-center">Bestellen</button>
-                
-                <button onclick="window.adjustSelectedQty(-1)" class="btn-act h-12 rounded bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-xl flex items-center justify-center shadow">-</button>
-                <button onclick="window.adjustSelectedQty(1)" class="btn-act h-12 rounded bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-xl flex items-center justify-center shadow">+</button>
-                <button onclick="window.filterCategory('Bestseller')" class="btn-act h-12 rounded bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-xs flex items-center justify-center shadow">Bestseller</button>
-                <button onclick="window.applyDiscountPrompt()" class="btn-act h-12 rounded bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold text-xs flex items-center justify-center shadow">%</button>
-                
-                <button onclick="window.openCheckoutModal()" class="btn-act h-12 col-span-2 sm:col-span-1 rounded bg-lime-500 hover:bg-lime-600 text-slate-900 font-black text-2xl flex items-center justify-center shadow">✓</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="page-tables" class="page-view hidden h-full flex flex-col p-4 overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <h2 class="text-xl font-bold text-slate-800">Tischplan & Raumübersicht</h2>
-                <p class="text-xs text-slate-500">Tisch auswählen zum Buchen oder Abrechnen</p>
-            </div>
-            <button onclick="window.showPage('page-pos')" class="btn-act bg-slate-700 text-white text-xs font-bold px-3 py-2 rounded">
-                Zur Kasse
-            </button>
-        </div>
-        <div id="tablePlanGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-    </section>
-
-    <section id="page-produkts" class="page-view hidden h-full flex flex-col bg-white overflow-hidden">
-        <div class="p-3 bg-slate-100 border-b border-slate-300 flex justify-between items-center">
-            <h2 class="font-bold text-slate-800 text-base">Produktverwaltung</h2>
-            <button onclick="window.openProductEditModal(null)" class="btn-act bg-amber-500 text-amber-950 text-xs font-bold px-3 py-1.5 rounded shadow">
-                + Neues Produkt
-            </button>
-        </div>
-
-        <div class="p-2 bg-slate-50 border-b border-slate-200">
-            <input type="text" id="productSearchInput" oninput="window.renderProductsTable()" class="w-full bg-white border border-slate-300 rounded-full px-4 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="🔍 Suche Name, Barcode...">
-        </div>
-
-        <div class="flex-1 overflow-y-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 sticky top-0">
-                    <tr>
-                        <th class="p-3">Barcode</th>
-                        <th class="p-3">Produktname</th>
-                        <th class="p-3">Kategorie</th>
-                        <th class="p-3 text-right">Preis</th>
-                        <th class="p-3 text-center">Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="page-members" class="page-view hidden h-full flex flex-col bg-white overflow-hidden">
-        <div class="p-3 bg-slate-100 border-b border-slate-300 flex justify-between items-center">
-            <h2 class="font-bold text-slate-800 text-base">Mitglieder- & Kundenliste</h2>
-            <button onclick="window.openMemberEditModal(null)" class="btn-act bg-amber-500 text-amber-950 text-xs font-bold px-3 py-1.5 rounded shadow">
-                + Neues Mitglied
-            </button>
-        </div>
-
-        <div class="p-2 bg-slate-50 border-b border-slate-200">
-            <input type="text" id="memberSearchInput" oninput="window.renderMembersTable()" class="w-full bg-white border border-slate-300 rounded-full px-4 py-1.5 text-xs focus:outline-none" placeholder="🔍 Suche Mitglied Name, Telefon...">
-        </div>
-
-        <div class="flex-1 overflow-y-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 sticky top-0">
-                    <tr>
-                        <th class="p-3">Name</th>
-                        <th class="p-3">Telefon</th>
-                        <th class="p-3 text-right">Guthaben</th>
-                        <th class="p-3 text-center">Punkte</th>
-                        <th class="p-3 text-center">Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody id="membersTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="page-orders" class="page-view hidden h-full flex flex-col bg-white overflow-hidden">
-        <div class="p-3 bg-slate-100 border-b border-slate-300 flex justify-between items-center">
-            <h2 class="font-bold text-slate-800 text-base">Bestellhistorie / Log-Zentrum</h2>
-        </div>
-        <div class="flex-1 overflow-y-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-300 sticky top-0">
-                    <tr>
-                        <th class="p-3">Bonnr.</th>
-                        <th class="p-3">Zeit</th>
-                        <th class="p-3">Typ</th>
-                        <th class="p-3">Zahlart</th>
-                        <th class="p-3 text-right">Summe</th>
-                        <th class="p-3 text-center">Aktion</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="page-zreport" class="page-view hidden h-full flex flex-col p-4 overflow-y-auto">
-        <div class="max-w-2xl mx-auto w-full bg-white rounded-lg shadow border border-slate-300 p-6">
-            <div class="flex justify-between items-start border-b border-slate-200 pb-4 mb-4">
-                <div>
-                    <h1 class="text-2xl font-black text-slate-800">Tagesabschluss (Z-Bon)</h1>
-                    <p class="text-xs text-slate-500">Umsatzübersicht & Buchführung</p>
-                </div>
-                <button onclick="window.print()" class="btn-act bg-slate-800 text-white text-xs font-bold px-3 py-2 rounded">
-                    🖨️ Drucken
-                </button>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 mb-6">
-                <div class="bg-slate-50 p-3 rounded border">
-                    <span class="text-[10px] uppercase font-bold text-slate-500">Gesamtumsatz</span>
-                    <div id="zTotalRevenue" class="text-xl font-black text-slate-900">0,00 €</div>
-                </div>
-                <div class="bg-slate-50 p-3 rounded border">
-                    <span class="text-[10px] uppercase font-bold text-slate-500">Bons</span>
-                    <div id="zTotalCount" class="text-xl font-black text-slate-900">0</div>
-                </div>
-                <div class="bg-slate-50 p-3 rounded border">
-                    <span class="text-[10px] uppercase font-bold text-slate-500">Ø Bon</span>
-                    <div id="zAvgReceipt" class="text-xl font-black text-slate-900">0,00 €</div>
-                </div>
-            </div>
-
-            <div class="divide-y divide-slate-200 border-t border-b mb-6 text-xs">
-                <div class="py-2 flex justify-between"><span>Barzahlung:</span><strong id="zCashTotal">0,00 €</strong></div>
-                <div class="py-2 flex justify-between"><span>Kartenzahlung:</span><strong id="zCardTotal">0,00 €</strong></div>
-                <div class="py-2 flex justify-between"><span>Guthaben:</span><strong id="zMemberTotal">0,00 €</strong></div>
-            </div>
-
-            <button onclick="window.closeBusinessDay()" class="btn-act w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm py-3 rounded">
-                Geschäftstag Abschließen & Leeren
-            </button>
-        </div>
-    </section>
-
-    <section id="page-settings" class="page-view hidden h-full p-6 overflow-y-auto">
-        <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow border border-slate-300 space-y-4 text-xs">
-            <h2 class="text-lg font-bold text-slate-800 border-b pb-2">KasseKat Einstellungen</h2>
-            <div>
-                <label class="block font-bold mb-1">Geschäftstag / Datum</label>
-                <input type="text" id="settingBusinessDate" class="w-full border rounded p-2 text-sm font-semibold" value="29.10">
-            </div>
-            <button onclick="window.saveSystemSettings()" class="btn-act w-full bg-amber-500 text-amber-950 font-bold py-2 rounded">
-                Einstellungen Speichern
-            </button>
-            <button onclick="window.resetAllDemoData()" class="btn-act w-full bg-slate-200 text-rose-700 font-bold py-2 rounded">
-                ⚠️ Demodaten Laden / Zurücksetzen
-            </button>
-        </div>
-    </section>
-
-</main>
-
-<!-- MODAL: CAMERA SCANNER WITH DEVICE SELECTOR -->
-<div id="scannerModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
-        <div class="bg-slate-800 text-white p-3 text-center font-bold text-sm flex justify-between items-center">
-            <span>📷 Barcode Scannen</span>
-            <button onclick="window.closeCameraScanner()" class="text-slate-400 hover:text-white text-lg">✕</button>
-        </div>
-
-        <!-- Camera Device Dropdown Selector -->
-        <div class="p-2 bg-slate-100 border-b border-slate-200 flex flex-col gap-1">
-            <label for="cameraSelect" class="text-[11px] font-bold text-slate-600 flex justify-between">
-                <span>📹 Kamera auswählen:</span>
-                <span id="cameraCountBadge" class="text-amber-600 font-extrabold">0 Kameras</span>
-            </label>
-            <select id="cameraSelect" onchange="window.switchCameraStream(this.value)" class="w-full text-xs bg-white border border-slate-300 rounded p-1.5 font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                <option value="">Kameras werden geladen...</option>
-            </select>
-        </div>
-
-        <div class="relative bg-black h-64 flex items-center justify-center overflow-hidden">
-            <video id="scannerVideo" class="w-full h-full object-cover" autoplay playsinline></video>
-            <div class="absolute inset-12 border-2 border-dashed border-amber-400 rounded-lg pointer-events-none opacity-80 animate-pulse"></div>
-        </div>
-
-        <div id="scannerStatus" class="p-3 text-center text-xs text-slate-600 bg-slate-100 font-medium">
-            Kamera wird gestartet...
-        </div>
-
-        <div class="p-2 border-t flex gap-2">
-            <input type="text" id="manualBarcodeInput" placeholder="Code manuell eingeben..." class="flex-1 text-xs border rounded px-2 py-1">
-            <button onclick="window.submitManualBarcode()" class="btn-act bg-amber-500 text-amber-950 text-xs font-bold px-3 py-1 rounded">OK</button>
-        </div>
-    </div>
-</div>
-
-<!-- CHECKOUT MODAL -->
-<div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
-        <div class="bg-slate-100 p-3 text-center border-b font-bold text-slate-800 text-sm">
-            <span id="modalPiecesHeader">0 Stücke</span>
-        </div>
-        <div class="p-6 text-center">
-            <span class="text-xs text-slate-500 font-semibold uppercase">Gesamtsumme</span>
-            <div id="modalTotalAmount" class="text-4xl font-black text-slate-900 my-2">0,00 €</div>
-
-            <div class="mt-4 text-left">
-                <label class="block text-xs font-bold text-slate-600 mb-1">Zahlungsart wählen:</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" onclick="window.setPaymentType('bar')" id="payBtn-bar" class="pay-type-btn border-2 border-amber-500 bg-amber-50 text-amber-900 font-bold text-xs p-2 rounded text-center">Bar</button>
-                    <button type="button" onclick="window.setPaymentType('karte')" id="payBtn-karte" class="pay-type-btn border border-slate-300 text-slate-700 font-bold text-xs p-2 rounded text-center">Karte</button>
-                    <button type="button" onclick="window.setPaymentType('konto')" id="payBtn-konto" class="pay-type-btn border border-slate-300 text-slate-700 font-bold text-xs p-2 rounded text-center">Guthaben</button>
-                </div>
-            </div>
-        </div>
-        <div class="flex border-t border-slate-200">
-            <button onclick="window.closeCheckoutModal()" class="btn-act w-1/2 py-3.5 bg-amber-100 text-amber-900 font-bold text-sm">
-                Abbrechen
-            </button>
-            <button onclick="window.finishOrder()" class="btn-act w-1/2 py-3.5 bg-lime-500 text-slate-900 font-extrabold text-sm">
-                Bestellen ✓
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- PRODUCT EDIT MODAL -->
-<div id="productModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden p-4">
-        <h3 id="productModalTitle" class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm">Produkt Anlegen</h3>
-        <form id="productForm" onsubmit="window.saveProductForm(event)" class="space-y-3 text-xs">
-            <input type="hidden" id="productFormId">
-            <div>
-                <label class="block font-bold mb-1 text-slate-600">Produktname</label>
-                <input type="text" id="productFormName" required class="w-full border rounded p-2">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block font-bold mb-1 text-slate-600">Preis (€)</label>
-                    <input type="number" step="0.01" id="productFormPrice" required class="w-full border rounded p-2">
-                </div>
-                <div>
-                    <label class="block font-bold mb-1 text-slate-600">Kategorie</label>
-                    <input type="text" id="productFormCategory" required list="categoryList" class="w-full border rounded p-2" placeholder="z. B. Getränke">
-                    <datalist id="categoryList">
-                        <option value="Getränke"></option>
-                        <option value="Speisen"></option>
-                        <option value="Dessert"></option>
-                    </datalist>
-                </div>
-            </div>
-            <div>
-                <label class="block font-bold mb-1 text-slate-600">Barcode / EAN</label>
-                <input type="text" id="productFormBarcode" class="w-full border rounded p-2">
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="window.closeProductModal()" class="btn-act px-3 py-1.5 bg-slate-200 rounded font-bold">Abbrechen</button>
-                <button type="submit" class="btn-act px-4 py-1.5 bg-amber-500 text-amber-950 rounded font-bold">Speichern</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- MEMBER EDIT MODAL -->
-<div id="memberModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden p-4">
-        <h3 id="memberModalTitle" class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm">Mitglied Verwalten</h3>
-        <form id="memberForm" onsubmit="window.saveMemberForm(event)" class="space-y-3 text-xs">
-            <input type="hidden" id="memberFormId">
-            <div>
-                <label class="block font-bold mb-1 text-slate-600">Vor- & Nachname</label>
-                <input type="text" id="memberFormName" required class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block font-bold mb-1 text-slate-600">Telefonnummer</label>
-                <input type="text" id="memberFormPhone" class="w-full border rounded p-2">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block font-bold mb-1 text-slate-600">Guthaben (€)</label>
-                    <input type="number" step="0.01" id="memberFormBalance" class="w-full border rounded p-2" value="0.00">
-                </div>
-                <div>
-                    <label class="block font-bold mb-1 text-slate-600">Bonus Punkte</label>
-                    <input type="number" id="memberFormPoints" class="w-full border rounded p-2" value="0">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="window.closeMemberModal()" class="btn-act px-3 py-1.5 bg-slate-200 rounded font-bold">Abbrechen</button>
-                <button type="submit" class="btn-act px-4 py-1.5 bg-amber-500 text-amber-950 rounded font-bold">Speichern</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="printableReceipt" class="hidden"></div>
-
-<script>
-(function() {
-    const defaultProducts = [
-        { id: 101, name: "Espresso", price: 2.20, category: "Getränke", barcode: "400123" },
-        { id: 102, name: "Cappuccino", price: 3.50, category: "Getränke", barcode: "400124" },
-        { id: 103, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "400125" },
-        { id: 104, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "400126" },
-        { id: 105, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "400127" },
-        { id: 106, name: "Club Sandwich", price: 7.50, category: "Speisen", barcode: "400128" },
-        { id: 107, name: "Muffin Schoko", price: 2.80, category: "Dessert", barcode: "400129" },
-        { id: 108, name: "Cheesecake", price: 3.80, category: "Dessert", barcode: "400130" }
-    ];
-
-    const defaultMembers = [
-        { id: 1, name: "Dennis Küper", phone: "0170 1234567", balance: 25.00, points: 140 },
-        { id: 2, name: "Sarah Meyer", phone: "0151 9876543", balance: 10.00, points: 85 }
-    ];
-
-    const defaultTables = Array.from({ length: 12 }, (_, i) => ({
-        id: i + 1,
-        name: `Tisch ${i + 1}`,
-        status: 'free',
-        cart: [],
-        memberId: null
-    }));
-
-    let products = JSON.parse(localStorage.getItem("pos_products")) || defaultProducts;
-    let members = JSON.parse(localStorage.getItem("pos_members")) || defaultMembers;
-    let tables = JSON.parse(localStorage.getItem("pos_tables")) || defaultTables;
-    let orders = JSON.parse(localStorage.getItem("pos_orders")) || [];
-
-    let activeCategory = "Alle";
-    let cart = [];
-    let activeMember = null;
-    let activeTableId = null;
-    let currentDiscount = 0;
-    let selectedCartIndex = null;
-    let numpadBuffer = "";
-    let selectedPaymentType = "bar";
-
-    // Scanner state variables
-    let scannerStream = null;
-    let scannerInterval = null;
-    let availableVideoDevices = [];
-    let activeDeviceId = null;
-
-    const tileColors = ["bg-slate-600", "bg-amber-600", "bg-slate-500", "bg-teal-700", "bg-rose-500", "bg-emerald-700"];
-
-    window.money = function(val) {
-        return Number(val || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-    };
-
-    window.escapeHtml = function(str) {
-        return String(str || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    };
-
-    window.showPage = function(pageId) {
-        document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-        const target = document.getElementById(pageId);
-        if(target) target.classList.remove('hidden');
-
-        if(pageId === 'page-pos') {
-            window.renderCategoryTabs();
-            window.renderPosProducts();
-            window.renderCart();
-        } else if(pageId === 'page-tables') {
-            window.renderTablesGrid();
-        } else if(pageId === 'page-produkts') {
-            window.renderProductsTable();
-        } else if(pageId === 'page-members') {
-            window.renderMembersTable();
-        } else if(pageId === 'page-orders') {
-            window.renderOrdersTable();
-        } else if(pageId === 'page-zreport') {
-            window.renderZReport();
-        }
-    };
-
-    window.triggerAppointmentNotice = function() {
-        alert("Terminverwaltung: Für heute liegen keine offenen Termine vor.");
-    };
-
-    window.openCameraScanner = async function() {
-        document.getElementById('scannerModal').classList.remove('hidden');
-        await window.loadCameraDevices();
-        await window.startSelectedCamera();
-    };
-
-    window.loadCameraDevices = async function() {
-        const select = document.getElementById('cameraSelect');
-        const badge = document.getElementById('cameraCountBadge');
-        if(!select) return;
-
-        try {
-            // Prompt permission to get device labels
-            const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            tempStream.getTracks().forEach(track => track.stop());
-
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            availableVideoDevices = devices.filter(d => d.kind === 'videoinput');
-
-            select.innerHTML = '';
-
-            if (availableVideoDevices.length === 0) {
-                select.innerHTML = '<option value="">Keine Kamera gefunden</option>';
-                if(badge) badge.textContent = '0 Kameras';
-                return;
-            }
-
-            if(badge) badge.textContent = `${availableVideoDevices.length} Kamera(s)`;
-
-            availableVideoDevices.forEach((device, index) => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                const label = device.label || `Kamera ${index + 1} (${device.deviceId.slice(0, 5)}...)`;
-                option.textContent = label;
-                select.appendChild(option);
-            });
-
-            if (!activeDeviceId && availableVideoDevices.length > 0) {
-                activeDeviceId = availableVideoDevices[0].deviceId;
-            }
-
-            select.value = activeDeviceId;
-        } catch(err) {
-            select.innerHTML = '<option value="">Kamerazugriff verweigert</option>';
-        }
-    };
-
-    window.switchCameraStream = async function(deviceId) {
-        if(!deviceId) return;
-        activeDeviceId = deviceId;
-        await window.startSelectedCamera();
-    };
-
-    window.startSelectedCamera = async function() {
-        const video = document.getElementById('scannerVideo');
-        const status = document.getElementById('scannerStatus');
-
-        // Stop existing tracks
-        if (scannerStream) {
-            scannerStream.getTracks().forEach(track => track.stop());
-        }
-        if (scannerInterval) {
-            clearInterval(scannerInterval);
+            select.innerHTML = members.map(m => `<option value="${m.id}">${m.name} (${m.credit.toFixed(2)}€)</option>`).join('');
+            document.getElementById('modalCustomer').classList.remove('hidden');
         }
 
-        try {
-            const constraints = {
-                video: activeDeviceId 
-                    ? { deviceId: { exact: activeDeviceId } }
-                    : { facingMode: { ideal: "environment" } }
-            };
-
-            scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = scannerStream;
-            status.textContent = "Kamera aktiv. Halten Sie einen Barcode vor die Linse.";
-
-            if ('BarcodeDetector' in window) {
-                const detector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'upc_a'] });
-                scannerInterval = setInterval(async () => {
-                    try {
-                        const barcodes = await detector.detect(video);
-                        if (barcodes.length > 0) {
-                            window.processScannedBarcode(barcodes[0].rawValue);
-                        }
-                    } catch (err) {}
-                }, 400);
-            } else {
-                status.textContent = "Kamera aktiv. Verwenden Sie die manuelle Eingabe unten.";
-            }
-        } catch(err) {
-            status.textContent = "Ausgewählte Kamera konnte nicht gestartet werden.";
-        }
-    };
-
-    window.submitManualBarcode = function() {
-        const val = document.getElementById('manualBarcodeInput').value.trim();
-        if(val) {
-            window.processScannedBarcode(val);
-            document.getElementById('manualBarcodeInput').value = "";
-        }
-    };
-
-    window.processScannedBarcode = function(code) {
-        const found = products.find(p => p.barcode === code);
-        if(found) {
-            window.closeCameraScanner();
-            window.showPage('page-pos');
-            window.addToCart(found.id);
-        } else {
-            document.getElementById('scannerStatus').textContent = `Scanned: ${code} (Artikel nicht im System)`;
-        }
-    };
-
-    window.closeCameraScanner = function() {
-        if(scannerInterval) clearInterval(scannerInterval);
-        if(scannerStream) {
-            scannerStream.getTracks().forEach(track => track.stop());
-        }
-        document.getElementById('scannerModal').classList.add('hidden');
-    };
-
-    window.renderCategoryTabs = function() {
-        const categories = ["Alle", ...new Set(products.map(p => p.category)), "Bestseller"];
-        const container = document.getElementById('categoryTabs');
-        if(!container) return;
-        
-        container.innerHTML = categories.map(cat => {
-            const active = activeCategory === cat ? 'bg-amber-500 text-amber-950' : 'bg-slate-200 text-slate-700 hover:bg-slate-300';
-            return `<button onclick="window.filterCategory('${cat}')" class="btn-act px-3 py-1.5 rounded-full whitespace-nowrap ${active}">${cat}</button>`;
-        }).join('');
-    };
-
-    window.filterCategory = function(cat) {
-        activeCategory = cat;
-        window.renderCategoryTabs();
-        window.renderPosProducts();
-    };
-
-    window.renderPosProducts = function() {
-        const grid = document.getElementById('productGrid');
-        if(!grid) return;
-
-        let filtered = products;
-        if(activeCategory !== "Alle" && activeCategory !== "Bestseller") {
-            filtered = products.filter(p => p.category === activeCategory);
+        function assignCustomerToOrder(name) {
+            alert('Kunde "' + name + '" der Bestellung zugewiesen.');
+            closeModal('modalCustomer');
         }
 
-        if(filtered.length === 0) {
-            grid.innerHTML = `<div class="col-span-full p-8 text-center text-xs text-slate-500 font-semibold bg-white rounded-lg border border-slate-200">Keine Produkte in dieser Kategorie.<br>Klicken Sie oben rechts auf <strong>+ Produkt</strong> um eines anzulegen.</div>`;
-            return;
-        }
+        function addCustomCredit() {
+            const mId = parseInt(document.getElementById('creditMemberSelect').value);
+            const amt = parseFloat(document.getElementById('creditAmountInput').value);
+            if(isNaN(amt) || amt <= 0) { alert('Bitte gültigen Betrag eingeben.'); return; }
 
-        grid.innerHTML = filtered.map((p, index) => {
-            const colorClass = tileColors[index % tileColors.length];
-            return `
-                <div onclick="window.addToCart(${p.id})" class="btn-act ${colorClass} text-white rounded-lg p-3 h-20 flex flex-col justify-between shadow cursor-pointer">
-                    <span class="text-xs font-bold leading-tight line-clamp-2">${window.escapeHtml(p.name)}</span>
-                    <span class="text-xs font-black text-amber-200 text-right">${window.money(p.price)}</span>
-                </div>
-            `;
-        }).join('');
-    };
-
-    window.addToCart = function(productId) {
-        const product = products.find(p => p.id === productId);
-        if(!product) return;
-
-        const existingIndex = cart.findIndex(item => item.id === productId);
-        if(existingIndex > -1) {
-            cart[existingIndex].qty += 1;
-            selectedCartIndex = existingIndex;
-        } else {
-            cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                qty: 1
-            });
-            selectedCartIndex = cart.length - 1;
-        }
-
-        window.syncCurrentTableCart();
-        window.renderCart();
-    };
-
-    window.renderCart = function() {
-        const container = document.getElementById('cartItemsList');
-        if(!container) return;
-
-        let subtotal = 0;
-
-        if(cart.length === 0) {
-            container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">Warenkorb ist leer</div>`;
-            selectedCartIndex = null;
-        } else {
-            container.innerHTML = cart.map((item, idx) => {
-                const sum = item.price * item.qty;
-                subtotal += sum;
-                const isSelected = idx === selectedCartIndex ? 'bg-amber-100 border-l-4 border-amber-500' : 'hover:bg-slate-50';
-
-                return `
-                    <div onclick="window.selectCartRow(${idx})" class="grid grid-cols-12 p-2 text-xs items-center cursor-pointer transition ${isSelected}">
-                        <span class="col-span-6 font-semibold text-slate-800 truncate">${window.escapeHtml(item.name)}</span>
-                        <span class="col-span-2 text-center font-bold text-slate-600">x${item.qty}</span>
-                        <span class="col-span-4 text-right font-bold text-slate-900">${window.money(sum)}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        let finalTotal = subtotal;
-        if(currentDiscount > 0) {
-            finalTotal = subtotal * (1 - (currentDiscount / 100));
-            document.getElementById('cartDiscountLabel').classList.remove('hidden');
-            document.getElementById('cartDiscountLabel').textContent = `Rabatt: ${currentDiscount}%`;
-        } else {
-            document.getElementById('cartDiscountLabel').classList.add('hidden');
-        }
-
-        document.getElementById('posTotalAmount').textContent = window.money(finalTotal);
-
-        if(activeMember) {
-            document.getElementById('cartMemberBanner').classList.remove('hidden');
-            document.getElementById('cartMemberName').textContent = `Mitglied: ${activeMember.name}`;
-        } else {
-            document.getElementById('cartMemberBanner').classList.add('hidden');
-        }
-
-        if(activeTableId) {
-            document.getElementById('cartTableBanner').classList.remove('hidden');
-            document.getElementById('cartTableName').textContent = `Tisch ${activeTableId}`;
-        } else {
-            document.getElementById('cartTableBanner').classList.add('hidden');
-        }
-    };
-
-    window.selectCartRow = function(index) {
-        selectedCartIndex = index;
-        window.renderCart();
-    };
-
-    window.adjustSelectedQty = function(delta) {
-        if(selectedCartIndex === null || !cart[selectedCartIndex]) return;
-        cart[selectedCartIndex].qty += delta;
-        if(cart[selectedCartIndex].qty <= 0) {
-            cart.splice(selectedCartIndex, 1);
-            selectedCartIndex = cart.length > 0 ? 0 : null;
-        }
-        window.syncCurrentTableCart();
-        window.renderCart();
-    };
-
-    window.clearCart = function() {
-        cart = [];
-        selectedCartIndex = null;
-        currentDiscount = 0;
-        numpadBuffer = "";
-        window.syncCurrentTableCart();
-        window.renderCart();
-    };
-
-    window.numpadInput = function(val) {
-        numpadBuffer += val;
-        document.getElementById('posTotalAmount').textContent = numpadBuffer + " €";
-    };
-
-    window.numpadBackspace = function() {
-        numpadBuffer = numpadBuffer.slice(0, -1);
-        if(numpadBuffer === "") {
-            window.renderCart();
-        } else {
-            document.getElementById('posTotalAmount').textContent = numpadBuffer + " €";
-        }
-    };
-
-    window.clearNumpadOrCart = function() {
-        if(numpadBuffer !== "") {
-            numpadBuffer = "";
-            window.renderCart();
-        } else {
-            window.clearCart();
-        }
-    };
-
-    window.applyCustomNumpadQty = function() {
-        if(numpadBuffer !== "" && selectedCartIndex !== null && cart[selectedCartIndex]) {
-            const customQty = parseInt(numpadBuffer);
-            if(!isNaN(customQty) && customQty > 0) {
-                cart[selectedCartIndex].qty = customQty;
-            }
-            numpadBuffer = "";
-            window.syncCurrentTableCart();
-            window.renderCart();
-        }
-    };
-
-    window.applyDiscountPrompt = function() {
-        const val = prompt("Rabatt in % eingeben (0-100):", currentDiscount);
-        if(val !== null) {
-            const disc = parseFloat(val);
-            if(!isNaN(disc) && disc >= 0 && disc <= 100) {
-                currentDiscount = disc;
-                window.renderCart();
-            }
-        }
-    };
-
-    window.renderTablesGrid = function() {
-        const grid = document.getElementById('tablePlanGrid');
-        if(!grid) return;
-
-        grid.innerHTML = tables.map(t => {
-            const isOccupied = t.status === 'occupied' || (t.cart && t.cart.length > 0);
-            const totalAmount = (t.cart || []).reduce((s, item) => s + (item.price * item.qty), 0);
-            const bgClass = isOccupied ? 'bg-amber-500 text-amber-950 border-amber-600' : 'bg-white text-slate-800 border-slate-300 hover:border-amber-400';
-
-            return `
-                <div onclick="window.selectTable(${t.id})" class="btn-act ${bgClass} border-2 rounded-xl p-4 flex flex-col justify-between h-32 cursor-pointer shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <span class="font-extrabold text-sm">${t.name}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isOccupied ? 'bg-amber-900 text-amber-100' : 'bg-slate-100 text-slate-600'}">
-                            ${isOccupied ? 'Belegt' : 'Frei'}
-                        </span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] block opacity-75">Offen</span>
-                        <span class="font-black text-lg">${window.money(totalAmount)}</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    };
-
-    window.selectTable = function(tableId) {
-        const t = tables.find(x => x.id === tableId);
-        if(!t) return;
-
-        activeTableId = t.id;
-        cart = [...(t.cart || [])];
-        activeMember = members.find(m => m.id === t.memberId) || null;
-        
-        window.showPage('page-pos');
-    };
-
-    window.syncCurrentTableCart = function() {
-        if(!activeTableId) return;
-        const t = tables.find(x => x.id === activeTableId);
-        if(t) {
-            t.cart = [...cart];
-            t.status = cart.length > 0 ? 'occupied' : 'free';
-            localStorage.setItem("pos_tables", JSON.stringify(tables));
-        }
-    };
-
-    window.clearCurrentTableSelection = function() {
-        activeTableId = null;
-        cart = [];
-        window.renderCart();
-    };
-
-    window.openMemberSelectionModal = function() {
-        const query = prompt("Mitglied suchen (Name oder Mobilnummer):");
-        if(!query) return;
-
-        const found = members.find(m => 
-            m.name.toLowerCase().includes(query.toLowerCase()) || 
-            (m.phone && m.phone.includes(query))
-        );
-
-        if(found) {
-            activeMember = found;
-            if(activeTableId) {
-                const t = tables.find(x => x.id === activeTableId);
-                if(t) t.memberId = found.id;
-            }
-            window.renderCart();
-            alert(`Mitglied '${found.name}' zugewiesen. Guthaben: ${window.money(found.balance)}`);
-        } else {
-            alert("Kein Mitglied gefunden.");
-        }
-    };
-
-    window.detachMemberFromCart = function() {
-        activeMember = null;
-        window.renderCart();
-    };
-
-    window.handleSearchBarcode = function(e) {
-        if(e.key === "Enter") {
-            const term = e.target.value.trim();
-            if(!term) return;
-
-            const found = products.find(p => p.barcode === term || p.name.toLowerCase().includes(term.toLowerCase()));
-            if(found) {
-                window.showPage('page-pos');
-                window.addToCart(found.id);
-                e.target.value = "";
-            } else {
-                alert(`Kein Artikel mit Code/Name '${term}' gefunden.`);
-            }
-        }
-    };
-
-    window.openCheckoutModal = function() {
-        if(cart.length === 0) {
-            alert("Warenkorb ist leer.");
-            return;
-        }
-
-        const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-        const total = currentDiscount > 0 ? subtotal * (1 - (currentDiscount / 100)) : subtotal;
-        const pieces = cart.reduce((s, i) => s + i.qty, 0);
-
-        document.getElementById('modalPiecesHeader').textContent = `${pieces} Artikel im Warenkorb`;
-        document.getElementById('modalTotalAmount').textContent = window.money(total);
-        document.getElementById('checkoutModal').classList.remove('hidden');
-    };
-
-    window.closeCheckoutModal = function() {
-        document.getElementById('checkoutModal').classList.add('hidden');
-    };
-
-    window.setPaymentType = function(type) {
-        selectedPaymentType = type;
-        document.querySelectorAll('.pay-type-btn').forEach(btn => {
-            btn.classList.remove('border-2', 'border-amber-500', 'bg-amber-50', 'text-amber-900');
-            btn.classList.add('border', 'border-slate-300', 'text-slate-700');
-        });
-        const target = document.getElementById(`payBtn-${type}`);
-        if(target) {
-            target.classList.add('border-2', 'border-amber-500', 'bg-amber-50', 'text-amber-900');
-        }
-    };
-
-    window.finishOrder = function() {
-        const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-        const total = currentDiscount > 0 ? subtotal * (1 - (currentDiscount / 100)) : subtotal;
-
-        if(selectedPaymentType === 'konto') {
-            if(!activeMember) {
-                alert("Für Guthabenzahlung muss ein Mitglied zugewiesen sein.");
-                return;
-            }
-            if(activeMember.balance < total) {
-                alert(`Unzureichendes Guthaben! (Guthaben: ${window.money(activeMember.balance)})`);
-                return;
-            }
-            activeMember.balance -= total;
-            localStorage.setItem("pos_members", JSON.stringify(members));
-        }
-
-        const orderObj = {
-            id: "BON-" + Math.floor(1000 + Math.random() * 9000),
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            date: document.getElementById('currentDateStr').textContent,
-            items: [...cart],
-            total: total,
-            paymentType: selectedPaymentType,
-            tableId: activeTableId,
-            memberId: activeMember ? activeMember.id : null
-        };
-
-        orders.unshift(orderObj);
-        localStorage.setItem("pos_orders", JSON.stringify(orders));
-
-        if(activeTableId) {
-            const t = tables.find(x => x.id === activeTableId);
-            if(t) {
-                t.cart = [];
-                t.status = 'free';
-                t.memberId = null;
-            }
-            localStorage.setItem("pos_tables", JSON.stringify(tables));
-        }
-
-        window.clearCart();
-        window.closeCheckoutModal();
-        alert(`Bestellung ${orderObj.id} erfasst!`);
-    };
-
-    window.renderProductsTable = function() {
-        const search = document.getElementById('productSearchInput').value.toLowerCase();
-        const tbody = document.getElementById('productsTableBody');
-        if(!tbody) return;
-
-        const filtered = products.filter(p => 
-            p.name.toLowerCase().includes(search) || 
-            (p.barcode && p.barcode.includes(search)) ||
-            p.category.toLowerCase().includes(search)
-        );
-
-        if(filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Keine Produkte gefunden</td></tr>`;
-            return;
-        }
-
-        tbody.innerHTML = filtered.map(p => `
-            <tr class="hover:bg-slate-50">
-                <td class="p-3 font-mono font-bold text-slate-600">${p.barcode || '-'}</td>
-                <td class="p-3 font-bold text-slate-800">${window.escapeHtml(p.name)}</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 font-semibold text-slate-600">${p.category}</span></td>
-                <td class="p-3 text-right font-black text-slate-900">${window.money(p.price)}</td>
-                <td class="p-3 text-center space-x-2">
-                    <button onclick="window.openProductEditModal(${p.id})" class="text-amber-600 font-bold hover:underline">Bearbeiten</button>
-                    <button onclick="window.deleteProduct(${p.id})" class="text-rose-600 font-bold hover:underline">Löschen</button>
-                </td>
-            </tr>
-        `).join('');
-    };
-
-    window.openProductEditModal = function(id) {
-        const modal = document.getElementById('productModal');
-        if(id) {
-            const p = products.find(x => x.id === id);
-            if(!p) return;
-            document.getElementById('productModalTitle').textContent = "Produkt Bearbeiten";
-            document.getElementById('productFormId').value = p.id;
-            document.getElementById('productFormName').value = p.name;
-            document.getElementById('productFormPrice').value = p.price;
-            document.getElementById('productFormCategory').value = p.category;
-            document.getElementById('productFormBarcode').value = p.barcode || '';
-        } else {
-            document.getElementById('productModalTitle').textContent = "Neues Produkt Anlegen";
-            document.getElementById('productForm').reset();
-            document.getElementById('productFormId').value = '';
-        }
-        modal.classList.remove('hidden');
-    };
-
-    window.closeProductModal = function() {
-        document.getElementById('productModal').classList.add('hidden');
-    };
-
-    window.saveProductForm = function(e) {
-        e.preventDefault();
-        const idVal = document.getElementById('productFormId').value;
-        const name = document.getElementById('productFormName').value;
-        const price = parseFloat(document.getElementById('productFormPrice').value);
-        const category = document.getElementById('productFormCategory').value;
-        const barcode = document.getElementById('productFormBarcode').value;
-
-        if(idVal) {
-            const p = products.find(x => x.id === parseInt(idVal));
-            if(p) {
-                p.name = name;
-                p.price = price;
-                p.category = category;
-                p.barcode = barcode;
-            }
-        } else {
-            products.push({ id: Date.now(), name, price, category, barcode });
-        }
-
-        localStorage.setItem("pos_products", JSON.stringify(products));
-        window.closeProductModal();
-        window.renderProductsTable();
-        window.renderPosProducts();
-    };
-
-    window.deleteProduct = function(id) {
-        if(confirm("Produkt löschen?")) {
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem("pos_products", JSON.stringify(products));
-            window.renderProductsTable();
-            window.renderPosProducts();
-        }
-    };
-
-    window.renderMembersTable = function() {
-        const search = document.getElementById('memberSearchInput').value.toLowerCase();
-        const tbody = document.getElementById('membersTableBody');
-        if(!tbody) return;
-
-        const filtered = members.filter(m => 
-            m.name.toLowerCase().includes(search) || 
-            (m.phone && m.phone.includes(search))
-        );
-
-        if(filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Keine Mitglieder vorhanden</td></tr>`;
-            return;
-        }
-
-        tbody.innerHTML = filtered.map(m => `
-            <tr class="hover:bg-slate-50">
-                <td class="p-3 font-bold text-slate-800">${window.escapeHtml(m.name)}</td>
-                <td class="p-3 text-slate-600">${m.phone || '-'}</td>
-                <td class="p-3 text-right font-black text-amber-700">${window.money(m.balance)}</td>
-                <td class="p-3 text-center font-bold text-slate-700">${m.points || 0} Pkt</td>
-                <td class="p-3 text-center">
-                    <button onclick="window.openMemberEditModal(${m.id})" class="text-amber-600 font-bold hover:underline">Bearbeiten</button>
-                </td>
-            </tr>
-        `).join('');
-    };
-
-    window.openMemberEditModal = function(id) {
-        const modal = document.getElementById('memberModal');
-        if(id) {
-            const m = members.find(x => x.id === id);
-            if(!m) return;
-            document.getElementById('memberModalTitle').textContent = "Mitglied Bearbeiten";
-            document.getElementById('memberFormId').value = m.id;
-            document.getElementById('memberFormName').value = m.name;
-            document.getElementById('memberFormPhone').value = m.phone || '';
-            document.getElementById('memberFormBalance').value = m.balance;
-            document.getElementById('memberFormPoints').value = m.points || 0;
-        } else {
-            document.getElementById('memberModalTitle').textContent = "Neues Mitglied Anlegen";
-            document.getElementById('memberForm').reset();
-            document.getElementById('memberFormId').value = '';
-        }
-        modal.classList.remove('hidden');
-    };
-
-    window.closeMemberModal = function() {
-        document.getElementById('memberModal').classList.add('hidden');
-    };
-
-    window.saveMemberForm = function(e) {
-        e.preventDefault();
-        const idVal = document.getElementById('memberFormId').value;
-        const name = document.getElementById('memberFormName').value;
-        const phone = document.getElementById('memberFormPhone').value;
-        const balance = parseFloat(document.getElementById('memberFormBalance').value) || 0;
-        const points = parseInt(document.getElementById('memberFormPoints').value) || 0;
-
-        if(idVal) {
-            const m = members.find(x => x.id === parseInt(idVal));
+            const m = members.find(x => x.id === mId);
             if(m) {
-                m.name = name;
-                m.phone = phone;
-                m.balance = balance;
-                m.points = points;
+                m.credit += amt;
+                saveData();
+                openCustomerModal();
+                alert('Guthaben erfolgreich um ' + amt.toFixed(2) + ' € aufgeladen!');
             }
-        } else {
-            members.push({ id: Date.now(), name, phone, balance, points });
         }
 
-        localStorage.setItem("pos_members", JSON.stringify(members));
-        window.closeMemberModal();
-        window.renderMembersTable();
-    };
-
-    window.renderOrdersTable = function() {
-        const tbody = document.getElementById('ordersTableBody');
-        if(!tbody) return;
-
-        if(orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Keine Bons gefunden</td></tr>`;
-            return;
+        // Notizen Modal
+        function openProductNoteModal() {
+            const t = getCurrentTable();
+            if(selectedCartIndex === null || !t.cart[selectedCartIndex]) {
+                alert('Bitte zuerst einen Artikel im Bon anklicken!');
+                return;
+            }
+            document.getElementById('productNoteInput').value = t.cart[selectedCartIndex].note || '';
+            document.getElementById('modalNote').classList.remove('hidden');
         }
 
-        tbody.innerHTML = orders.map(o => `
-            <tr class="hover:bg-slate-50">
-                <td class="p-3 font-mono font-bold text-slate-700">${o.id}</td>
-                <td class="p-3 text-slate-600">${o.time}</td>
-                <td class="p-3 font-semibold">${o.tableId ? 'Tisch ' + o.tableId : 'Direktkasse'}</td>
-                <td class="p-3 capitalize font-bold text-slate-600">${o.paymentType}</td>
-                <td class="p-3 text-right font-black text-slate-900">${window.money(o.total)}</td>
-                <td class="p-3 text-center">
-                    <button onclick="window.printOrderReceipt('${o.id}')" class="btn-act text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded font-bold">🖨️ Bon</button>
-                </td>
-            </tr>
-        `).join('');
-    };
-
-    window.renderZReport = function() {
-        const totalRev = orders.reduce((s, o) => s + o.total, 0);
-        const count = orders.length;
-        const avg = count > 0 ? totalRev / count : 0;
-
-        const cash = orders.filter(o => o.paymentType === 'bar').reduce((s, o) => s + o.total, 0);
-        const card = orders.filter(o => o.paymentType === 'karte').reduce((s, o) => s + o.total, 0);
-        const member = orders.filter(o => o.paymentType === 'konto').reduce((s, o) => s + o.total, 0);
-
-        document.getElementById('zTotalRevenue').textContent = window.money(totalRev);
-        document.getElementById('zTotalCount').textContent = count;
-        document.getElementById('zAvgReceipt').textContent = window.money(avg);
-
-        document.getElementById('zCashTotal').textContent = window.money(cash);
-        document.getElementById('zCardTotal').textContent = window.money(card);
-        document.getElementById('zMemberTotal').textContent = window.money(member);
-    };
-
-    window.closeBusinessDay = function() {
-        if(confirm("Tagesabschluss durchführen und Bons leeren?")) {
-            orders = [];
-            localStorage.setItem("pos_orders", JSON.stringify(orders));
-            window.renderZReport();
-            alert("Tagesabschluss erfolgreich durchgeführt!");
+        function saveProductNote() {
+            const t = getCurrentTable();
+            if(selectedCartIndex !== null && t.cart[selectedCartIndex]) {
+                t.cart[selectedCartIndex].note = document.getElementById('productNoteInput').value;
+                renderCart();
+                saveData();
+            }
+            closeModal('modalNote');
         }
-    };
 
-    window.printOrderReceipt = function(orderId) {
-        const order = orders.find(o => o.id === orderId);
-        if(!order) return;
-
-        const receiptDiv = document.getElementById('printableReceipt');
-        receiptDiv.innerHTML = `
-            <div style="font-family: monospace; max-width: 300px; margin: auto;">
-                <h2 style="text-align: center;">KasseKat POS</h2>
-                <p style="text-align: center; font-size: 12px;">Beleg-Nr: ${order.id}</p>
-                <hr>
-                <p>Datum/Zeit: ${order.date || '29.10'} ${order.time}</p>
-                <hr>
-                ${order.items.map(i => `
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>${i.qty}x ${i.name}</span>
-                        <span>${window.money(i.price * i.qty)}</span>
-                    </div>
-                `).join('')}
-                <hr>
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px;">
-                    <span>TOTAL:</span>
-                    <span>${window.money(order.total)}</span>
-                </div>
-                <p style="font-size: 12px;">Zahlart: ${order.paymentType.toUpperCase()}</p>
-            </div>
-        `;
-        window.print();
-    };
-
-    window.saveSystemSettings = function() {
-        const newDate = document.getElementById('settingBusinessDate').value;
-        document.getElementById('currentDateStr').textContent = newDate;
-        alert("Einstellungen gespeichert.");
-    };
-
-    window.resetAllDemoData = function() {
-        if(confirm("Alle Daten auf Demozustand zurücksetzen?")) {
-            localStorage.clear();
-            products = defaultProducts;
-            members = defaultMembers;
-            tables = defaultTables;
-            orders = [];
-            location.reload();
+        // Rabatt Modal
+        function openDiscountModal() {
+            document.getElementById('discountPercentInput').value = '';
+            document.getElementById('modalDiscount').classList.remove('hidden');
         }
-    };
 
-    window.addEventListener('keydown', (e) => {
-        const activeElem = document.activeElement;
-        if (activeElem && activeElem.tagName === 'INPUT') return;
-
-        if (e.key >= '0' && e.key <= '9') {
-            window.numpadInput(e.key);
-        } else if (e.key === 'Backspace') {
-            window.numpadBackspace();
-        } else if (e.key === 'Enter') {
-            window.applyCustomNumpadQty();
-        } else if (e.key === 'c' || e.key === 'C') {
-            window.clearNumpadOrCart();
+        function applyDiscount() {
+            const pct = parseFloat(document.getElementById('discountPercentInput').value);
+            if(isNaN(pct) || pct < 0 || pct > 100) { alert('Ungültiger Rabatt!'); return; }
+            discountMultiplier = 1.0 - (pct / 100.0);
+            const t = getCurrentTable();
+            calcTableSum(t);
+            renderCart();
+            closeModal('modalDiscount');
         }
-    });
 
-    window.onload = function() {
-        window.showPage('page-dashboard');
-    };
+        // Checkout / Bezahlen Modal
+        function checkoutOrder() {
+            const t = getCurrentTable();
+            if(t.cart.length === 0) { alert('Warenkorb ist leer!'); return; }
+            document.getElementById('checkoutTotalText').textContent = 'Gesamt: ' + t.sum.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('cashGiven').value = t.sum.toFixed(2);
+            calcChange();
+            document.getElementById('modalCheckout').classList.remove('hidden');
+        }
 
-})();
-</script>
+        function toggleCashInput() {
+            const method = document.getElementById('payMethod').value;
+            document.getElementById('cashInputGroup').style.display = method === 'bar' ? 'block' : 'none';
+        }
+
+        function calcChange() {
+            const t = getCurrentTable();
+            const given = parseFloat(document.getElementById('cashGiven').value) || 0;
+            const change = given - t.sum;
+            document.getElementById('changeAmountText').textContent = 'Rückgeld: ' + (change >= 0 ? change.toFixed(2).replace('.', ',') + ' €' : 'Zu wenig!');
+        }
+
+        function confirmPayment() {
+            alert('Bezahlung erfolgreich abgeschlossen! Bon wurde gedruckt.');
+            releaseTable();
+            closeModal('modalCheckout');
+        }
+
+        // Produktverwaltung
+        function renderProductsTable() {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.barcode}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.category}</td>
+                    <td>${p.price.toFixed(2).replace('.', ',')} €</td>
+                    <td>
+                        <span class="action-link" onclick="openProductModal(${p.id})">Bearbeiten</span>
+                        <span class="action-link delete" onclick="deleteProduct(${p.id})">Löschen</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterProductsTable(query) {
+            const rows = document.querySelectorAll('#productsTableBody tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        function openProductModal(id = null) {
+            document.getElementById('editProdId').value = id || '';
+            if(id) {
+                const p = products.find(x => x.id === id);
+                document.getElementById('productModalTitle').textContent = 'Produkt bearbeiten';
+                document.getElementById('prodName').value = p.name;
+                document.getElementById('prodBarcode').value = p.barcode;
+                document.getElementById('prodCategory').value = p.category;
+                document.getElementById('prodPrice').value = p.price;
+            } else {
+                document.getElementById('productModalTitle').textContent = 'Neues Produkt anlegen';
+                document.getElementById('prodName').value = '';
+                document.getElementById('prodBarcode').value = '400' + Math.floor(Math.random()*900+100);
+                document.getElementById('prodCategory').value = 'Getränke';
+                document.getElementById('prodPrice').value = '';
+            }
+            document.getElementById('modalProduct').classList.remove('hidden');
+        }
+
+        function saveProductData() {
+            const id = document.getElementById('editProdId').value;
+            const name = document.getElementById('prodName').value;
+            const barcode = document.getElementById('prodBarcode').value;
+            const category = document.getElementById('prodCategory').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+
+            if(!name || isNaN(price)) { alert('Bitte alle Pflichtfelder ausfüllen.'); return; }
+
+            if(id) {
+                const p = products.find(x => x.id == id);
+                p.name = name; p.barcode = barcode; p.category = category; p.price = price;
+            } else {
+                products.push({ id: Date.now(), name, barcode, category, price });
+            }
+            saveData();
+            closeModal('modalProduct');
+            renderProductsTable();
+        }
+
+        function deleteProduct(id) {
+            if(confirm('Produkt wirklich löschen?')) {
+                products = products.filter(x => x.id !== id);
+                saveData();
+                renderProductsTable();
+            }
+        }
+
+        // Mitgliederverwaltung
+        function renderMembersTable() {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = members.map(m => `
+                <tr>
+                    <td><strong>${m.name}</strong></td>
+                    <td>${m.phone}</td>
+                    <td>${m.credit.toFixed(2).replace('.', ',')} €</td>
+                    <td>${m.points} Pkt</td>
+                    <td><span class="action-link" onclick="alert('Mitglied bearbeiten')">Bearbeiten</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function filterMembersTable(query) {
+            const rows = document.querySelectorAll('#membersTableBody tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        function openMemberModal() {
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPhone').value = '';
+            document.getElementById('modalMember').classList.remove('hidden');
+        }
+
+        function saveMemberData() {
+            const name = document.getElementById('memberName').value;
+            const phone = document.getElementById('memberPhone').value;
+            if(!name) { alert('Name ist erforderlich.'); return; }
+            members.push({ id: Date.now(), name, phone: phone || '-', credit: 0.0, points: 0 });
+            saveData();
+            closeModal('modalMember');
+            renderMembersTable();
+        }
+
+        // Z-Bon
+        function renderZBon() {
+            const content = document.getElementById('zbonContent');
+            const totalSum = tables.reduce((acc, t) => acc + t.sum, 0);
+            content.innerHTML = `
+                ================================<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KASSEKAT TAGESABSCHLUSS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                ================================<br>
+                Datum: 29.10.2026 - 21:15 Uhr<br>
+                Geschäftstag: 29.10<br>
+                --------------------------------<br>
+                Gesamtumsatz (Brutto): ${totalSum.toFixed(2).replace('.', ',')} €<br>
+                Bar-Einnahmen: ${totalSum.toFixed(2).replace('.', ',')} €<br>
+                EC-Karten Umsätze: 0,00 €<br>
+                Guthaben Abchuchungen: 0,00 €<br>
+                --------------------------------<br>
+                Anzahl Tische belegt: ${tables.filter(t=>t.occupied).length}<br>
+                ================================<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z-BON ERFOLGREICH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                ================================
+            `;
+        }
+
+        // Kamera Barcode Scanner
+        function openCameraScanner(target = 'pos') {
+            activeScannerTarget = target;
+            document.getElementById('modalScanner').classList.remove('hidden');
+            const video = document.getElementById('scannerVideo');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    scannerStream = stream;
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    document.getElementById('scannerStatus').textContent = 'Kamera nicht verfügbar.';
+                });
+        }
+
+        function closeCameraScanner() {
+            if(scannerStream) {
+                scannerStream.getTracks().forEach(t => t.stop());
+            }
+            document.getElementById('modalScanner').classList.add('hidden');
+        }
+
+        function scanBarcodeIntoProductForm() {
+            openCameraScanner('productForm');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function saveData() {
+            localStorage.setItem('k_products', JSON.stringify(products));
+            localStorage.setItem('k_members', JSON.stringify(members));
+            localStorage.setItem('k_tables', JSON.stringify(tables));
+        }
+
+        // Start auf Dashboard
+        switchView('dashboard');
+    </script>
 </body>
 </html>
