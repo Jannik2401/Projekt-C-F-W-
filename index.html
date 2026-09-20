@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KasseKat POS - Komplettsystem</title>
+    <title>KasseKat POS - Komplettsystem mit Trinkgeld & Numpad</title>
     <style>
         :root {
             --bg-grid: #e4e7eb;
@@ -201,7 +201,6 @@
             flex-shrink: 0;
         }
 
-        /* Warenkorb mit echtem Scrollen */
         .cart-items {
             flex: 1;
             overflow-y: auto;
@@ -659,7 +658,7 @@
                         <div class="warning-day">⚠️ Geschäftstag: 29.10</div>
 
                         <div class="total-box">
-                            <span class="total-box-label">Eingabe / Betrag</span>
+                            <span class="total-box-label" id="numpadBoxLabel">Gesamt / Eingabe</span>
                             <div id="numpadInputDisplay" class="total-box-value">0,00 €</div>
                         </div>
 
@@ -831,12 +830,13 @@
         </div>
     </div>
 
-    <!-- Checkout Modal -->
+    <!-- Checkout Modal mit Trinkgeld -->
     <div id="modalCheckout" class="modal-overlay hidden">
-        <div class="modal-box">
+        <div class="modal-box" style="width: 460px;">
             <div class="modal-title">Bezahlung abschließen</div>
             <div class="modal-body">
-                <div style="font-size: 18px; font-weight: bold; margin-bottom: 14px; text-align:center;" id="checkoutTotalText">Gesamt: 0,00 €</div>
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; text-align:center;" id="checkoutTotalText">Warenwert: 0,00 €</div>
+                
                 <div class="form-group">
                     <label>Zahlungsart wählen:</label>
                     <select id="payMethod" onchange="togglePaymentInputs()">
@@ -845,12 +845,32 @@
                         <option value="guthaben">Guthaben abbuchen</option>
                     </select>
                 </div>
+
+                <!-- Trinkgeld Auswahl -->
+                <div class="form-group">
+                    <label>Trinkgeld hinzufügen:</label>
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                        <button type="button" class="btn-primary" style="flex:1; padding:6px; font-size:12px; background:#e2e8f0; color:#334155;" onclick="setTip(0)">0 €</button>
+                        <button type="button" class="btn-primary" style="flex:1; padding:6px; font-size:12px;" onclick="setTipPercent(5)">5%</button>
+                        <button type="button" class="btn-primary" style="flex:1; padding:6px; font-size:12px;" onclick="setTipPercent(10)">10%</button>
+                        <button type="button" class="btn-primary" style="flex:1; padding:6px; font-size:12px;" onclick="setTipPercent(15)">15%</button>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <input type="number" id="tipAmountInput" step="0.50" placeholder="Trinkgeld in €" oninput="updateFinalCheckoutSum()" style="flex:1;">
+                    </div>
+                </div>
+
+                <div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:14px; text-align:right; font-size:16px; font-weight:bold; color:#1e3a8a;" id="checkoutFinalSumText">
+                    Endsumme inkl. Trinkgeld: 0,00 €
+                </div>
+
                 <!-- Bar Input -->
                 <div class="form-group" id="cashInputGroup">
                     <label>Gegeben (€):</label>
                     <input type="number" id="cashGiven" step="0.01" oninput="calcChange()">
                     <div style="margin-top: 8px; font-weight: bold; color: #16a34a;" id="changeAmountText">Rückgeld: 0,00 €</div>
                 </div>
+
                 <!-- Guthaben Kunden-Auswahl -->
                 <div class="form-group hidden" id="creditInputGroup">
                     <label>Kundenkonto wählen:</label>
@@ -1035,7 +1055,6 @@
             { id: 10, name: "Chai Latte", price: 3.90, category: "Kaffee", barcode: "4001100000102" },
             { id: 11, name: "Frischer Minztee", price: 3.20, category: "Kaffee", barcode: "4001100000119" },
             { id: 12, name: "Earl Grey Tee", price: 2.80, category: "Kaffee", barcode: "4001100000126" },
-            { id: 13, name: "Grüner Tee", price: 2.80, category: "Kaffee", barcode: "4001100000133" },
             { id: 21, name: "Mineralwasser 0.5l", price: 2.50, category: "Getränke", barcode: "4001100000218" },
             { id: 23, name: "Cola 0.33l", price: 2.90, category: "Getränke", barcode: "4001100000232" },
             { id: 41, name: "Flammkuchen Classic", price: 8.90, category: "Speisen", barcode: "4001100000416" },
@@ -1125,7 +1144,7 @@
             }
         }
 
-        // Numpad Logik
+        // Numpad Logik & Live-Gesamtsummenanzeige
         function pressNum(val) {
             numpadBuffer += val;
             updateNumpadDisplay();
@@ -1143,11 +1162,17 @@
 
         function updateNumpadDisplay() {
             const display = document.getElementById('numpadInputDisplay');
-            if(numpadBuffer === '') {
-                display.textContent = '0,00 €';
-            } else {
+            const label = document.getElementById('numpadBoxLabel');
+            const t = getCurrentTable();
+            const cartSum = t.cart.reduce((acc, item) => acc + (item.price * item.qty), 0) * discountMultiplier;
+
+            if(numpadBuffer !== '') {
                 let num = parseInt(numpadBuffer) / 100;
                 display.textContent = num.toFixed(2).replace('.', ',') + ' €';
+                label.textContent = 'Eingabe (Betrag)';
+            } else {
+                display.textContent = cartSum.toFixed(2).replace('.', ',') + ' €';
+                label.textContent = 'Endsumme';
             }
         }
 
@@ -1212,7 +1237,6 @@
             if(numpadBuffer !== '') {
                 qtyToAdd = parseInt(numpadBuffer) || 1;
                 numpadBuffer = '';
-                updateNumpadDisplay();
             }
 
             const t = getCurrentTable();
@@ -1225,6 +1249,7 @@
             t.occupied = true;
             calcTableSum(t);
             renderCart();
+            updateNumpadDisplay();
             saveData();
         }
 
@@ -1241,6 +1266,7 @@
                     <div style="text-align:right;">${(item.price * item.qty * discountMultiplier).toFixed(2).replace('.', ',')} €</div>
                 </div>
             `).join('');
+            updateNumpadDisplay();
         }
 
         function selectCartRow(idx) {
@@ -1321,12 +1347,17 @@
             }
         }
 
-        // Checkout / Bezahlen Modal & Guthaben Kunden-Liste
+        // Checkout / Bezahlen Modal mit Trinkgeld Logik
+        let currentCheckoutBaseSum = 0;
+
         function checkoutOrder() {
             const t = getCurrentTable();
             if(t.cart.length === 0) { alert('Warenkorb ist leer!'); return; }
-            document.getElementById('checkoutTotalText').textContent = 'Gesamt: ' + t.sum.toFixed(2).replace('.', ',') + ' €';
-            document.getElementById('cashGiven').value = t.sum.toFixed(2);
+            currentCheckoutBaseSum = t.sum;
+            
+            document.getElementById('checkoutTotalText').textContent = 'Warenwert: ' + currentCheckoutBaseSum.toFixed(2).replace('.', ',') + ' €';
+            document.getElementById('tipAmountInput').value = '0.00';
+            document.getElementById('cashGiven').value = currentCheckoutBaseSum.toFixed(2);
             
             // Kunden Dropdown befüllen
             const custSelect = document.getElementById('checkoutCustomerSelect');
@@ -1334,8 +1365,32 @@
             
             document.getElementById('payMethod').value = 'bar';
             togglePaymentInputs();
-            calcChange();
+            updateFinalCheckoutSum();
             document.getElementById('modalCheckout').classList.remove('hidden');
+        }
+
+        function setTip(val) {
+            document.getElementById('tipAmountInput').value = val.toFixed(2);
+            updateFinalCheckoutSum();
+        }
+
+        function setTipPercent(pct) {
+            let tip = currentCheckoutBaseSum * (pct / 100);
+            document.getElementById('tipAmountInput').value = tip.toFixed(2);
+            updateFinalCheckoutSum();
+        }
+
+        function updateFinalCheckoutSum() {
+            let tip = parseFloat(document.getElementById('tipAmountInput').value) || 0;
+            let finalSum = currentCheckoutBaseSum + tip;
+            document.getElementById('checkoutFinalSumText').textContent = 'Endsumme inkl. Trinkgeld: ' + finalSum.toFixed(2).replace('.', ',') + ' €';
+            
+            // Auto-update cash given default if bar
+            const method = document.getElementById('payMethod').value;
+            if(method === 'bar') {
+                document.getElementById('cashGiven').value = finalSum.toFixed(2);
+                calcChange();
+            }
         }
 
         function togglePaymentInputs() {
@@ -1343,6 +1398,7 @@
             document.getElementById('cashInputGroup').style.display = method === 'bar' ? 'block' : 'none';
             document.getElementById('creditInputGroup').style.display = method === 'guthaben' ? 'block' : 'none';
             if(method === 'guthaben') updateCheckoutCustomerBalance();
+            updateFinalCheckoutSum();
         }
 
         function updateCheckoutCustomerBalance() {
@@ -1354,41 +1410,47 @@
         }
 
         function calcChange() {
-            const t = getCurrentTable();
+            let tip = parseFloat(document.getElementById('tipAmountInput').value) || 0;
+            let finalSum = currentCheckoutBaseSum + tip;
             const given = parseFloat(document.getElementById('cashGiven').value) || 0;
-            const change = given - t.sum;
+            const change = given - finalSum;
             document.getElementById('changeAmountText').textContent = 'Rückgeld: ' + (change >= 0 ? change.toFixed(2).replace('.', ',') + ' €' : 'Zu wenig!');
         }
 
         function confirmPayment() {
             const t = getCurrentTable();
             const method = document.getElementById('payMethod').value;
+            let tip = parseFloat(document.getElementById('tipAmountInput').value) || 0;
+            let finalSum = currentCheckoutBaseSum + tip;
 
             if(method === 'guthaben') {
                 const mId = parseInt(document.getElementById('checkoutCustomerSelect').value);
                 const m = members.find(x => x.id === mId);
                 if(m) {
-                    if(m.credit < t.sum) {
+                    if(m.credit < finalSum) {
                         alert('Fehler: Der Kunde hat nicht genügend Guthaben!');
                         return;
                     }
-                    m.credit -= t.sum;
+                    m.credit -= finalSum;
                 }
             }
 
             // Umsatz für Mitarbeiter speichern & protokollieren
-            currentStaff.salesTotal += t.sum;
-            if(method === 'bar') currentStaff.cashExpected += t.sum;
+            currentStaff.salesTotal += finalSum;
+            if(method === 'bar') currentStaff.cashExpected += finalSum;
+
+            let methodText = method === 'bar' ? 'Barzahlung' : (method === 'karte' ? 'EC / Karte' : 'Guthaben');
+            if(tip > 0) methodText += ` (inkl. ${tip.toFixed(2)} € Trinkgeld)`;
 
             salesProtocol.unshift({
                 time: new Date().toLocaleDateString() + ' - ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 staff: currentStaff.name,
-                total: t.sum,
-                method: method === 'bar' ? 'Barzahlung' : (method === 'karte' ? 'EC / Karte' : 'Guthaben')
+                total: finalSum,
+                method: methodText
             });
 
             saveData();
-            alert('Bezahlung erfolgreich abgeschlossen durch ' + currentStaff.name + '!');
+            alert('Bezahlung von ' + finalSum.toFixed(2) + ' € erfolgreich abgeschlossen!');
             releaseTable();
             closeModal('modalCheckout');
         }
